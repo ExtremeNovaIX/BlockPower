@@ -1,0 +1,35 @@
+# 必填 - 指定mod加载器类型
+modLoader="javafml"
+# 必填 - 指定Forge加载器版本范围，通常跟随Minecraft版本更新
+loaderVersion="[47,)"
+# 必填 - 模组许可证
+license="All rights reserved"
+
+[[mods]] # 必填 - 开始定义模组
+# 必填 - 模组ID，必须与@Mod注解中的值一致
+modId="blockpower"
+# 必填 - 模组版本
+version="0.1.0"
+# 必填 - 模组显示名称
+displayName="Block Power"
+# 可选 - 模组作者
+authors="K2536,ExtremaNovaIX,LJH"
+# 必填 - 模组描述
+description='''一个致力于为我的世界添加更加多样的连招系统的模组'''
+
+# 定义模组依赖
+[[dependencies.blockpower]]
+    # 必填 - 依赖Forge
+    modId="forge"
+    mandatory=true
+    versionRange="[47,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.blockpower]]
+    # 必填 - 依赖Minecraft
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1]"
+    ordering="NONE"
+    side="BOTH"
