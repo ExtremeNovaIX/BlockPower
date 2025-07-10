@@ -14,6 +14,4 @@ public class KeyBindings {
             InputConstants.KEY_R,//按键绑定
             BLOCKPOWER_KEY
     );
-
-
 }

@@ -29,7 +29,11 @@ public class Rush_Minecart extends AbstractMinecart {
 
     private ServerPlayer player;
 
-    protected Rush_Minecart(EntityType<?> entityType, Level level, double x, double y, double z,ServerPlayer player) {
+    private int cooldownTicks = 0; //无法挣脱的计时器
+
+    private static final int COOLDOWN_DURATION = 100; //无法挣脱的持续时间
+
+    protected Rush_Minecart(EntityType<?> entityType, Level level, double x, double y, double z, ServerPlayer player) {
         super(entityType, level, x, y, z);
         this.player = player;
     }
@@ -45,7 +49,7 @@ public class Rush_Minecart extends AbstractMinecart {
                 player.getX() + lookAngle.x * distance,
                 player.getY() - 0.5,
                 player.getZ() + lookAngle.z * distance
-                ,player
+                , player
         );
 
         //设置矿车的速度和方向
@@ -78,6 +82,12 @@ public class Rush_Minecart extends AbstractMinecart {
         player.startRiding(minecart);
     }
 
+    /**
+     * 检测半径内的非乘坐者实体
+     *
+     * @param player 释放技能的玩家
+     * @return 半径内的非乘坐者和非自身实体列表
+     */
     private List<Entity> detectEntity(@NotNull ServerPlayer player) {
         //创建一个半径为radius的检测区域
         double radius = 2;
@@ -100,6 +110,11 @@ public class Rush_Minecart extends AbstractMinecart {
         );
     }
 
+    /**
+     * 伤害撞到的实体
+     *
+     * @param player 释放技能的玩家
+     */
     private void hurtEntity(@NotNull ServerPlayer player) {
         List<Entity> entities = detectEntity(player);
         if (!entities.isEmpty()) {
@@ -119,10 +134,31 @@ public class Rush_Minecart extends AbstractMinecart {
                 entity.setPos(this.getX(), this.getY() + this.getPassengersRidingOffset() + entity.getMyRidingOffset(), this.getZ());
             }
         }
-        //伤害撞到的实体
-        if (this.player != null) {
-            hurtEntity(this.player);
+
+        // 更新冷却计时器
+        if (cooldownTicks > 0) {
+            cooldownTicks--;
         }
+
+        if (this.player != null) {
+            //如果技能释放者在矿车上，那么伤害撞到的实体
+            if (this.player.isPassenger()) {
+                hurtEntity(this.player);
+            } else {
+                //如果技能释放者不在矿车上，那么让碰撞到的第一个实体强制骑乘矿车并在一段时间内无法挣脱
+                List<Entity> entities = detectEntity(this.player);
+                if (!entities.isEmpty()) {
+                    entities.get(0).startRiding(this);
+                    cooldownTicks = COOLDOWN_DURATION;
+                }
+            }
+        }
+    }
+
+
+    @Override
+    public boolean canRiderInteract() {
+        return cooldownTicks <= 0; // 冷却期间禁止下车
     }
 
     @Override
