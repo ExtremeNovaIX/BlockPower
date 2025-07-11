@@ -31,12 +31,8 @@ public class FakeRailRenderer extends EntityRenderer<FakeRailEntity> {
 
         poseStack.pushPose();
 
-        //移动到旋转中心
-        poseStack.translate(0.5D, 0.0D, 0.5D);
-        //绕Y轴旋转
         poseStack.mulPose(Axis.YP.rotationDegrees(-yRot + 90));
-        //从旋转中心移回
-        poseStack.translate(-0.5D, 0.0D, -0.5D);
+        poseStack.translate(-0.5D, 0, -0.5D);
 
         this.blockRenderer.renderSingleBlock(railState, poseStack, buffer, packedLight, OverlayTexture.NO_OVERLAY);
 

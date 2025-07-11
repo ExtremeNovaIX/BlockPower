@@ -66,17 +66,39 @@ public class RushMinecartEntity extends AbstractMinecart {
 
     private void handleTrailSpawning() {
         Vec3 currentPos = this.position();
-
-        //检查与上一个生成点的距离是否大于等于1
-        if (lastRailPlacementPos.equals(Vec3.ZERO) || currentPos.distanceToSqr(lastRailPlacementPos) >= 1.0D) {
-
-            //生成一个新的 FakeRailEntity
-            FakeRailEntity fakeRail = new FakeRailEntity(this.level(), this.getX(), this.getY(), this.getZ(), this.getYRot());
-            this.level().addFreshEntity(fakeRail);
-
-            //更新记录点
-            this.lastRailPlacementPos = currentPos;
+        // 第一次生成时，直接在脚下生成一个并设置记录点
+        if (lastRailPlacementPos.equals(Vec3.ZERO)) {
+            spawnRailAt(currentPos);
+            lastRailPlacementPos = currentPos;
+            return;
         }
+
+        Vec3 moveVector = currentPos.subtract(lastRailPlacementPos);
+        double moveDistance = moveVector.length();
+
+        // 如果移动距离大于等于1个方块，就需要填充
+        if (moveDistance >= 1.0D) {
+            Vec3 moveDirection = moveVector.normalize();
+            // 计算需要填充多少个铁轨
+            int segmentsToSpawn = (int) Math.floor(moveDistance);
+
+            // 循环填充空隙
+            for (int i = 1; i <= segmentsToSpawn; i++) {
+                Vec3 spawnPos = lastRailPlacementPos.add(moveDirection.scale(i));
+                spawnRailAt(spawnPos);
+            }
+
+            // 更新记录点，只加上已经填充过的整数距离
+            lastRailPlacementPos = lastRailPlacementPos.add(moveDirection.scale(segmentsToSpawn));
+        }
+    }
+
+    // 将生成逻辑提取为一个辅助方法，方便调用
+    private void spawnRailAt(Vec3 pos) {
+        // 此处的YAW直接用当前的YAW，效果已经很好。
+        // 如果需要更平滑的转向，可以记录上一次的YAW进行插值，但目前没有必要。
+        FakeRailEntity fakeRail = new FakeRailEntity(this.level(), pos.x(), pos.y(), pos.z(), this.getYRot());
+        this.level().addFreshEntity(fakeRail);
     }
 
     private void handleRushMinecart() {

@@ -27,7 +27,7 @@ public class ModEntities {
             ENTITY_TYPES.register("rush_minecart",
                     () -> EntityType.Builder.<RushMinecartEntity>of(RushMinecartEntity::new, MobCategory.MISC)
                             .sized(0.98F, 0.7F)
-                            .clientTrackingRange(8) // 客户端追踪范围
+                            .clientTrackingRange(32) // 客户端追踪范围
                             .updateInterval(3) // 更新间隔
                             .build("rush_minecart"));
 }
