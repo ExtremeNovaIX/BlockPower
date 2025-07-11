@@ -1,6 +1,7 @@
 package BlockPower.Entities.RushMinecart;
 
 import BlockPower.Entities.FakeRail.FakeRailEntity;
+import BlockPower.Main.Main;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -19,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+
+import static BlockPower.Main.Main.sendDebugMessage;
 
 public class RushMinecartEntity extends AbstractMinecart {
 
@@ -93,10 +96,7 @@ public class RushMinecartEntity extends AbstractMinecart {
         }
     }
 
-    // 将生成逻辑提取为一个辅助方法，方便调用
     private void spawnRailAt(Vec3 pos) {
-        // 此处的YAW直接用当前的YAW，效果已经很好。
-        // 如果需要更平滑的转向，可以记录上一次的YAW进行插值，但目前没有必要。
         FakeRailEntity fakeRail = new FakeRailEntity(this.level(), pos.x(), pos.y(), pos.z(), this.getYRot());
         this.level().addFreshEntity(fakeRail);
     }
@@ -118,12 +118,16 @@ public class RushMinecartEntity extends AbstractMinecart {
             Vec3 motion = this.getDeltaMovement();
             this.setDeltaMovement(new Vec3(motion.x, 0, motion.z));
         } else {
-            //如果技能释放者不在矿车上，那么让碰撞到的第一个实体强制骑乘矿车并在一段时间内无法挣脱
-            List<Entity> entities = detectEntity(this.player, 5);
-            if (!entities.isEmpty() && rideFlag) {
-                entities.get(0).startRiding(this);
-                cooldownTicks = COOLDOWN_DURATION;
-                rideFlag = false;
+            if (rideFlag) {//初始化过后（rideFlag被设为true），开始执行逻辑
+                //如果技能释放者不在矿车上，那么让碰撞到的第一个实体强制骑乘矿车并在一段时间内无法挣脱
+                List<Entity> entities = detectEntity(this.player, 5);
+                if (!entities.isEmpty()) {
+                    entities.get(0).startRiding(this);
+                    sendDebugMessage((ServerPlayer) player, String.valueOf(cooldownTicks));
+                    cooldownTicks = COOLDOWN_DURATION;
+                    sendDebugMessage((ServerPlayer) player, String.valueOf(cooldownTicks));
+                    rideFlag = false;
+                }
             }
             //模拟重力和阻力
             this.setDeltaMovement(this.getDeltaMovement()
