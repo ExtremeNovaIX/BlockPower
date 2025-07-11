@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import static BlockPower.Main.Main.sendDebugMessage;
+import static BlockPower.Util.ScreenShake.ScreenShakeHandler.shakeTrigger;
 
 public class RushMinecartEntity extends AbstractMinecart {
 
@@ -123,9 +124,7 @@ public class RushMinecartEntity extends AbstractMinecart {
                 List<Entity> entities = detectEntity(this.player, 5);
                 if (!entities.isEmpty()) {
                     entities.get(0).startRiding(this);
-                    sendDebugMessage((ServerPlayer) player, String.valueOf(cooldownTicks));
                     cooldownTicks = COOLDOWN_DURATION;
-                    sendDebugMessage((ServerPlayer) player, String.valueOf(cooldownTicks));
                     rideFlag = false;
                 }
             }
@@ -212,6 +211,8 @@ public class RushMinecartEntity extends AbstractMinecart {
         List<Entity> entities = detectEntity(player, 2);
         if (!entities.isEmpty()) {
             entities.forEach(entity -> entity.hurt(this.level().damageSources().magic(), 20.0F));
+            //触发屏幕震动并线性衰减
+            shakeTrigger(20, 1f,0.9f);
         }
     }
 

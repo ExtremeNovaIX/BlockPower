@@ -46,7 +46,7 @@ public class PlayerActionPacket_C2S {
                     // 执行“矿车冲刺”操作
                     LOGGER.info("服务端受到指令：MINECART_RUSH");
                     if (player != null) {
-                            createRushMinecart(player);
+                        createRushMinecart(player);
                     }
                     break;
             }
