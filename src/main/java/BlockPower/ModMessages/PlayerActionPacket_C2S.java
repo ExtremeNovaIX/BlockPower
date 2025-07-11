@@ -8,8 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
-import static BlockPower.Entities.Rush_Minecart.createRushMinecart;
-import static BlockPower.Main.Main.sendDebugMessage;
+import static BlockPower.Entities.RushMinecart.RushMinecartEntity.createRushMinecart;
 
 // 通用数据包类
 // 用于定义客户端和服务端之间的通用数据包类型
@@ -47,7 +46,6 @@ public class PlayerActionPacket_C2S {
                     // 执行“矿车冲刺”操作
                     LOGGER.info("服务端受到指令：MINECART_RUSH");
                     if (player != null) {
-                        sendDebugMessage(player, "服务端收到指令：MINECART_RUSH");
                             createRushMinecart(player);
                     }
                     break;

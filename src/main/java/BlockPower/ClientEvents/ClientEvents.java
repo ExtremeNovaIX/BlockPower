@@ -1,16 +1,19 @@
 package BlockPower.ClientEvents;
 
+import BlockPower.Entities.FakeRail.FakeRailRenderer;
+import BlockPower.Entities.ModEntities;
+import BlockPower.Entities.RushMinecart.RushMinecartRenderer;
 import BlockPower.KeyBindings.KeyBindings;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.swing.text.JTextComponent;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
@@ -39,5 +42,11 @@ public class ClientEvents {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void onRenderRegister(final EntityRenderersEvent.RegisterRenderers event) {
+        EntityRenderers.register(ModEntities.FAKE_RAIL_ENTITY.get(), FakeRailRenderer::new);
+        EntityRenderers.register(ModEntities.RUSH_MINECART.get(), RushMinecartRenderer::new);
     }
 }

@@ -1,5 +1,6 @@
 package BlockPower.Main;
 
+import BlockPower.Entities.ModEntities;
 import BlockPower.ModMessages.ModMessages;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -23,6 +24,7 @@ public class Main {
         //不要管这个报错，它是正常的
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         //注册事件总线
+        ModEntities.ENTITY_TYPES.register(modEventBus);
         MinecraftForge.EVENT_BUS.register(this);
         ModMessages.register();
 
