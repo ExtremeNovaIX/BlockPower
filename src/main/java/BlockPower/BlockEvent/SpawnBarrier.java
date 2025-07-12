@@ -3,6 +3,7 @@ package BlockPower.BlockEvent;
 import net.minecraft.core.BlockPos;
 // 修正导入正确的Level类
 import net.minecraft.world.level.Level;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 
 public class SpawnBarrier {
     public static void spawnBarrier(Level level, BlockPos center, float yaw, int radius, int height, net.minecraft.world.level.block.Block block) {
@@ -20,9 +21,12 @@ public class SpawnBarrier {
             // 使用修正后的三角函数计算坐标
             int x = center.getX() + (int) (radius * Math.cos(angle));
             int z = center.getZ() + (int) (radius * Math.sin(angle));
-            for (int y = -2; y < height; y++) {
+            for (int y = -2; y < height+2; y++) {
+
                 BlockPos pos = new BlockPos(x, center.getY() + y, z);
-                level.setBlock(pos, block.defaultBlockState(), 3);
+                if (level.isEmptyBlock(pos)) {
+                    level.setBlock(pos, block.defaultBlockState(), 3);
+                }
             }
         }
     }
