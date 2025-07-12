@@ -2,6 +2,9 @@ package BlockPower.ModMessages;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.thread.BlockableEventLoop;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.network.NetworkEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.function.Supplier;
 
 import static BlockPower.Entities.RushMinecart.RushMinecartEntity.createRushMinecart;
+import static BlockPower.BlockEvent.SpawnBarrier.spawnBarrier;
 
 // 通用数据包类
 // 用于定义客户端和服务端之间的通用数据包类型
@@ -49,6 +53,13 @@ public class PlayerActionPacket_C2S {
                         createRushMinecart(player);
                     }
                     break;
+                case SPAWN_BARRIER:
+                    LOGGER.info("服务端受到指令：SPAWN_BARRIER");
+                    if (player != null) {
+                        spawnBarrier(player.level(),player.blockPosition(),player.getYRot(),5,3, Blocks.STONE);
+                    }
+
+
             }
         });
         return true;

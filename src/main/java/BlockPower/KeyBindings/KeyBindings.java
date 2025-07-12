@@ -14,4 +14,14 @@ public class KeyBindings {
             InputConstants.KEY_R,//按键绑定
             BLOCKPOWER_KEY
     );
+
+    public static final KeyMapping SPAWN_BARRIER = new KeyMapping(
+            "key.blockpower.spawn_barrier",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            InputConstants.KEY_F,//按键绑定
+            BLOCKPOWER_KEY
+    );
+
+
 }

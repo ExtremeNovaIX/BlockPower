@@ -25,6 +25,11 @@ public class ClientInputHandler {
                 LOGGER.info("MINECART_RUSH key 触发!");
                 ModMessages.sendToServer(new PlayerActionPacket_C2S(PlayerAction.MINECART_RUSH));
             }
+
+            if (KeyBindings.SPAWN_BARRIER.consumeClick()) {
+                LOGGER.info("SPAWN_BARRIER key 触发!");
+                ModMessages.sendToServer(new PlayerActionPacket_C2S(PlayerAction.SPAWN_BARRIER));
+            }
         }
     }
 }
