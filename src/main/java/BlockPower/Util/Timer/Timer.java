@@ -10,15 +10,44 @@ public class Timer {
     private int tickDuration = 0;
     private boolean isEnd = false;
 
-    public Timer(int tick,int tickDuration){
+    public boolean isEnd() {
+        return isEnd;
+    }
+
+    public void setEnd(boolean end) {
+        isEnd = end;
+    }
+
+    private static Timer instance;
+
+    public Timer(int tick, int tickDuration) {
         this.tick = tick;
         this.tickDuration = tickDuration;
+        instance = this;
+    }
+
+    public static boolean timer(int tick, int tickDuration){
+        Timer timer = new Timer(tick, tickDuration);
+        return timer.isEnd();
     }
 
     @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event){
-        if(event.phase == TickEvent.Phase.END){
-            if(tick == 0)
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            Timer timer = Timer.getInstance();
+            if (timer != null) {
+                int newTick = timer.getTickDuration();
+                if (!(newTick <= 0) && timer.getTick() == 0) {
+                    timer.setTick(newTick);
+                }
+                int nowTick = timer.getTick();
+                if (nowTick > 0) {
+                    timer.setTick(nowTick - 1);
+                }else{
+                    timer.setEnd(true);
+                    event.setCanceled(true);
+                }
+            }
         }
     }
 
@@ -37,5 +66,9 @@ public class Timer {
 
     public void setTickDuration(int tickDuration) {
         this.tickDuration = tickDuration;
+    }
+
+    public static Timer getInstance() {
+        return instance;
     }
 }
