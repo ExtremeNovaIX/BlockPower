@@ -10,9 +10,6 @@ import java.util.function.Supplier;
 
 import static BlockPower.Entities.RushMinecart.RushMinecartEntity.createRushMinecart;
 
-// 通用数据包类
-// 用于定义客户端和服务端之间的通用数据包类型
-// 该类包含一个枚举类型 PlayerAction，用于定义客户端可以执行的不同操作
 public class PlayerActionPacket_C2S {
 
     private final PlayerAction action;
@@ -49,6 +46,7 @@ public class PlayerActionPacket_C2S {
                         createRushMinecart(player);
                     }
                     break;
+
             }
         });
         return true;

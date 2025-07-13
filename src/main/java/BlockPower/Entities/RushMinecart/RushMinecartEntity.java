@@ -2,6 +2,8 @@ package BlockPower.Entities.RushMinecart;
 
 import BlockPower.Entities.FakeRail.FakeRailEntity;
 import BlockPower.Main.Main;
+import BlockPower.ModMessages.PlayerActionPacket_S2C;
+import BlockPower.ModMessages.ServerAction;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import static BlockPower.Main.Main.sendDebugMessage;
+import static BlockPower.ModMessages.ModMessages.sendToPlayer;
 import static BlockPower.Util.ScreenShake.ScreenShakeHandler.shakeTrigger;
 
 public class RushMinecartEntity extends AbstractMinecart {
@@ -210,9 +213,14 @@ public class RushMinecartEntity extends AbstractMinecart {
     private void hurtEntity(@NotNull Player player) {
         List<Entity> entities = detectEntity(player, 2);
         if (!entities.isEmpty()) {
-            entities.forEach(entity -> entity.hurt(this.level().damageSources().magic(), 20.0F));
+            entities.forEach(entity -> {
+                entity.hurt(this.level().damageSources().mobAttack(player), 15F);
+                if (entity instanceof ServerPlayer) {
+                    sendToPlayer(new PlayerActionPacket_S2C(ServerAction.SHAKE), (ServerPlayer) entity);
+                }
+            });
             //触发屏幕震动并线性衰减
-            shakeTrigger(20, 1f,0.9f);
+            shakeTrigger(5, 3f);
         }
     }
 
