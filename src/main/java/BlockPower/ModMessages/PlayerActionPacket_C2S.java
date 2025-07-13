@@ -1,6 +1,6 @@
 package BlockPower.ModMessages;
 
-import BlockPower.BlockEvent.InitBarrier;
+import BlockPower.BlockEvent.SpawnBarrier;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
@@ -53,7 +53,7 @@ public class PlayerActionPacket_C2S {
                 case SPAWN_BARRIER:
                     LOGGER.info("服务端受到指令：SPAWN_BARRIER");
                     if (player != null) {
-                        InitBarrier.init(player);
+                        SpawnBarrier.init(player);
                     }
             }
         });
