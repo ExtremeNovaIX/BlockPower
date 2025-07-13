@@ -5,6 +5,7 @@ import BlockPower.ModMessages.ModMessages;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -37,7 +38,7 @@ public class Main {
      * @param player  指定的玩家
      * @param message 要发送的调试信息
      */
-    public static void sendDebugMessage(ServerPlayer player, String message) {
+    public static void sendDebugMessage(Player player, String message) {
         Component debugMessage = Component.literal("[DEBUG] ")
                 .withStyle(ChatFormatting.GOLD)
                 .append(Component.literal(message).withStyle(ChatFormatting.WHITE));
