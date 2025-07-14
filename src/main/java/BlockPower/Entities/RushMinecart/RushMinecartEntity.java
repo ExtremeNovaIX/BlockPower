@@ -1,10 +1,14 @@
 package BlockPower.Entities.RushMinecart;
 
 import BlockPower.Entities.FakeRail.FakeRailEntity;
+import BlockPower.Entities.ModEntities;
 import BlockPower.Main.Main;
 import BlockPower.ModMessages.PlayerActionPacket_S2C;
 import BlockPower.ModMessages.ServerAction;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -43,6 +47,8 @@ public class RushMinecartEntity extends AbstractMinecart {
 
     private Vec3 lastRailPlacementPos = Vec3.ZERO;//记录上一个生成点的位置
 
+    private static final EntityDataAccessor<Boolean> DATA_IS_ACTIVE = SynchedEntityData.defineId(RushMinecartEntity.class, EntityDataSerializers.BOOLEAN);
+
     public RushMinecartEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
         this.player = null;
@@ -57,13 +63,14 @@ public class RushMinecartEntity extends AbstractMinecart {
     @Override
     public void tick() {
         this.checkBelowWorld(); // 检查是否掉出世界
-        this.move(MoverType.SELF, this.getDeltaMovement());
         this.checkInsideBlocks();
         if (this.isVehicle()) {
             for (net.minecraft.world.entity.Entity entity : this.getPassengers()) {
                 entity.setPos(this.getX(), this.getY() + this.getPassengersRidingOffset() + entity.getMyRidingOffset(), this.getZ());
             }
         }
+        this.move(MoverType.SELF, this.getDeltaMovement());
+        handleMinecartMovement();
         //服务端逻辑
         if (!this.level().isClientSide) {
             handleTrailSpawning();
@@ -73,7 +80,7 @@ public class RushMinecartEntity extends AbstractMinecart {
 
     private void handleMinecartMovement() {
         if (this.player != null) {
-            if (this.player.isPassenger()) {
+            if (this.entityData.get(DATA_IS_ACTIVE)) {
                 //保持矿车无重力和阻力
                 Vec3 motion = this.getDeltaMovement();
                 this.setDeltaMovement(new Vec3(motion.x, 0, motion.z));
@@ -138,6 +145,8 @@ public class RushMinecartEntity extends AbstractMinecart {
         if (player != null) {
             if (this.player.isPassenger()) {
                 hurtEntity(this.player);
+                //同步状态
+                this.entityData.set(DATA_IS_ACTIVE, true);
             } else {
                 if (rideFlag) {//初始化过后（rideFlag被设为true），开始执行逻辑
                     //如果技能释放者不在矿车上，那么让碰撞到的第一个实体强制骑乘矿车并在一段时间内无法挣脱
@@ -147,6 +156,8 @@ public class RushMinecartEntity extends AbstractMinecart {
                         cooldownTicks = COOLDOWN_DURATION;
                         rideFlag = false;
                     }
+                    //同步状态
+                    this.entityData.set(DATA_IS_ACTIVE, false);
                 }
             }
         }
@@ -158,7 +169,7 @@ public class RushMinecartEntity extends AbstractMinecart {
         double distance = 1.5;
         //创建一个新的矿车实体
         RushMinecartEntity minecart = new RushMinecartEntity(
-                EntityType.MINECART,
+                ModEntities.RUSH_MINECART.get(),
                 player.level(),
                 player.getX() + lookAngle.x * distance,
                 player.getY() + 0.1,
@@ -224,17 +235,27 @@ public class RushMinecartEntity extends AbstractMinecart {
      * @param player 释放技能的玩家
      */
     private void hurtEntity(@NotNull Player player) {
-        List<Entity> entities = detectEntity(player, 2);
+        List<Entity> entities = detectEntity(player, 3);
         if (!entities.isEmpty()) {
             entities.forEach(entity -> {
                 entity.hurt(this.level().damageSources().mobAttack(player), 15F);
                 if (entity instanceof ServerPlayer) {
                     sendToPlayer(new PlayerActionPacket_S2C(ServerAction.SHAKE), (ServerPlayer) entity);
                 }
+                knockBackEntity(entity,2);
             });
             //触发屏幕震动并线性衰减
             shakeTrigger(5, 3f);
         }
+    }
+
+    private void knockBackEntity(Entity entity, double strength) {
+        Vec3 knockbackVector = entity.position().subtract(this.position()).normalize();
+        entity.setDeltaMovement(entity.getDeltaMovement().add(
+                knockbackVector.x * strength,
+                1 * strength,
+                knockbackVector.z * strength
+        ));
     }
 
     @Override
@@ -250,5 +271,25 @@ public class RushMinecartEntity extends AbstractMinecart {
     @Override
     public @NotNull Type getMinecartType() {
         return Type.RIDEABLE;
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(DATA_IS_ACTIVE, true);
+    }
+
+    @Override
+    public boolean isPushable() {
+        return false;
+    }
+
+    @Override
+    public void push(Entity pEntity) {
+    }
+
+    @Override
+    public boolean canBeCollidedWith() {
+        return false;
     }
 }
