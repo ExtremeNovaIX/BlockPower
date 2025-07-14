@@ -71,6 +71,23 @@ public class RushMinecartEntity extends AbstractMinecart {
         }
     }
 
+    private void handleMinecartMovement() {
+        if (this.player != null) {
+            if (this.player.isPassenger()) {
+                //保持矿车无重力和阻力
+                Vec3 motion = this.getDeltaMovement();
+                this.setDeltaMovement(new Vec3(motion.x, 0, motion.z));
+            } else {
+                //模拟重力和阻力
+                this.setDeltaMovement(this.getDeltaMovement()
+                        .multiply(0.95, 1.0, 0.95)//x和z轴应用阻力
+                        .add(0.0, -0.03D, 0.0)//y轴应用重力
+                );
+            }
+        }
+
+    }
+
     private void handleTrailSpawning() {
         Vec3 currentPos = this.position();
         // 第一次生成时，直接在脚下生成一个并设置记录点
@@ -108,7 +125,9 @@ public class RushMinecartEntity extends AbstractMinecart {
     private void handleRushMinecart() {
         //技能释放后2tick后让释放者骑乘矿车并开始执行矿车逻辑
         if (rideDelayTicks-- == 0) {
-            player.startRiding(this);
+            if (player != null) {
+                player.startRiding(this);
+            }
             rideFlag = true;
         }
         // 更新冷却计时器
@@ -116,26 +135,20 @@ public class RushMinecartEntity extends AbstractMinecart {
             cooldownTicks--;
         }
         //如果技能释放者在矿车上，那么伤害撞到的实体
-        if (this.player.isPassenger()) {
-            hurtEntity(this.player);
-            //保持矿车无重力和阻力
-            Vec3 motion = this.getDeltaMovement();
-            this.setDeltaMovement(new Vec3(motion.x, 0, motion.z));
-        } else {
-            if (rideFlag) {//初始化过后（rideFlag被设为true），开始执行逻辑
-                //如果技能释放者不在矿车上，那么让碰撞到的第一个实体强制骑乘矿车并在一段时间内无法挣脱
-                List<Entity> entities = detectEntity(this.player, 5);
-                if (!entities.isEmpty()) {
-                    entities.get(0).startRiding(this);
-                    cooldownTicks = COOLDOWN_DURATION;
-                    rideFlag = false;
+        if (player != null) {
+            if (this.player.isPassenger()) {
+                hurtEntity(this.player);
+            } else {
+                if (rideFlag) {//初始化过后（rideFlag被设为true），开始执行逻辑
+                    //如果技能释放者不在矿车上，那么让碰撞到的第一个实体强制骑乘矿车并在一段时间内无法挣脱
+                    List<Entity> entities = detectEntity(this.player, 5);
+                    if (!entities.isEmpty()) {
+                        entities.get(0).startRiding(this);
+                        cooldownTicks = COOLDOWN_DURATION;
+                        rideFlag = false;
+                    }
                 }
             }
-            //模拟重力和阻力
-            this.setDeltaMovement(this.getDeltaMovement()
-                    .multiply(0.95, 1.0, 0.95)//x和z轴应用阻力
-                    .add(0.0, -0.03D, 0.0)//y轴应用重力
-            );
         }
     }
 
