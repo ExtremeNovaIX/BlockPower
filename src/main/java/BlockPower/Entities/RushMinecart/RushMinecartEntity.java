@@ -5,6 +5,7 @@ import BlockPower.Entities.ModEntities;
 import BlockPower.Main.Main;
 import BlockPower.ModMessages.PlayerActionPacket_S2C;
 import BlockPower.ModMessages.ServerAction;
+import BlockPower.Util.Timer.TickTimer;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -35,19 +36,23 @@ public class RushMinecartEntity extends AbstractMinecart {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("Rush_Minecart");
 
-    private boolean rideFlag = false;//控制矿车只拉取一次生物
-
     private final Player player;
 
     private int rideDelayTicks = 2;
 
     private int cooldownTicks = 0; //无法挣脱的计时器
 
-    private static final int COOLDOWN_DURATION = 60; //无法挣脱的持续时间
+    private static final int COOLDOWN_DURATION = 20; //无法挣脱的持续时间
 
     private Vec3 lastRailPlacementPos = Vec3.ZERO;//记录上一个生成点的位置
 
-    private static final EntityDataAccessor<Boolean> DATA_IS_ACTIVE = SynchedEntityData.defineId(RushMinecartEntity.class, EntityDataSerializers.BOOLEAN);
+    private boolean isActive = false;//矿车运行状态
+
+    private boolean physicsEnabled = false;
+
+    private TickTimer rideDelayTimer;
+
+
 
     public RushMinecartEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -80,7 +85,7 @@ public class RushMinecartEntity extends AbstractMinecart {
 
     private void handleMinecartMovement() {
         if (this.player != null) {
-            if (this.entityData.get(DATA_IS_ACTIVE)) {
+            if (physicsEnabled) {
                 //保持矿车无重力和阻力
                 Vec3 motion = this.getDeltaMovement();
                 this.setDeltaMovement(new Vec3(motion.x, 0, motion.z));
@@ -92,7 +97,6 @@ public class RushMinecartEntity extends AbstractMinecart {
                 );
             }
         }
-
     }
 
     private void handleTrailSpawning() {
@@ -130,12 +134,11 @@ public class RushMinecartEntity extends AbstractMinecart {
     }
 
     private void handleRushMinecart() {
-        //技能释放后2tick后让释放者骑乘矿车并开始执行矿车逻辑
+
         if (rideDelayTicks-- == 0) {
             if (player != null) {
                 player.startRiding(this);
             }
-            rideFlag = true;
         }
         // 更新冷却计时器
         if (cooldownTicks > 0) {
@@ -143,21 +146,26 @@ public class RushMinecartEntity extends AbstractMinecart {
         }
         //如果技能释放者在矿车上，那么伤害撞到的实体
         if (player != null) {
-            if (this.player.isPassenger()) {
-                hurtEntity(this.player);
-                //同步状态
-                this.entityData.set(DATA_IS_ACTIVE, true);
+
+            if (rideDelayTimer == null) {
+                rideDelayTimer = new TickTimer();
             } else {
-                if (rideFlag) {//初始化过后（rideFlag被设为true），开始执行逻辑
-                    //如果技能释放者不在矿车上，那么让碰撞到的第一个实体强制骑乘矿车并在一段时间内无法挣脱
-                    List<Entity> entities = detectEntity(this.player, 5);
-                    if (!entities.isEmpty()) {
-                        entities.get(0).startRiding(this);
-                        cooldownTicks = COOLDOWN_DURATION;
-                        rideFlag = false;
+                //矿车逻辑
+                Entity passenger = this.getFirstPassenger();
+                if (passenger == player) {
+                    isActive = true;//标志初始化完成，可以开始执行逻辑
+                    hurtEntity(this.player);
+                } else {
+                    if (isActive) {//初始化完成且玩家下车，执行强制骑乘逻辑
+                        //如果技能释放者不在矿车上，那么让碰撞到的第一个实体强制骑乘矿车并在一段时间内无法挣脱
+                        List<Entity> entities = detectEntity(this.player, 5);
+                        if (!entities.isEmpty()) {
+                            entities.get(0).startRiding(this);
+                            cooldownTicks = COOLDOWN_DURATION;
+                            isActive = false;//技能结束，进入销毁逻辑
+                            physicsEnabled = true;
+                        }
                     }
-                    //同步状态
-                    this.entityData.set(DATA_IS_ACTIVE, false);
                 }
             }
         }
@@ -242,7 +250,7 @@ public class RushMinecartEntity extends AbstractMinecart {
                 if (entity instanceof ServerPlayer) {
                     sendToPlayer(new PlayerActionPacket_S2C(ServerAction.SHAKE), (ServerPlayer) entity);
                 }
-                knockBackEntity(entity,2);
+                knockBackEntity(entity, 2);
             });
             //触发屏幕震动并线性衰减
             shakeTrigger(5, 3f);
@@ -253,14 +261,18 @@ public class RushMinecartEntity extends AbstractMinecart {
         Vec3 knockbackVector = entity.position().subtract(this.position()).normalize();
         entity.setDeltaMovement(entity.getDeltaMovement().add(
                 knockbackVector.x * strength,
-                1 * strength,
+                0.6 * strength,
                 knockbackVector.z * strength
         ));
     }
 
     @Override
     public boolean canRiderInteract() {
-        return cooldownTicks <= 0; // 冷却期间禁止下车
+        if (this.getFirstPassenger() == player) {
+            return true;
+        } else {
+            return cooldownTicks <= 0; // 冷却期间禁止下车
+        }
     }
 
     @Override
@@ -271,12 +283,6 @@ public class RushMinecartEntity extends AbstractMinecart {
     @Override
     public @NotNull Type getMinecartType() {
         return Type.RIDEABLE;
-    }
-
-    @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DATA_IS_ACTIVE, true);
     }
 
     @Override
