@@ -23,6 +23,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,18 +41,20 @@ public class RushMinecartEntity extends AbstractMinecart {
 
     private int rideDelayTicks = 2;
 
-    private int cooldownTicks = 0; //无法挣脱的计时器
-
-    private static final int COOLDOWN_DURATION = 20; //无法挣脱的持续时间
-
     private Vec3 lastRailPlacementPos = Vec3.ZERO;//记录上一个生成点的位置
 
-    private boolean isActive = false;//矿车运行状态
+    //矿车运行状态，当技能释放者在车上时为true，运行撞击逻辑，技能释放者下车时为false，进入销毁逻辑和强制骑乘逻辑
+    private boolean isActive = false;
 
-    private boolean physicsEnabled = false;
+    private boolean physicsEnabled = false;//是否开启物理
+
+    private boolean isCrashed = false;//是否已经碰撞
+
+    private boolean autoDiscard = false;//是否自动销毁
 
     private TickTimer rideDelayTimer;
-
+    private TickTimer activeEndTimer;
+    private TickTimer crashTimer;
 
 
     public RushMinecartEntity(EntityType<?> entityType, Level level) {
@@ -64,17 +67,13 @@ public class RushMinecartEntity extends AbstractMinecart {
         this.player = player;
     }
 
-
     @Override
     public void tick() {
-        this.checkBelowWorld(); // 检查是否掉出世界
-        this.checkInsideBlocks();
-        if (this.isVehicle()) {
-            for (net.minecraft.world.entity.Entity entity : this.getPassengers()) {
-                entity.setPos(this.getX(), this.getY() + this.getPassengersRidingOffset() + entity.getMyRidingOffset(), this.getZ());
-            }
-        }
-        this.move(MoverType.SELF, this.getDeltaMovement());
+        //检查是否需要销毁
+        handleCrash(crashTimer);
+        handleActiveStateEnd(activeEndTimer);
+
+        normalMinecraftLogic();
         handleMinecartMovement();
         //服务端逻辑
         if (!this.level().isClientSide) {
@@ -83,92 +82,122 @@ public class RushMinecartEntity extends AbstractMinecart {
         }
     }
 
-    private void handleMinecartMovement() {
-        if (this.player != null) {
-            if (physicsEnabled) {
-                //保持矿车无重力和阻力
-                Vec3 motion = this.getDeltaMovement();
-                this.setDeltaMovement(new Vec3(motion.x, 0, motion.z));
-            } else {
-                //模拟重力和阻力
-                this.setDeltaMovement(this.getDeltaMovement()
-                        .multiply(0.95, 1.0, 0.95)//x和z轴应用阻力
-                        .add(0.0, -0.03D, 0.0)//y轴应用重力
-                );
-            }
-        }
-    }
-
-    private void handleTrailSpawning() {
-        Vec3 currentPos = this.position();
-        // 第一次生成时，直接在脚下生成一个并设置记录点
-        if (lastRailPlacementPos.equals(Vec3.ZERO)) {
-            spawnRailAt(currentPos);
-            lastRailPlacementPos = currentPos;
-            return;
-        }
-
-        Vec3 moveVector = currentPos.subtract(lastRailPlacementPos);
-        double moveDistance = moveVector.length();
-
-        // 如果移动距离大于等于1个方块，就需要填充
-        if (moveDistance >= 1.0D) {
-            Vec3 moveDirection = moveVector.normalize();
-            // 计算需要填充多少个铁轨
-            int segmentsToSpawn = (int) Math.floor(moveDistance);
-
-            // 循环填充空隙
-            for (int i = 1; i <= segmentsToSpawn; i++) {
-                Vec3 spawnPos = lastRailPlacementPos.add(moveDirection.scale(i));
-                spawnRailAt(spawnPos);
-            }
-
-            // 更新记录点，只加上已经填充过的整数距离
-            lastRailPlacementPos = lastRailPlacementPos.add(moveDirection.scale(segmentsToSpawn));
-        }
-    }
-
-    private void spawnRailAt(Vec3 pos) {
-        FakeRailEntity fakeRail = new FakeRailEntity(this.level(), pos.x(), pos.y(), pos.z(), this.getYRot());
-        this.level().addFreshEntity(fakeRail);
-    }
-
     private void handleRushMinecart() {
-
         if (rideDelayTicks-- == 0) {
             if (player != null) {
                 player.startRiding(this);
             }
         }
-        // 更新冷却计时器
-        if (cooldownTicks > 0) {
-            cooldownTicks--;
-        }
-        //如果技能释放者在矿车上，那么伤害撞到的实体
-        if (player != null) {
 
+        if (player != null) {
             if (rideDelayTimer == null) {
                 rideDelayTimer = new TickTimer();
             } else {
                 //矿车逻辑
                 Entity passenger = this.getFirstPassenger();
+                //如果技能释放者在矿车上，那么伤害撞到的实体
                 if (passenger == player) {
                     isActive = true;//标志初始化完成，可以开始执行逻辑
                     hurtEntity(this.player);
+
                 } else {
                     if (isActive) {//初始化完成且玩家下车，执行强制骑乘逻辑
                         //如果技能释放者不在矿车上，那么让碰撞到的第一个实体强制骑乘矿车并在一段时间内无法挣脱
                         List<Entity> entities = detectEntity(this.player, 5);
                         if (!entities.isEmpty()) {
                             entities.get(0).startRiding(this);
-                            cooldownTicks = COOLDOWN_DURATION;
                             isActive = false;//技能结束，进入销毁逻辑
+                            autoDiscard = true;
                             physicsEnabled = true;
                         }
+
+                    }
+
+                }
+
+            }
+        }
+    }
+
+    private void handleMinecartMovement() {
+        this.move(MoverType.SELF, this.getDeltaMovement());
+        if (!physicsEnabled) {
+            //保持矿车无重力和阻力
+            Vec3 motion = this.getDeltaMovement();
+            this.setDeltaMovement(new Vec3(motion.x, 0, motion.z));
+        } else {
+            //模拟阻力
+            this.setDeltaMovement(this.getDeltaMovement()
+                    .multiply(0.95, 1.0, 0.95)//x和z轴应用阻力
+                    .add(0.0, -0.03D, 0.0));//y轴应用重力
+        }
+    }
+
+    private void handleActiveStateEnd(TickTimer activeEndTimer) {
+        //处理矿车激活状态结束时的相关逻辑
+        if (!isActive && autoDiscard) {
+            if (activeEndTimer == null) {
+                this.activeEndTimer = new TickTimer();
+            } else {
+                if (activeEndTimer.waitTicks(activeEndTimer, 30)) {
+                    this.discard();
+                }
+            }
+        }
+    }
+
+    private void handleCrash(TickTimer crashTimer) {
+        //处理技能释放者在矿车上时碰撞后的逻辑
+        if (isCrashed && isActive) {
+            if (crashTimer == null) {
+                this.crashTimer = new TickTimer();
+            } else {
+                physicsEnabled = true;
+                //等待3秒后自动销毁矿车
+                if (crashTimer.waitTicks(crashTimer, 60)) {
+                    if (player != null) {
+                        player.stopRiding();
+                        this.discard();
                     }
                 }
             }
         }
+    }
+
+    private void handleTrailSpawning() {
+        if (isActive && !isCrashed) {//矿车正常运作中才会生成铁轨
+            Vec3 currentPos = this.position();
+            // 第一次生成时，直接在脚下生成一个并设置记录点
+            if (lastRailPlacementPos.equals(Vec3.ZERO)) {
+                spawnRailAt(currentPos);
+                lastRailPlacementPos = currentPos;
+                return;
+            }
+
+            Vec3 moveVector = currentPos.subtract(lastRailPlacementPos);
+            double moveDistance = moveVector.length();
+
+            // 如果移动距离大于等于1个方块，就需要填充
+            if (moveDistance >= 1.0D) {
+                Vec3 moveDirection = moveVector.normalize();
+                // 计算需要填充多少个铁轨
+                int segmentsToSpawn = (int) Math.floor(moveDistance);
+
+                // 循环填充空隙
+                for (int i = 1; i <= segmentsToSpawn; i++) {
+                    Vec3 spawnPos = lastRailPlacementPos.add(moveDirection.scale(i));
+                    spawnRailAt(spawnPos);
+                }
+
+                // 更新记录点，只加上已经填充过的整数距离
+                lastRailPlacementPos = lastRailPlacementPos.add(moveDirection.scale(segmentsToSpawn));
+            }
+        }
+    }
+
+    private void spawnRailAt(Vec3 pos) {
+        FakeRailEntity fakeRail = new FakeRailEntity(this.level(), pos.x(), pos.y(), pos.z(), this.getYRot());
+        this.level().addFreshEntity(fakeRail);
     }
 
     public static void createRushMinecart(@NotNull ServerPlayer player) {
@@ -254,6 +283,7 @@ public class RushMinecartEntity extends AbstractMinecart {
             });
             //触发屏幕震动并线性衰减
             shakeTrigger(5, 3f);
+            isCrashed = true;
         }
     }
 
@@ -266,13 +296,19 @@ public class RushMinecartEntity extends AbstractMinecart {
         ));
     }
 
+    private void normalMinecraftLogic() {
+        this.checkBelowWorld(); // 检查是否掉出世界
+        this.checkInsideBlocks();
+        if (this.isVehicle()) {
+            for (Entity entity : this.getPassengers()) {
+                entity.setPos(this.getX(), this.getY() + this.getPassengersRidingOffset() + entity.getMyRidingOffset(), this.getZ());
+            }
+        }
+    }
+
     @Override
     public boolean canRiderInteract() {
-        if (this.getFirstPassenger() == player) {
-            return true;
-        } else {
-            return cooldownTicks <= 0; // 冷却期间禁止下车
-        }
+        return isActive;
     }
 
     @Override
