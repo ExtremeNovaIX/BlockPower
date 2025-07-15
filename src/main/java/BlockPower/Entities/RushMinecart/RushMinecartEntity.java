@@ -37,18 +37,18 @@ public class RushMinecartEntity extends AbstractMinecart {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("Rush_Minecart");
 
-    private final Player player;
+    private Player player;
 
     private int rideDelayTicks = 2;
 
     private Vec3 lastRailPlacementPos = Vec3.ZERO;//记录上一个生成点的位置
 
     //矿车运行状态，当技能释放者在车上时为true，运行撞击逻辑，技能释放者下车时为false，进入销毁逻辑和强制骑乘逻辑
-    private boolean isActive = false;
+    private static final EntityDataAccessor<Boolean> DATA_IS_ACTIVE = SynchedEntityData.defineId(RushMinecartEntity.class, EntityDataSerializers.BOOLEAN);
 
     private boolean physicsEnabled = false;//是否开启物理
 
-    private boolean isCrashed = false;//是否已经碰撞
+    private boolean isCrashed = false;//是否碰撞
 
     private boolean autoDiscard = false;//是否自动销毁
 
@@ -56,7 +56,12 @@ public class RushMinecartEntity extends AbstractMinecart {
     private TickTimer activeEndTimer;
     private TickTimer crashTimer;
 
-
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(DATA_IS_ACTIVE, false);
+        this.entityData.define(DATA_IS_CRASHED, false);
+    }
     public RushMinecartEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
         this.player = null;
@@ -97,18 +102,18 @@ public class RushMinecartEntity extends AbstractMinecart {
                 Entity passenger = this.getFirstPassenger();
                 //如果技能释放者在矿车上，那么伤害撞到的实体
                 if (passenger == player) {
-                    isActive = true;//标志初始化完成，可以开始执行逻辑
+                    this.entityData.set(DATA_IS_ACTIVE, true);//标志初始化完成，可以开始执行逻辑
                     hurtEntity(this.player);
 
                 } else {
-                    if (isActive) {//初始化完成且玩家下车，执行强制骑乘逻辑
+                    if (this.entityData.get(DATA_IS_ACTIVE) && !isCrashed) {//初始化完成且玩家下车，执行强制骑乘逻辑
                         //如果技能释放者不在矿车上，那么让碰撞到的第一个实体强制骑乘矿车并在一段时间内无法挣脱
+                        physicsEnabled = true;
+                        autoDiscard = true;
                         List<Entity> entities = detectEntity(this.player, 5);
                         if (!entities.isEmpty()) {
+                            this.entityData.set(DATA_IS_ACTIVE, false);//技能结束，进入销毁逻辑
                             entities.get(0).startRiding(this);
-                            isActive = false;//技能结束，进入销毁逻辑
-                            autoDiscard = true;
-                            physicsEnabled = true;
                         }
 
                     }
@@ -128,14 +133,14 @@ public class RushMinecartEntity extends AbstractMinecart {
         } else {
             //模拟阻力
             this.setDeltaMovement(this.getDeltaMovement()
-                    .multiply(0.95, 1.0, 0.95)//x和z轴应用阻力
-                    .add(0.0, -0.03D, 0.0));//y轴应用重力
+                    .multiply(0.97, 1.0, 0.97)//x和z轴应用阻力
+                    .add(0.0, -0.1D, 0.0));//y轴应用重力
         }
     }
 
     private void handleActiveStateEnd(TickTimer activeEndTimer) {
         //处理矿车激活状态结束时的相关逻辑
-        if (!isActive && autoDiscard) {
+        if (!this.entityData.get(DATA_IS_ACTIVE) && autoDiscard) {
             if (activeEndTimer == null) {
                 this.activeEndTimer = new TickTimer();
             } else {
@@ -148,7 +153,7 @@ public class RushMinecartEntity extends AbstractMinecart {
 
     private void handleCrash(TickTimer crashTimer) {
         //处理技能释放者在矿车上时碰撞后的逻辑
-        if (isCrashed && isActive) {
+        if (isCrashed && this.entityData.get(DATA_IS_ACTIVE)) {
             if (crashTimer == null) {
                 this.crashTimer = new TickTimer();
             } else {
@@ -165,7 +170,7 @@ public class RushMinecartEntity extends AbstractMinecart {
     }
 
     private void handleTrailSpawning() {
-        if (isActive && !isCrashed) {//矿车正常运作中才会生成铁轨
+        if (this.entityData.get(DATA_IS_ACTIVE) && !isCrashed) {//矿车正常运作中才会生成铁轨
             Vec3 currentPos = this.position();
             // 第一次生成时，直接在脚下生成一个并设置记录点
             if (lastRailPlacementPos.equals(Vec3.ZERO)) {
@@ -308,7 +313,15 @@ public class RushMinecartEntity extends AbstractMinecart {
 
     @Override
     public boolean canRiderInteract() {
-        return isActive;
+        return this.entityData.get(DATA_IS_ACTIVE);
+    }
+
+    @Override
+    protected void removePassenger(@NotNull Entity passenger) {
+        if (!this.entityData.get(DATA_IS_ACTIVE)) {
+            return;
+        }
+        super.removePassenger(passenger);
     }
 
     @Override
