@@ -37,31 +37,34 @@ public class RushMinecartEntity extends AbstractMinecart {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("Rush_Minecart");
 
-    private Player player;
+    /**
+     * 定义矿车的所有可能状态
+     */
+    public enum State {
+        INITIALIZING, //初始延迟, 等待玩家骑乘
+        RUSHING,      //玩家在车上, 高速冲刺
+        SEEKING,      //玩家下车, 寻找新目标
+        CAPTURED,     //已捕获新乘客, 冷却中
+        CRASHED,      //已撞毁, 准备销毁
+        ENDING        //技能结束, 准备销毁
+    }
 
-    private int rideDelayTicks = 2;
+    private Player player;
 
     private Vec3 lastRailPlacementPos = Vec3.ZERO;//记录上一个生成点的位置
 
-    //矿车运行状态，当技能释放者在车上时为true，运行撞击逻辑，技能释放者下车时为false，进入销毁逻辑和强制骑乘逻辑
-    private static final EntityDataAccessor<Boolean> DATA_IS_ACTIVE = SynchedEntityData.defineId(RushMinecartEntity.class, EntityDataSerializers.BOOLEAN);
-
-    private boolean physicsEnabled = false;//是否开启物理
-
-    private boolean isCrashed = false;//是否碰撞
-
-    private boolean autoDiscard = false;//是否自动销毁
+    private static final EntityDataAccessor<Integer> DATA_STATE = SynchedEntityData.defineId(RushMinecartEntity.class, EntityDataSerializers.INT);
 
     private TickTimer rideDelayTimer;
-    private TickTimer activeEndTimer;
+    private TickTimer endTimer;
     private TickTimer crashTimer;
 
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        this.entityData.define(DATA_IS_ACTIVE, false);
-        this.entityData.define(DATA_IS_CRASHED, false);
+        this.entityData.define(DATA_STATE, State.INITIALIZING.ordinal());
     }
+
     public RushMinecartEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
         this.player = null;
@@ -74,103 +77,96 @@ public class RushMinecartEntity extends AbstractMinecart {
 
     @Override
     public void tick() {
-        //检查是否需要销毁
-        handleCrash(crashTimer);
-        handleActiveStateEnd(activeEndTimer);
-
         normalMinecraftLogic();
         handleMinecartMovement();
+
         //服务端逻辑
         if (!this.level().isClientSide) {
+            updateState();
             handleTrailSpawning();
-            handleRushMinecart();
         }
     }
 
-    private void handleRushMinecart() {
-        if (rideDelayTicks-- == 0) {
-            if (player != null) {
-                player.startRiding(this);
-            }
+    /**
+     * 核心逻辑, 根据当前状态执行对应逻辑并切换状态
+     */
+    private void updateState() {
+        if (player == null) {
+            return;
         }
 
-        if (player != null) {
-            if (rideDelayTimer == null) {
-                rideDelayTimer = new TickTimer();
-            } else {
-                //矿车逻辑
-                Entity passenger = this.getFirstPassenger();
-                //如果技能释放者在矿车上，那么伤害撞到的实体
-                if (passenger == player) {
-                    this.entityData.set(DATA_IS_ACTIVE, true);//标志初始化完成，可以开始执行逻辑
-                    hurtEntity(this.player);
+        State currentState = getState();
 
-                } else {
-                    if (this.entityData.get(DATA_IS_ACTIVE) && !isCrashed) {//初始化完成且玩家下车，执行强制骑乘逻辑
-                        //如果技能释放者不在矿车上，那么让碰撞到的第一个实体强制骑乘矿车并在一段时间内无法挣脱
-                        physicsEnabled = true;
-                        autoDiscard = true;
-                        List<Entity> entities = detectEntity(this.player, 5);
-                        if (!entities.isEmpty()) {
-                            this.entityData.set(DATA_IS_ACTIVE, false);//技能结束，进入销毁逻辑
-                            entities.get(0).startRiding(this);
-                        }
-
-                    }
-
+        switch (currentState) {
+            case INITIALIZING:
+                if (rideDelayTimer == null) rideDelayTimer = new TickTimer();
+                if (rideDelayTimer.waitTicks(rideDelayTimer, 2)) {
+                    player.startRiding(this);
+                    setState(State.RUSHING);
                 }
+                break;
 
-            }
+            case RUSHING:
+                if (this.getFirstPassenger() != player) {
+                    setState(State.SEEKING);
+                    break;
+                }
+                hurtEntity(player);
+                break;
+
+            case SEEKING:
+                List<Entity> entities = detectEntity(player, 4);
+                if (!entities.isEmpty()) {
+                    entities.get(0).startRiding(this);
+                    setState(State.CAPTURED);
+                } else {
+                    //如果在一定时间内没找到目标，则进入结束状态
+                    if (endTimer == null) endTimer = new TickTimer();
+                    if (endTimer.waitTicks(endTimer, 80)) {
+                        setState(State.ENDING);
+                    }
+                }
+                break;
+
+            case CAPTURED:
+                //被捕获的生物下车后，进入结束状态
+                if (endTimer == null) endTimer = new TickTimer();
+                if (endTimer.waitTicks(endTimer, 40)) {
+                    setState(State.ENDING);
+                }
+                break;
+
+            case CRASHED:
+                hurtEntity(player);
+                if (crashTimer == null) crashTimer = new TickTimer();
+                if (crashTimer.waitTicks(crashTimer, 120)) {
+                    this.discard();
+                }
+                break;
+
+            case ENDING:
+                this.discard();
+                break;
         }
     }
 
     private void handleMinecartMovement() {
-        this.move(MoverType.SELF, this.getDeltaMovement());
-        if (!physicsEnabled) {
-            //保持矿车无重力和阻力
+        State currentState = getState();
+
+        //冲刺时无重力
+        if (currentState == State.RUSHING) {
             Vec3 motion = this.getDeltaMovement();
             this.setDeltaMovement(new Vec3(motion.x, 0, motion.z));
         } else {
-            //模拟阻力
             this.setDeltaMovement(this.getDeltaMovement()
-                    .multiply(0.97, 1.0, 0.97)//x和z轴应用阻力
-                    .add(0.0, -0.1D, 0.0));//y轴应用重力
+                    .multiply(0.97, 1.0, 0.97)
+                    .add(0.0, -0.1D, 0.0));
         }
-    }
-
-    private void handleActiveStateEnd(TickTimer activeEndTimer) {
-        //处理矿车激活状态结束时的相关逻辑
-        if (!this.entityData.get(DATA_IS_ACTIVE) && autoDiscard) {
-            if (activeEndTimer == null) {
-                this.activeEndTimer = new TickTimer();
-            } else {
-                if (activeEndTimer.waitTicks(activeEndTimer, 30)) {
-                    this.discard();
-                }
-            }
-        }
-    }
-
-    private void handleCrash(TickTimer crashTimer) {
-        //处理技能释放者在矿车上时碰撞后的逻辑
-        if (isCrashed && this.entityData.get(DATA_IS_ACTIVE)) {
-            if (crashTimer == null) {
-                this.crashTimer = new TickTimer();
-            } else {
-                physicsEnabled = true;
-                //等待3秒后自动销毁矿车
-                if (crashTimer.waitTicks(crashTimer, 60)) {
-                    if (player != null) {
-                        player.stopRiding();
-                        this.discard();
-                    }
-                }
-            }
-        }
+        this.move(MoverType.SELF, this.getDeltaMovement());
     }
 
     private void handleTrailSpawning() {
-        if (this.entityData.get(DATA_IS_ACTIVE) && !isCrashed) {//矿车正常运作中才会生成铁轨
+        if (getState() == State.RUSHING) {//矿车正常运作中才会生成铁轨
             Vec3 currentPos = this.position();
             // 第一次生成时，直接在脚下生成一个并设置记录点
             if (lastRailPlacementPos.equals(Vec3.ZERO)) {
@@ -277,7 +273,7 @@ public class RushMinecartEntity extends AbstractMinecart {
      * @param player 释放技能的玩家
      */
     private void hurtEntity(@NotNull Player player) {
-        List<Entity> entities = detectEntity(player, 3);
+        List<Entity> entities = detectEntity(player, 4);
         if (!entities.isEmpty()) {
             entities.forEach(entity -> {
                 entity.hurt(this.level().damageSources().mobAttack(player), 15F);
@@ -286,9 +282,9 @@ public class RushMinecartEntity extends AbstractMinecart {
                 }
                 knockBackEntity(entity, 2);
             });
-            //触发屏幕震动并线性衰减
-            shakeTrigger(5, 3f);
-            isCrashed = true;
+            //触发屏幕震动
+            sendToPlayer(new PlayerActionPacket_S2C(ServerAction.SHAKE), (ServerPlayer) player);
+            setState(State.CRASHED);
         }
     }
 
@@ -311,14 +307,22 @@ public class RushMinecartEntity extends AbstractMinecart {
         }
     }
 
+    private State getState() {
+        return State.values()[this.entityData.get(DATA_STATE)];
+    }
+
+    private void setState(State state) {
+        this.entityData.set(DATA_STATE, state.ordinal());
+    }
+
     @Override
     public boolean canRiderInteract() {
-        return this.entityData.get(DATA_IS_ACTIVE);
+        return !(getState() == State.RUSHING);
     }
 
     @Override
     protected void removePassenger(@NotNull Entity passenger) {
-        if (!this.entityData.get(DATA_IS_ACTIVE)) {
+        if (getState() == State.CAPTURED) {
             return;
         }
         super.removePassenger(passenger);
