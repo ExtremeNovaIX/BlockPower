@@ -18,7 +18,7 @@ public class ModEntities {
             ENTITY_TYPES.register("fake_rail",
                     () -> EntityType.Builder.<FakeRailEntity>of(FakeRailEntity::new, MobCategory.MISC)
                             .sized(0.1F, 0.1F)
-                            .clientTrackingRange(32)
+                            .clientTrackingRange(128)
                             .noSave()
                             .fireImmune()
                             .build("fake_rail"));
@@ -27,7 +27,7 @@ public class ModEntities {
             ENTITY_TYPES.register("rush_minecart",
                     () -> EntityType.Builder.<RushMinecartEntity>of(RushMinecartEntity::new, MobCategory.MISC)
                             .sized(0.98F, 0.7F)
-                            .clientTrackingRange(32) // 客户端追踪范围
+                            .clientTrackingRange(128) // 客户端追踪范围
                             .updateInterval(1) // 更新间隔
                             .noSave()
                             .noSummon()

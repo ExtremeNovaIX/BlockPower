@@ -139,7 +139,7 @@ public class RushMinecartEntity extends AbstractMinecart {
             case CRASHED:
                 hurtEntity(player);
                 if (crashTimer == null) crashTimer = new TickTimer();
-                if (crashTimer.waitTicks(crashTimer, 120)) {
+                if (crashTimer.waitTicks(crashTimer, 40)) {
                     this.discard();
                 }
                 break;
@@ -154,7 +154,7 @@ public class RushMinecartEntity extends AbstractMinecart {
         State currentState = getState();
 
         //冲刺时无重力
-        if (currentState == State.RUSHING) {
+        if (currentState == State.RUSHING || currentState == State.INITIALIZING) {
             Vec3 motion = this.getDeltaMovement();
             this.setDeltaMovement(new Vec3(motion.x, 0, motion.z));
         } else {
@@ -201,6 +201,13 @@ public class RushMinecartEntity extends AbstractMinecart {
         this.level().addFreshEntity(fakeRail);
     }
 
+
+    public void spawnInitialRail() {
+        Vec3 initialPos = this.position();
+        this.spawnRailAt(initialPos);
+        this.lastRailPlacementPos = initialPos;
+    }
+
     public static void createRushMinecart(@NotNull ServerPlayer player) {
         Vec3 lookAngle = player.getLookAngle();
         lookAngle = new Vec3(lookAngle.x, 0, lookAngle.z).normalize();
@@ -226,6 +233,8 @@ public class RushMinecartEntity extends AbstractMinecart {
         //将矿车添加到世界中
         player.level().addFreshEntity(minecart);
         LOGGER.info("生成冲刺矿车");
+
+        minecart.spawnInitialRail();
 
         if (player.onGround()) {
             player.setDeltaMovement(player.getDeltaMovement().add(0, 0.5, 0));
@@ -280,10 +289,12 @@ public class RushMinecartEntity extends AbstractMinecart {
                 if (entity instanceof ServerPlayer) {
                     sendToPlayer(new PlayerActionPacket_S2C(ServerAction.SHAKE), (ServerPlayer) entity);
                 }
-                knockBackEntity(entity, 2);
+                knockBackEntity(entity, 0.6);
             });
             //触发屏幕震动
-            sendToPlayer(new PlayerActionPacket_S2C(ServerAction.SHAKE), (ServerPlayer) player);
+            if (getState() == State.RUSHING) {
+                sendToPlayer(new PlayerActionPacket_S2C(ServerAction.SHAKE), (ServerPlayer) player);
+            }
             setState(State.CRASHED);
         }
     }
@@ -292,7 +303,7 @@ public class RushMinecartEntity extends AbstractMinecart {
         Vec3 knockbackVector = entity.position().subtract(this.position()).normalize();
         entity.setDeltaMovement(entity.getDeltaMovement().add(
                 knockbackVector.x * strength,
-                0.6 * strength,
+                1 * strength,
                 knockbackVector.z * strength
         ));
     }
