@@ -1,9 +1,10 @@
 package BlockPower.Entities.RushMinecart;
 
-import BlockPower.DTO.S2C.ShakeData;
 import BlockPower.Entities.FakeRail.FakeRailEntity;
 import BlockPower.Entities.ModEntities;
+import BlockPower.Main.Main;
 import BlockPower.ModMessages.PlayerActionPacket_S2C;
+import BlockPower.ModMessages.ServerAction;
 import BlockPower.Util.Timer.TickTimer;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -22,12 +23,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static BlockPower.Main.Main.sendDebugMessage;
 import static BlockPower.ModMessages.ModMessages.sendToPlayer;
+import static BlockPower.Util.ScreenShake.ScreenShakeHandler.shakeTrigger;
 
 public class RushMinecartEntity extends AbstractMinecart {
 
@@ -148,16 +152,17 @@ public class RushMinecartEntity extends AbstractMinecart {
 
     private void handleMinecartMovement() {
         State currentState = getState();
-        Vec3 motion = this.getDeltaMovement();
+
         //冲刺时无重力
         if (currentState == State.RUSHING || currentState == State.INITIALIZING) {
+            Vec3 motion = this.getDeltaMovement();
             this.setDeltaMovement(new Vec3(motion.x, 0, motion.z));
         } else {
             this.setDeltaMovement(this.getDeltaMovement()
                     .multiply(0.97, 1.0, 0.97)
                     .add(0.0, -0.1D, 0.0));
         }
-        this.move(MoverType.SELF, new Vec3(motion.x, motion.y, motion.z));
+        this.move(MoverType.SELF, this.getDeltaMovement());
     }
 
     private void handleTrailSpawning() {
@@ -282,13 +287,13 @@ public class RushMinecartEntity extends AbstractMinecart {
             entities.forEach(entity -> {
                 entity.hurt(this.level().damageSources().mobAttack(player), 15F);
                 if (entity instanceof ServerPlayer) {
-                    sendToPlayer(new PlayerActionPacket_S2C(new ShakeData(5,3f)), (ServerPlayer) entity);
+                    sendToPlayer(new PlayerActionPacket_S2C(ServerAction.SHAKE), (ServerPlayer) entity);
                 }
                 knockBackEntity(entity, 0.6);
             });
             //触发屏幕震动
             if (getState() == State.RUSHING) {
-                sendToPlayer(new PlayerActionPacket_S2C(new ShakeData(5,3f)), (ServerPlayer) player);
+                sendToPlayer(new PlayerActionPacket_S2C(ServerAction.SHAKE), (ServerPlayer) player);
             }
             setState(State.CRASHED);
         }
@@ -298,7 +303,7 @@ public class RushMinecartEntity extends AbstractMinecart {
         Vec3 knockbackVector = entity.position().subtract(this.position()).normalize();
         entity.setDeltaMovement(entity.getDeltaMovement().add(
                 knockbackVector.x * strength,
-                0.6 * strength,
+                1 * strength,
                 knockbackVector.z * strength
         ));
     }
@@ -354,7 +359,7 @@ public class RushMinecartEntity extends AbstractMinecart {
     }
 
     @Override
-    public boolean canCollideWith(Entity p_20303_) {
+    public boolean canBeCollidedWith() {
         return false;
     }
 }
