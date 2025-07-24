@@ -1,5 +1,6 @@
 package BlockPower.ClientEvents;
 
+import BlockPower.DTO.C2S.MinecartData;
 import BlockPower.KeyBindings.KeyBindings;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.ModMessages.PlayerAction;
@@ -23,7 +24,7 @@ public class ClientInputHandler {
         if (event.phase == TickEvent.Phase.END) {
             if (KeyBindings.MINECART_RUSH.consumeClick()) {
                 LOGGER.info("MINECART_RUSH key 触发!");
-                ModMessages.sendToServer(new PlayerActionPacket_C2S(PlayerAction.MINECART_RUSH));
+                ModMessages.sendToServer(new PlayerActionPacket_C2S(new MinecartData()));
             }
         }
     }

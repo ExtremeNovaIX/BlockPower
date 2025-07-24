@@ -1,5 +1,6 @@
 package BlockPower.Entities.RushMinecart;
 
+import BlockPower.DTO.S2C.ShakeData;
 import BlockPower.Entities.FakeRail.FakeRailEntity;
 import BlockPower.Entities.ModEntities;
 import BlockPower.Main.Main;
@@ -287,13 +288,13 @@ public class RushMinecartEntity extends AbstractMinecart {
             entities.forEach(entity -> {
                 entity.hurt(this.level().damageSources().mobAttack(player), 15F);
                 if (entity instanceof ServerPlayer) {
-                    sendToPlayer(new PlayerActionPacket_S2C(ServerAction.SHAKE), (ServerPlayer) entity);
+                    sendToPlayer(new PlayerActionPacket_S2C(new ShakeData(5,3f)), (ServerPlayer) entity);
                 }
                 knockBackEntity(entity, 0.6);
             });
             //触发屏幕震动
             if (getState() == State.RUSHING) {
-                sendToPlayer(new PlayerActionPacket_S2C(ServerAction.SHAKE), (ServerPlayer) player);
+                sendToPlayer(new PlayerActionPacket_S2C(new ShakeData(5,3f)), (ServerPlayer) player);
             }
             setState(State.CRASHED);
         }

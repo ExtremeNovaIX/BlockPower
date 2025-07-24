@@ -106,3 +106,23 @@ publishing {
         }
     }
 }
+
+jar {
+
+    manifest {
+
+        attributes([
+
+                // 将 "--add-opens=java.base/java.lang=com.google.gson"
+
+                // 的信息添加到 MANIFEST.MF 文件中。
+
+                // 这是Java 9+ 模块系统的标准做法。
+
+                "Add-Opens": "java.base/java.lang=com.google.gson"
+
+        ])
+
+    }
+
+}
