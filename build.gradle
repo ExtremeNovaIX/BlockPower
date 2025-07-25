@@ -27,7 +27,8 @@ minecraft {
         client {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
+            property 'forge.logging.console.level', 'info'
+            property 'forge.logging.log4j.level', 'INFO'
             mods {
                 blockpower {
                     source sourceSets.main
@@ -37,7 +38,8 @@ minecraft {
         server {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
+            property 'forge.logging.console.level', 'info'
+            property 'forge.logging.log4j.level', 'INFO'
             mods {
                 blockpower {
                     source sourceSets.main
