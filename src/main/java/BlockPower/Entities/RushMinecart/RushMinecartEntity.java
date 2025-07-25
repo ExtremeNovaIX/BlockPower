@@ -112,6 +112,11 @@ public class RushMinecartEntity extends AbstractMinecart {
                     setState(State.SEEKING);
                     break;
                 }
+
+                if (this.getDeltaMovement().length() < 0.1) {
+                    setState(State.CRASHED);
+                }
+
                 hurtEntity(player);
                 break;
 
@@ -138,10 +143,10 @@ public class RushMinecartEntity extends AbstractMinecart {
                 break;
 
             case CRASHED:
-                hurtEntity(player);
                 if (crashTimer == null) crashTimer = new TickTimer();
-                if (crashTimer.waitTicks(crashTimer, 40)) {
-                    this.discard();
+                hurtEntity(player);
+                if (crashTimer.waitTicks(crashTimer, 20)) {
+                    setState(State.ENDING);
                 }
                 break;
 
@@ -153,17 +158,16 @@ public class RushMinecartEntity extends AbstractMinecart {
 
     private void handleMinecartMovement() {
         State currentState = getState();
-
+        Vec3 motion = this.getDeltaMovement();
         //冲刺时无重力
         if (currentState == State.RUSHING || currentState == State.INITIALIZING) {
-            Vec3 motion = this.getDeltaMovement();
             this.setDeltaMovement(new Vec3(motion.x, 0, motion.z));
         } else {
             this.setDeltaMovement(this.getDeltaMovement()
                     .multiply(0.97, 1.0, 0.97)
                     .add(0.0, -0.1D, 0.0));
         }
-        this.move(MoverType.SELF, this.getDeltaMovement());
+        this.move(MoverType.SELF, new Vec3(motion.x, motion.y, motion.z));
     }
 
     private void handleTrailSpawning() {
@@ -288,13 +292,13 @@ public class RushMinecartEntity extends AbstractMinecart {
             entities.forEach(entity -> {
                 entity.hurt(this.level().damageSources().mobAttack(player), 15F);
                 if (entity instanceof ServerPlayer) {
-                    sendToPlayer(new PlayerActionPacket_S2C(new ShakeData(5,3f)), (ServerPlayer) entity);
+                    sendToPlayer(new PlayerActionPacket_S2C(new ShakeData(5, 3f)), (ServerPlayer) entity);
                 }
-                knockBackEntity(entity, 0.6);
+                knockBackEntity(entity, 0.4);
             });
             //触发屏幕震动
             if (getState() == State.RUSHING) {
-                sendToPlayer(new PlayerActionPacket_S2C(new ShakeData(5,3f)), (ServerPlayer) player);
+                sendToPlayer(new PlayerActionPacket_S2C(new ShakeData(5, 3f)), (ServerPlayer) player);
             }
             setState(State.CRASHED);
         }
@@ -304,7 +308,7 @@ public class RushMinecartEntity extends AbstractMinecart {
         Vec3 knockbackVector = entity.position().subtract(this.position()).normalize();
         entity.setDeltaMovement(entity.getDeltaMovement().add(
                 knockbackVector.x * strength,
-                1 * strength,
+                0.6 * strength,
                 knockbackVector.z * strength
         ));
     }
@@ -360,7 +364,7 @@ public class RushMinecartEntity extends AbstractMinecart {
     }
 
     @Override
-    public boolean canBeCollidedWith() {
+    public boolean canCollideWith(Entity p_20303_) {
         return false;
     }
 }
