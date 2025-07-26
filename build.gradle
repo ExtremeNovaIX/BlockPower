@@ -29,6 +29,8 @@ minecraft {
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'info'
             property 'forge.logging.log4j.level', 'INFO'
+            property 'forge.enabledGameTestNamespaces', 'blockpower'
+            jvmArgs '--add-opens=java.base/java.lang=com.google.gson', '--add-opens=java.base/java.util=com.google.gson'
             mods {
                 blockpower {
                     source sourceSets.main
@@ -40,6 +42,7 @@ minecraft {
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'info'
             property 'forge.logging.log4j.level', 'INFO'
+            jvmArgs '--add-opens=java.base/java.lang=com.google.gson', '--add-opens=java.base/java.util=com.google.gson'
             mods {
                 blockpower {
                     source sourceSets.main
@@ -121,8 +124,7 @@ jar {
 
                 // 这是Java 9+ 模块系统的标准做法。
 
-                "Add-Opens": "java.base/java.lang=com.google.gson"
-
+                "Add-Opens": "java.base/java.lang=com.google.gson java.base/java.util=com.google.gson"
         ])
 
     }

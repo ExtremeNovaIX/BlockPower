@@ -3,9 +3,9 @@ package BlockPower.Entities.RushMinecart;
 import BlockPower.DTO.S2C.ShakeData;
 import BlockPower.Entities.FakeRail.FakeRailEntity;
 import BlockPower.Entities.ModEntities;
-import BlockPower.Main.Main;
 import BlockPower.ModMessages.PlayerActionPacket_S2C;
-import BlockPower.ModMessages.ServerAction;
+import BlockPower.ModSounds.ModSounds;
+import BlockPower.Util.Commons;
 import BlockPower.Util.Timer.TickTimer;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -24,15 +24,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static BlockPower.Main.Main.sendDebugMessage;
 import static BlockPower.ModMessages.ModMessages.sendToPlayer;
-import static BlockPower.Util.ScreenShake.ScreenShakeHandler.shakeTrigger;
 
 public class RushMinecartEntity extends AbstractMinecart {
 
@@ -113,10 +110,6 @@ public class RushMinecartEntity extends AbstractMinecart {
                     break;
                 }
 
-                if (this.getDeltaMovement().length() < 0.1) {
-                    setState(State.CRASHED);
-                }
-
                 hurtEntity(player);
                 break;
 
@@ -159,6 +152,12 @@ public class RushMinecartEntity extends AbstractMinecart {
     private void handleMinecartMovement() {
         State currentState = getState();
         Vec3 motion = this.getDeltaMovement();
+
+        //速度过低时，进入撞毁状态
+        if (motion.length() < 0.1 && currentState != State.CRASHED) {
+            setState(State.CRASHED);
+        }
+
         //冲刺时无重力
         if (currentState == State.RUSHING || currentState == State.INITIALIZING) {
             this.setDeltaMovement(new Vec3(motion.x, 0, motion.z));
@@ -298,6 +297,7 @@ public class RushMinecartEntity extends AbstractMinecart {
             });
             //触发屏幕震动
             if (getState() == State.RUSHING) {
+                Commons.sendPlaySound((ServerPlayer) player, ModSounds.MINECART_CRASH.get(), 1.0F, 1.0F);
                 sendToPlayer(new PlayerActionPacket_S2C(new ShakeData(5, 3f)), (ServerPlayer) player);
             }
             setState(State.CRASHED);

@@ -2,9 +2,7 @@ package BlockPower.Util.Gson;
 
 import BlockPower.DTO.ActionData;
 import BlockPower.DTO.ActionPacket;
-import BlockPower.DTO.C2S.MinecartData;
-import BlockPower.DTO.S2C.ShakeData;
-import BlockPower.ModMessages.PlayerAction;
+import BlockPower.ModMessages.ClientAction;
 import BlockPower.ModMessages.ServerAction;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,15 +19,16 @@ public class ModGson {
         final RuntimeTypeAdapterFactory<ActionData> typeFactory = RuntimeTypeAdapterFactory
                 .of(ActionData.class, "actionType");
         LOGGER.info("开始自动注册所有S2C动作");
-        autoRegisterFromEnum(typeFactory, ServerAction.class);
+        autoRegisterFromEnum(typeFactory, ClientAction.class);
         LOGGER.info("自动注册所有S2C动作完成");
 
         LOGGER.info("开始自动注册所有C2S动作");
-        autoRegisterFromEnum(typeFactory, PlayerAction.class);
+        autoRegisterFromEnum(typeFactory, ServerAction.class);
         LOGGER.info("自动注册所有C2S动作完成");
 
         GSON_INSTANCE = new GsonBuilder()
                 .registerTypeAdapterFactory(typeFactory)
+                .registerTypeAdapterFactory(OptionalTypeAdapter.FACTORY)
                 .create();
     }
 

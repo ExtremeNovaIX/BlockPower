@@ -1,17 +1,25 @@
 package BlockPower.ModMessages;
 
 import BlockPower.DTO.ActionData;
+import BlockPower.DTO.S2C.PlaySoundData;
 import BlockPower.DTO.S2C.ShakeData;
 import BlockPower.Util.Gson.ModGson;
+import BlockPower.Util.PlaySounds.PlaySounds;
 import BlockPower.Util.ScreenShake.ScreenShakeHandler;
 import com.google.gson.Gson;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public class PlayerActionPacket_S2C {
@@ -47,9 +55,9 @@ public class PlayerActionPacket_S2C {
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
-            // 首先判断data是否为null，增加健壮性
+            // 首先判断data是否为null
             if (this.data == null) {
-                LOGGER.warn("收到了一个空的S2C数据包");
+                LOGGER.warn("收到了异常S2C数据包");
                 return;
             }
 
@@ -57,6 +65,9 @@ public class PlayerActionPacket_S2C {
             if (this.data instanceof ShakeData shakeData) {
                 LOGGER.info("客户端收到指令：SHAKE (时长: {}, 强度: {})", shakeData.getDuration(), shakeData.getStrength());
                 ScreenShakeHandler.shakeTrigger(shakeData.getDuration(), shakeData.getStrength());
+            } else if (this.data instanceof PlaySoundData playSoundData) {
+                LOGGER.info("客户端收到指令：PLAY_SOUND (音效: {}, 音量: {}, 音调: {})", playSoundData.getSoundEventLocation(), playSoundData.getVolume(), playSoundData.getPitch());
+                PlaySounds.playSound(playSoundData);
             } else {
                 LOGGER.warn("收到了未知的S2C动作类型: " + this.data.getClass().getName());
             }

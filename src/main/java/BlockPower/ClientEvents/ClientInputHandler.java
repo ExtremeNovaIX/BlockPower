@@ -3,7 +3,6 @@ package BlockPower.ClientEvents;
 import BlockPower.DTO.C2S.MinecartData;
 import BlockPower.KeyBindings.KeyBindings;
 import BlockPower.ModMessages.ModMessages;
-import BlockPower.ModMessages.PlayerAction;
 import BlockPower.ModMessages.PlayerActionPacket_C2S;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
