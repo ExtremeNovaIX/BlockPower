@@ -1,6 +1,7 @@
 package BlockPower.Main;
 
 import BlockPower.Entities.ModEntities;
+import BlockPower.Items.ModItems;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.ModSounds.ModSounds;
 import net.minecraft.ChatFormatting;
@@ -27,6 +28,7 @@ public class Main {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         //注册事件总线
         ModSounds.register(modEventBus);
+        ModItems.ITEMS.register(modEventBus);
         ModEntities.ENTITY_TYPES.register(modEventBus);
         MinecraftForge.EVENT_BUS.register(this);
         ModMessages.register();
