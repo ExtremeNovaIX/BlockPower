@@ -1,0 +1,10 @@
+{
+	"minecart_crash": {
+		"sounds": [
+			{
+				"name": "blockpower:minecart_crash",
+				"stream": true
+			}
+		]
+	}
+}

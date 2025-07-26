@@ -6,24 +6,44 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 
 public class PlaySoundData extends ActionData {
-    private int entityId;
+    private double x;
+    private double y;
+    private double z;
     private String soundEventLocation;
     private float volume;
     private float pitch;
 
     public PlaySoundData(Entity entity, SoundEvent soundEvent, float volume, float pitch) {
-        this.entityId = entity.getId();
+        this.x = entity.getX();
+        this.y = entity.getY();
+        this.z = entity.getZ();
         this.soundEventLocation = soundEvent.getLocation().toString();
         this.volume = volume;
         this.pitch = pitch;
     }
 
-    public int getEntityId() {
-        return entityId;
+    public double getX() {
+        return x;
     }
 
-    public void setEntityId(int entityId) {
-        this.entityId = entityId;
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public double getZ() {
+        return z;
+    }
+
+    public void setZ(double z) {
+        this.z = z;
     }
 
     public float getPitch() {
