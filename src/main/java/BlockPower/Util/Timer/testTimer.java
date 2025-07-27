@@ -2,8 +2,6 @@ package BlockPower.Util.Timer;
 
 import net.minecraftforge.event.TickEvent;
 
-import static BlockPower.Main.Main.sendDebugMessage;
-
 //@Mod.EventBusSubscriber
 
 /**
@@ -18,10 +16,10 @@ public class testTimer {
     //第二步，在tick相关事件或者循环中使用如下结构
     public void onServerTick(TickEvent.PlayerTickEvent event) {
         if(timer == null) {
-            timer = new TickTimer();
+            timer = new TickTimer(100);
         }
         if (event.phase == TickEvent.Phase.END) {
-            if (timer.waitTicks(timer,100)) {
+            if (timer.updateTimer(timer)) {
                 //在这里写等待后的逻辑
             }
         }

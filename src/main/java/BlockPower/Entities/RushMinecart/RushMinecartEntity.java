@@ -1,17 +1,18 @@
 package BlockPower.Entities.RushMinecart;
 
-import BlockPower.DTO.S2C.ShakeData;
 import BlockPower.Entities.FakeRail.FakeRailEntity;
 import BlockPower.Entities.ModEntities;
-import BlockPower.ModMessages.PlayerActionPacket_S2C;
 import BlockPower.ModSounds.ModSounds;
-import BlockPower.Util.Commons;
+import BlockPower.Util.Timer.ServerTickListener;
 import BlockPower.Util.Timer.TickTimer;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,10 +28,12 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
-import static BlockPower.Main.Main.sendDebugMessage;
-import static BlockPower.ModMessages.ModMessages.sendToPlayer;
+import static BlockPower.Util.Commons.sendScreenShake;
 
 public class RushMinecartEntity extends AbstractMinecart {
 
@@ -53,6 +56,11 @@ public class RushMinecartEntity extends AbstractMinecart {
     private Vec3 lastRailPlacementPos = Vec3.ZERO;//记录上一个生成点的位置
 
     private static final EntityDataAccessor<Integer> DATA_STATE = SynchedEntityData.defineId(RushMinecartEntity.class, EntityDataSerializers.INT);
+
+    private static final Random r = new Random();
+
+    private final Map<Entity, TickTimer> particleTimers = new HashMap<>();//粒子效果计时器
+
 
     private TickTimer rideDelayTimer;
     private TickTimer endTimer;
@@ -83,7 +91,7 @@ public class RushMinecartEntity extends AbstractMinecart {
     public void tick() {
         normalMinecraftLogic();
         handleMinecartMovement();
-
+        updateParticlesTimer();
         //服务端逻辑
         if (!this.level().isClientSide) {
             updateState();
@@ -103,9 +111,8 @@ public class RushMinecartEntity extends AbstractMinecart {
 
         switch (currentState) {
             case INITIALIZING:
-                initLookAngle = this.getLookAngle();
-                if (rideDelayTimer == null) rideDelayTimer = new TickTimer();
-                if (rideDelayTimer.waitTicks(rideDelayTimer, 2)) {
+                if (rideDelayTimer == null) rideDelayTimer = new TickTimer(2);
+                if (rideDelayTimer.updateTimer(rideDelayTimer)) {
                     player.startRiding(this);
                     setState(State.RUSHING);
                 }
@@ -117,7 +124,10 @@ public class RushMinecartEntity extends AbstractMinecart {
                     break;
                 }
 
-                hurtEntity(player);
+                //每2tick触发一次
+                if (ServerTickListener.getTicks() % 2 == 0) {
+                    hurtEntity(player);
+                }
                 break;
 
             case SEEKING:
@@ -127,8 +137,8 @@ public class RushMinecartEntity extends AbstractMinecart {
                     setState(State.CAPTURED);
                 } else {
                     //如果在一定时间内没找到目标，则进入结束状态
-                    if (endTimer == null) endTimer = new TickTimer();
-                    if (endTimer.waitTicks(endTimer, 80)) {
+                    if (endTimer == null) endTimer = new TickTimer(80);
+                    if (endTimer.updateTimer(endTimer)) {
                         setState(State.ENDING);
                     }
                 }
@@ -136,16 +146,18 @@ public class RushMinecartEntity extends AbstractMinecart {
 
             case CAPTURED:
                 //被捕获的生物下车后，进入结束状态
-                if (endTimer == null) endTimer = new TickTimer();
-                if (endTimer.waitTicks(endTimer, 40)) {
+                if (endTimer == null) endTimer = new TickTimer(40);
+                if (endTimer.updateTimer(endTimer)) {
                     setState(State.ENDING);
                 }
                 break;
 
             case CRASHED:
-                if (crashTimer == null) crashTimer = new TickTimer();
-                hurtEntity(player);
-                if (crashTimer.waitTicks(crashTimer, 20)) {
+                if (crashTimer == null) crashTimer = new TickTimer(20);
+                if (ServerTickListener.getTicks() % 2 == 0) {
+                    hurtEntity(player);
+                }
+                if (crashTimer.updateTimer(crashTimer)) {
                     setState(State.ENDING);
                 }
                 break;
@@ -161,7 +173,7 @@ public class RushMinecartEntity extends AbstractMinecart {
         Vec3 motion = this.getDeltaMovement();
 
         //速度过低时，进入撞毁状态
-        if (currentState == State.RUSHING && motion.length() < 0.1 ) {
+        if (currentState == State.RUSHING && motion.length() < 0.1) {
             setState(State.CRASHED);
         }
 
@@ -204,6 +216,32 @@ public class RushMinecartEntity extends AbstractMinecart {
                 // 更新记录点，只加上已经填充过的整数距离
                 lastRailPlacementPos = lastRailPlacementPos.add(moveDirection.scale(segmentsToSpawn));
             }
+        }
+    }
+
+    private void updateParticlesTimer() {
+        if (!this.level().isClientSide) {
+            particleTimers.entrySet().removeIf(
+                    entry -> {
+                        ServerLevel serverLevel = (ServerLevel) this.level();
+                        Entity entity = entry.getKey();
+                        TickTimer timer = entry.getValue();
+                        if (timer.updateTimer(timer)) {
+                            return true;
+                        }
+
+                        serverLevel.sendParticles(
+                                ParticleTypes.CLOUD,
+                                entity.getX(),
+                                entity.getY() + 1.0,
+                                entity.getZ(),
+                                3,
+                                0.3, 0.3, 0.3,
+                                0.05
+                        );
+                        return false;
+                    }
+            );
         }
     }
 
@@ -292,20 +330,25 @@ public class RushMinecartEntity extends AbstractMinecart {
      * @param player 释放技能的玩家
      */
     private void hurtEntity(@NotNull Player player) {
-        sendDebugMessage(player, getState().toString());
         List<Entity> entities = detectEntity(player, 4);
         if (!entities.isEmpty()) {
             entities.forEach(entity -> {
                 entity.hurt(this.level().damageSources().mobAttack(player), 15F);
+                //为每个被击中的实体启动粒子计时器
+                particleTimers.put(entity, new TickTimer(40));
                 if (entity instanceof ServerPlayer) {
-                    sendToPlayer(new PlayerActionPacket_S2C(new ShakeData(5, 3f)), (ServerPlayer) entity);
+                    sendScreenShake(15, 2f, (ServerPlayer) player);
                 }
-                knockBackEntity(entity, 0.4);
+                if (!this.level().isClientSide) {
+                    this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
+                            ModSounds.MINECART_CRASH.get(),
+                            SoundSource.PLAYERS, r.nextFloat(0.5f) + 0.8f, r.nextFloat(0.5f) + 0.8f);
+                }
+                knockBackEntity(entity, 1.5);
             });
             //触发屏幕震动
             if (getState() == State.RUSHING) {
-                Commons.sendPlaySound((ServerPlayer) player, ModSounds.MINECART_CRASH.get(), 1.0F, 1.0F);
-                sendToPlayer(new PlayerActionPacket_S2C(new ShakeData(5, 3f)), (ServerPlayer) player);
+                sendScreenShake(15, 2f, (ServerPlayer) player);
             }
             setState(State.CRASHED);
         }

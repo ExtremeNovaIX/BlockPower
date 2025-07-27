@@ -2,12 +2,12 @@ package BlockPower.Util.Timer;
 
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
-
 public class TickTimer {
     private int startTick;
 
     private int nowTick;
+
+    private int tickDuration;
 
     public int getNowTick() {
         return nowTick;
@@ -17,18 +17,18 @@ public class TickTimer {
         this.nowTick = nowTick;
     }
 
-    public TickTimer() {
+    public TickTimer(int tickDuration) {
         this.startTick = ServerTickListener.getTicks();
+        this.tickDuration = tickDuration;
     }
 
     /**
      * 等待一段时间，具体用法请查看testTimer
      * @param tickTimer 计时器对象
-     * @param tickDuration 等待时间
      * @return true: 等待时间已到
      *         false: 等待时间未到
      */
-    public boolean waitTicks(@NotNull TickTimer tickTimer, int tickDuration) {
+    public boolean updateTimer(@NotNull TickTimer tickTimer) {
         tickTimer.setNowTick(ServerTickListener.getTicks() - tickTimer.getStartTick());
         return tickTimer.getNowTick()  >= tickDuration;
     }
@@ -39,5 +39,9 @@ public class TickTimer {
 
     public void setStartTick(int startTick) {
         this.startTick = startTick;
+    }
+
+    public int getTickDuration() {
+        return tickDuration;
     }
 }
