@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static BlockPower.Main.Main.sendDebugMessage;
 import static BlockPower.ModMessages.ModMessages.sendToPlayer;
 
 public class RushMinecartEntity extends AbstractMinecart {
@@ -47,7 +48,7 @@ public class RushMinecartEntity extends AbstractMinecart {
         ENDING        //技能结束, 准备销毁
     }
 
-    private Player player;
+    private ServerPlayer player;
 
     private Vec3 lastRailPlacementPos = Vec3.ZERO;//记录上一个生成点的位置
 
@@ -66,6 +67,11 @@ public class RushMinecartEntity extends AbstractMinecart {
     public RushMinecartEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
         this.player = null;
+    }
+
+    public RushMinecartEntity(ServerPlayer player) {
+        super(ModEntities.RUSH_MINECART.get(), player.level());
+        this.player = player;
     }
 
     protected RushMinecartEntity(EntityType<?> entityType, Level level, double x, double y, double z, ServerPlayer player) {
@@ -97,6 +103,7 @@ public class RushMinecartEntity extends AbstractMinecart {
 
         switch (currentState) {
             case INITIALIZING:
+                initLookAngle = this.getLookAngle();
                 if (rideDelayTimer == null) rideDelayTimer = new TickTimer();
                 if (rideDelayTimer.waitTicks(rideDelayTimer, 2)) {
                     player.startRiding(this);
@@ -154,7 +161,7 @@ public class RushMinecartEntity extends AbstractMinecart {
         Vec3 motion = this.getDeltaMovement();
 
         //速度过低时，进入撞毁状态
-        if (motion.length() < 0.1 && currentState != State.CRASHED) {
+        if (currentState == State.RUSHING && motion.length() < 0.1 ) {
             setState(State.CRASHED);
         }
 
@@ -212,7 +219,7 @@ public class RushMinecartEntity extends AbstractMinecart {
         this.lastRailPlacementPos = initialPos;
     }
 
-    public static void createRushMinecart(@NotNull ServerPlayer player) {
+    public void createRushMinecart() {
         Vec3 lookAngle = player.getLookAngle();
         lookAngle = new Vec3(lookAngle.x, 0, lookAngle.z).normalize();
         double distance = 1.5;
@@ -233,7 +240,6 @@ public class RushMinecartEntity extends AbstractMinecart {
         minecart.xRotO = minecart.getXRot();
         double scale = 1.5;
         minecart.setDeltaMovement(lookAngle.scale(scale));
-
         //将矿车添加到世界中
         player.level().addFreshEntity(minecart);
         LOGGER.info("生成冲刺矿车");
@@ -286,6 +292,7 @@ public class RushMinecartEntity extends AbstractMinecart {
      * @param player 释放技能的玩家
      */
     private void hurtEntity(@NotNull Player player) {
+        sendDebugMessage(player, getState().toString());
         List<Entity> entities = detectEntity(player, 4);
         if (!entities.isEmpty()) {
             entities.forEach(entity -> {

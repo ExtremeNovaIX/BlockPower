@@ -2,6 +2,7 @@ package BlockPower.ModMessages;
 
 import BlockPower.DTO.ActionData;
 import BlockPower.DTO.C2S.MinecartData;
+import BlockPower.Entities.RushMinecart.RushMinecartEntity;
 import BlockPower.Util.Gson.ModGson;
 import com.google.gson.Gson;
 import net.minecraft.network.FriendlyByteBuf;
@@ -13,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 
-import static BlockPower.Entities.RushMinecart.RushMinecartEntity.createRushMinecart;
 
 public class PlayerActionPacket_C2S {
 
@@ -59,7 +59,7 @@ public class PlayerActionPacket_C2S {
 
             if (this.data instanceof MinecartData) {
                 LOGGER.info("服务端收到来自 {} 的指令：MINECART_RUSH", player.getGameProfile().getName());
-                createRushMinecart(player);
+                new RushMinecartEntity(player).createRushMinecart();
             }
             // else if (this.data instanceof AnotherC2SData anotherData) {
             //     // 如果未来有其他C2S动作，在这里继续添加 else if
