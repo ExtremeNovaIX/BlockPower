@@ -5,6 +5,7 @@ import BlockPower.Entities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Util.Timer.ServerTickListener;
 import BlockPower.Util.Timer.TickTimer;
+import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -61,10 +62,7 @@ public class RushMinecartEntity extends AbstractMinecart {
 
     private final Map<Entity, TickTimer> particleTimers = new HashMap<>();//粒子效果计时器
 
-
-    private TickTimer rideDelayTimer;
-    private TickTimer endTimer;
-    private TickTimer crashTimer;
+    private static final TimerManager timerManager = TimerManager.getInstance();//全局计时器管理类
 
     @Override
     protected void defineSynchedData() {
@@ -111,8 +109,7 @@ public class RushMinecartEntity extends AbstractMinecart {
 
         switch (currentState) {
             case INITIALIZING:
-                if (rideDelayTimer == null) rideDelayTimer = new TickTimer(2);
-                if (rideDelayTimer.updateTimer(rideDelayTimer)) {
+                if (timerManager.isTimerCyclingDue(this,"rideDelayTimer",2)) {
                     player.startRiding(this);
                     setState(State.RUSHING);
                 }
@@ -137,8 +134,7 @@ public class RushMinecartEntity extends AbstractMinecart {
                     setState(State.CAPTURED);
                 } else {
                     //如果在一定时间内没找到目标，则进入结束状态
-                    if (endTimer == null) endTimer = new TickTimer(80);
-                    if (endTimer.updateTimer(endTimer)) {
+                    if (timerManager.isTimerCyclingDue(this,"endTimer",80)) {
                         setState(State.ENDING);
                     }
                 }
@@ -146,18 +142,16 @@ public class RushMinecartEntity extends AbstractMinecart {
 
             case CAPTURED:
                 //被捕获的生物下车后，进入结束状态
-                if (endTimer == null) endTimer = new TickTimer(40);
-                if (endTimer.updateTimer(endTimer)) {
+                if (timerManager.isTimerCyclingDue(this,"endTimer",40)) {
                     setState(State.ENDING);
                 }
                 break;
 
             case CRASHED:
-                if (crashTimer == null) crashTimer = new TickTimer(20);
                 if (ServerTickListener.getTicks() % 2 == 0) {
                     hurtEntity(player);
                 }
-                if (crashTimer.updateTimer(crashTimer)) {
+                if (timerManager.isTimerCyclingDue(this,"crashTimer",20)) {
                     setState(State.ENDING);
                 }
                 break;
@@ -226,7 +220,7 @@ public class RushMinecartEntity extends AbstractMinecart {
                         ServerLevel serverLevel = (ServerLevel) this.level();
                         Entity entity = entry.getKey();
                         TickTimer timer = entry.getValue();
-                        if (timer.updateTimer(timer)) {
+                        if (timer.isFinished()) {
                             return true;
                         }
 
