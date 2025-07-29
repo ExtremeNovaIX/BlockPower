@@ -1,6 +1,7 @@
 package BlockPower.Entities;
 
-import BlockPower.Entities.FakeRail.FakeRailEntity;
+import BlockPower.Entities.DropAnvil.DropAnvilEntity;
+import BlockPower.Entities.RushMinecart.FakeRailEntity;
 import BlockPower.Entities.RushMinecart.RushMinecartEntity;
 import BlockPower.Main.Main;
 import net.minecraft.world.entity.EntityType;
@@ -32,4 +33,12 @@ public class ModEntities {
                             .noSave()
                             .noSummon()
                             .build("rush_minecart"));
+
+    public static final RegistryObject<EntityType<DropAnvilEntity>> DROP_ANVIL =
+            ENTITY_TYPES.register("drop_anvil",
+                    () -> EntityType.Builder.<DropAnvilEntity>of(DropAnvilEntity::new, MobCategory.MISC)
+                            .sized(1.0F, 1.0F)
+                            .noSave()
+                            .noSummon()
+                            .build("drop_anvil"));
 }

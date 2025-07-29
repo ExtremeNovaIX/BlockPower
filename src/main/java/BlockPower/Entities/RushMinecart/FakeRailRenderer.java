@@ -1,5 +1,5 @@
 // 文件名: FakeRailRenderer.java
-package BlockPower.Entities.FakeRail;
+package BlockPower.Entities.RushMinecart;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;

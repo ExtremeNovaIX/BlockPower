@@ -1,4 +1,4 @@
-package BlockPower.Entities.FakeRail;
+package BlockPower.Entities.RushMinecart;
 
 import BlockPower.Entities.ModEntities;
 import net.minecraft.nbt.CompoundTag;
@@ -14,7 +14,7 @@ import net.minecraftforge.network.NetworkHooks;
 
 public class FakeRailEntity extends Entity {
 
-    private int lifeTime = 10;
+    private int lifeTime = 40;
 
     private static final EntityDataAccessor<Float> DATA_YAW = SynchedEntityData.defineId(FakeRailEntity.class, EntityDataSerializers.FLOAT);
 
