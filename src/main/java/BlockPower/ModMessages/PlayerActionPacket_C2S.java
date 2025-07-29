@@ -59,6 +59,7 @@ public class PlayerActionPacket_C2S {
 
             if (this.data instanceof MinecartData) {
                 LOGGER.info("服务端收到来自 {} 的指令：MINECART_RUSH", player.getGameProfile().getName());
+                //TODO:把createRushMinecart方法改为static
                 new RushMinecartEntity(player).createRushMinecart();
             }
             // else if (this.data instanceof AnotherC2SData anotherData) {

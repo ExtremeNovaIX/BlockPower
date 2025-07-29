@@ -1,8 +1,10 @@
 package BlockPower.ModMessages;
 
 import BlockPower.DTO.ActionData;
+import BlockPower.DTO.S2C.HitStopData;
 import BlockPower.DTO.S2C.ShakeData;
 import BlockPower.Util.Gson.ModGson;
+import BlockPower.Util.HitStop.HitStopHandler;
 import BlockPower.Util.ScreenShake.ScreenShakeHandler;
 import com.google.gson.Gson;
 import net.minecraft.network.FriendlyByteBuf;
@@ -56,6 +58,9 @@ public class PlayerActionPacket_S2C {
             if (this.data instanceof ShakeData shakeData) {
                 LOGGER.info("客户端收到指令：SHAKE (时长: {}, 强度: {})", shakeData.getDuration(), shakeData.getStrength());
                 ScreenShakeHandler.shakeTrigger(shakeData.getDuration(), shakeData.getStrength());
+            } else if (this.data instanceof HitStopData hitStopData) {
+                LOGGER.info("客户端收到指令：HIT_STOP (时长: {})", hitStopData.getDuration());
+                HitStopHandler.start(hitStopData.getDuration());
             } else {
                 LOGGER.warn("收到了未知的S2C动作类型: " + this.data.getClass().getName());
             }

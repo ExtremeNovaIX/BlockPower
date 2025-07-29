@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import static BlockPower.Util.Commons.sendHitStop;
 import static BlockPower.Util.Commons.sendScreenShake;
 
 public class RushMinecartEntity extends AbstractMinecart {
@@ -331,7 +332,8 @@ public class RushMinecartEntity extends AbstractMinecart {
                 //为每个被击中的实体启动粒子计时器
                 particleTimers.put(entity, new TickTimer(40));
                 if (entity instanceof ServerPlayer) {
-                    sendScreenShake(15, 2f, (ServerPlayer) player);
+                    sendScreenShake(6, 2f, (ServerPlayer) player);
+                    sendHitStop(2, (ServerPlayer) player);
                 }
                 if (!this.level().isClientSide) {
                     this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
@@ -342,7 +344,8 @@ public class RushMinecartEntity extends AbstractMinecart {
             });
             //触发屏幕震动
             if (getState() == State.RUSHING) {
-                sendScreenShake(15, 2f, (ServerPlayer) player);
+                sendScreenShake(6, 2f, (ServerPlayer) player);
+                sendHitStop(2, (ServerPlayer) player);
             }
             setState(State.CRASHED);
         }
