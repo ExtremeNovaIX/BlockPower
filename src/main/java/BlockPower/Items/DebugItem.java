@@ -1,8 +1,9 @@
 package BlockPower.Items;
 
 import BlockPower.Main.Main;
-import BlockPower.Util.ImpactVFX.ImpactVFXHandler;
 
+import BlockPower.Util.Visual.ClientEffectManager;
+import BlockPower.Util.Visual.VisualEffect;
 import com.mojang.logging.LogUtils;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -41,5 +42,6 @@ public class DebugItem extends Item {
 
     private void testClientMethod(Player player) {
         LOGGER.info("testClientMethod");
+            ClientEffectManager.spawnEffect(VisualEffect.EffectType.CROSS_STAR,player.position(),100);
     }
 }
