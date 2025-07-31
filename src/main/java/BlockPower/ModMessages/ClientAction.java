@@ -1,6 +1,7 @@
 package BlockPower.ModMessages;
 
 import BlockPower.DTO.ActionPacket;
+import BlockPower.DTO.S2C.CrossStarRenderData;
 import BlockPower.DTO.S2C.HitStopData;
 import BlockPower.DTO.S2C.ShakeData;
 
@@ -10,4 +11,6 @@ public enum ClientAction {
     SHAKE,
     @ActionPacket(HitStopData.class)
     HIT_STOP,
+    @ActionPacket(CrossStarRenderData.class)
+    CROSS_STAR,
 }

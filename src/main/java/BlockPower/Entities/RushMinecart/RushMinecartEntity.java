@@ -34,8 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static BlockPower.Util.Commons.sendHitStop;
-import static BlockPower.Util.Commons.sendScreenShake;
+import static BlockPower.Util.Commons.*;
 
 public class RushMinecartEntity extends AbstractMinecart {
 
@@ -347,6 +346,11 @@ public class RushMinecartEntity extends AbstractMinecart {
                 sendScreenShake(3, 3f, (ServerPlayer) player);
                 sendHitStop(3, (ServerPlayer) player);
             }
+
+            if (getState() == State.RUSHING) {
+                sendCrossStarRender(20, (ServerPlayer) player);
+            }
+
             setState(State.CRASHED);
         }
     }

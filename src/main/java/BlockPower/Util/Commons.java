@@ -1,5 +1,6 @@
 package BlockPower.Util;
 
+import BlockPower.DTO.S2C.CrossStarRenderData;
 import BlockPower.DTO.S2C.HitStopData;
 import BlockPower.DTO.S2C.ShakeData;
 import BlockPower.ModMessages.PlayerActionPacket_S2C;
@@ -30,6 +31,16 @@ public class Commons {
      */
     public static void sendHitStop(int duration, ServerPlayer serverPlayer) {
         sendToPlayer(new PlayerActionPacket_S2C(new HitStopData(duration)), serverPlayer);
+    }
+
+    /**
+     * 触发十字星渲染
+     *
+     * @param duration     渲染持续时间
+     * @param serverPlayer 目标玩家
+     */
+    public static void sendCrossStarRender(int duration, ServerPlayer serverPlayer) {
+        sendToPlayer(new PlayerActionPacket_S2C(new CrossStarRenderData(duration, serverPlayer.position())), serverPlayer);
     }
 
 }

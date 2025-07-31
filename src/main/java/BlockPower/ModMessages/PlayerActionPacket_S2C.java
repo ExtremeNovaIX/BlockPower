@@ -1,13 +1,17 @@
 package BlockPower.ModMessages;
 
 import BlockPower.DTO.ActionData;
+import BlockPower.DTO.S2C.CrossStarRenderData;
 import BlockPower.DTO.S2C.HitStopData;
 import BlockPower.DTO.S2C.ShakeData;
 import BlockPower.Util.Gson.ModGson;
 import BlockPower.Util.HitStop.HitStopHandler;
 import BlockPower.Util.ScreenShake.ScreenShakeHandler;
+import BlockPower.Util.Visual.ClientEffectManager;
+import BlockPower.Util.Visual.VisualEffect;
 import com.google.gson.Gson;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +65,13 @@ public class PlayerActionPacket_S2C {
             } else if (this.data instanceof HitStopData hitStopData) {
                 LOGGER.info("客户端收到指令：HIT_STOP (时长: {})", hitStopData.getDuration());
                 HitStopHandler.start(hitStopData.getDuration());
+            } else if (this.data instanceof CrossStarRenderData crossStarRenderData) {
+                LOGGER.info("客户端收到指令：CROSS_STAR (时长: {}, 位置: {}, {}, {})", crossStarRenderData.getDuration(), crossStarRenderData.getX(), crossStarRenderData.getY(), crossStarRenderData.getZ());
+                ClientEffectManager.spawnEffect(
+                        VisualEffect.EffectType.CROSS_STAR,
+                        new Vec3(crossStarRenderData.getX(), crossStarRenderData.getY(), crossStarRenderData.getZ()),
+                        crossStarRenderData.getDuration()
+                );
             } else {
                 LOGGER.warn("收到了未知的S2C动作类型: " + this.data.getClass().getName());
             }
