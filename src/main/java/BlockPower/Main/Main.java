@@ -32,7 +32,6 @@ public class Main {
         ModEntities.ENTITY_TYPES.register(modEventBus);
         MinecraftForge.EVENT_BUS.register(this);
         ModMessages.register();
-
     }
 
     /**

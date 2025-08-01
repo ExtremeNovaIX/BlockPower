@@ -349,7 +349,7 @@ public class RushMinecartEntity extends AbstractMinecart {
                 }
                 if (!this.level().isClientSide) {
                     this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
-                            ModSounds.MINECART_CRASH.get(),
+                            ModSounds.MINECART_CRASH_SOUND.get(),
                             SoundSource.PLAYERS, r.nextFloat(0.5f) + 0.8f, r.nextFloat(0.5f) + 0.8f);
                 }
                 knockBackEntity(entity, 1.5);
