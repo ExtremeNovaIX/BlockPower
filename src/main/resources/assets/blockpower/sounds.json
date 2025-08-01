@@ -1,0 +1,58 @@
+{
+	"anvil_sound": {
+		"sounds": [
+			{
+				"name": "blockpower:anvil",
+				"stream": true
+			}
+		]
+	},
+	"fly_sound": {
+		"sounds": [
+			{
+				"name": "blockpower:fly",
+				"stream": true
+			}
+		]
+	},
+	"hit_sound": {
+		"sounds": [
+			{
+				"name": "blockpower:hit",
+				"stream": true
+			}
+		]
+	},
+	"kill_finish_sound": {
+		"sounds": [
+			{
+				"name": "blockpower:kill_finish",
+				"stream": true
+			}
+		]
+	},
+	"magma_block_sound": {
+		"sounds": [
+			{
+				"name": "blockpower:magma_block",
+				"stream": true
+			}
+		]
+	},
+	"minecart_crash_sound": {
+		"sounds": [
+			{
+				"name": "blockpower:minecart_crash",
+				"stream": true
+			}
+		]
+	},
+	"sweeping_knockback_sound": {
+		"sounds": [
+			{
+				"name": "blockpower:sweeping_knockback",
+				"stream": true
+			}
+		]
+	}
+}

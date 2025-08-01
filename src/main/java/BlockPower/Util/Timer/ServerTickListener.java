@@ -6,7 +6,7 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber
 public class ServerTickListener {
-    private static int ticks = 0;
+    private static long ticks = 0;
 
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
@@ -15,7 +15,7 @@ public class ServerTickListener {
         }
     }
 
-    public static int getTicks() {
+    public static long getTicks() {
         return ticks;
     }
 }

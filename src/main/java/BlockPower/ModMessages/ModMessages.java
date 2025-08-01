@@ -41,6 +41,12 @@ public class ModMessages {
                 .consumerMainThread(PlayerActionPacket_C2S::handle)
                 .add();
 
+        net.messageBuilder(PlayerActionPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(PlayerActionPacket_S2C::new)
+                .encoder(PlayerActionPacket_S2C::toBytes)
+                .consumerMainThread(PlayerActionPacket_S2C::handle)
+                .add();
+
     }
 
     // 一个辅助方法，用于从客户端向服务端发包
