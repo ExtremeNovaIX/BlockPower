@@ -1,6 +1,5 @@
 package BlockPower.Entities.RushMinecart;
 
-import BlockPower.Entities.FakeRail.FakeRailEntity;
 import BlockPower.Entities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Util.Timer.ServerTickListener;

@@ -1,6 +1,7 @@
 package BlockPower.ClientEvents;
 
-import BlockPower.Entities.FakeRail.FakeRailRenderer;
+import BlockPower.Entities.DropAnvil.DropAnvilRenderer;
+import BlockPower.Entities.RushMinecart.FakeRailRenderer;
 import BlockPower.Entities.ModEntities;
 import BlockPower.Entities.RushMinecart.RushMinecartRenderer;
 import BlockPower.KeyBindings.KeyBindings;
@@ -48,5 +49,6 @@ public class ClientEvents {
     public static void onRenderRegister(final EntityRenderersEvent.RegisterRenderers event) {
         EntityRenderers.register(ModEntities.FAKE_RAIL_ENTITY.get(), FakeRailRenderer::new);
         EntityRenderers.register(ModEntities.RUSH_MINECART.get(), RushMinecartRenderer::new);
+        EntityRenderers.register(ModEntities.DROP_ANVIL.get(), DropAnvilRenderer::new);
     }
 }

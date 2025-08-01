@@ -14,4 +14,12 @@ public class KeyBindings {
             InputConstants.KEY_R,//按键绑定
             BLOCKPOWER_KEY
     );
+
+    public static final KeyMapping DROP_ANVIL = new KeyMapping(
+            "key.blockpower.drop_anvil",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            InputConstants.KEY_F,//按键绑定
+            BLOCKPOWER_KEY
+    );
 }

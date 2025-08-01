@@ -1,5 +1,6 @@
 package BlockPower.ClientEvents;
 
+import BlockPower.DTO.C2S.DropAnvilData;
 import BlockPower.DTO.C2S.MinecartData;
 import BlockPower.KeyBindings.KeyBindings;
 import BlockPower.ModMessages.ModMessages;
@@ -24,6 +25,10 @@ public class ClientInputHandler {
             if (KeyBindings.MINECART_RUSH.consumeClick()) {
                 LOGGER.info("MINECART_RUSH key 触发!");
                 ModMessages.sendToServer(new PlayerActionPacket_C2S(new MinecartData()));
+            }
+            if (KeyBindings.DROP_ANVIL.consumeClick()) {
+                LOGGER.info("DROP_ANVIL key 触发!");
+                ModMessages.sendToServer(new PlayerActionPacket_C2S(new DropAnvilData()));
             }
         }
     }

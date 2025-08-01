@@ -1,7 +1,9 @@
 package BlockPower.ModMessages;
 
 import BlockPower.DTO.ActionData;
+import BlockPower.DTO.C2S.DropAnvilData;
 import BlockPower.DTO.C2S.MinecartData;
+import BlockPower.Entities.DropAnvil.DropAnvilEntity;
 import BlockPower.Entities.RushMinecart.RushMinecartEntity;
 import BlockPower.Util.Gson.ModGson;
 import com.google.gson.Gson;
@@ -60,6 +62,9 @@ public class PlayerActionPacket_C2S {
             if (this.data instanceof MinecartData) {
                 LOGGER.info("服务端收到来自 {} 的指令：MINECART_RUSH", player.getGameProfile().getName());
                 RushMinecartEntity.createRushMinecart(player);
+            } else if (this.data instanceof DropAnvilData) {
+                LOGGER.info("服务端收到来自 {} 的指令：DROP_ANVIL", player.getGameProfile().getName());
+                DropAnvilEntity.createDropAnvil(player);
             }
             // else if (this.data instanceof AnotherC2SData anotherData) {
             //     // 如果未来有其他C2S动作，在这里继续添加 else if
