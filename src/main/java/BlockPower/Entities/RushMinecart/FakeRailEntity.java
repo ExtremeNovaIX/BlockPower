@@ -68,4 +68,10 @@ public class FakeRailEntity extends Entity {
         //让客户端知道实体被创建的数据包
         return NetworkHooks.getEntitySpawningPacket(this);
     }
+
+    @Override
+    public boolean canCollideWith(Entity entity) {
+        return false;
+    }
+
 }

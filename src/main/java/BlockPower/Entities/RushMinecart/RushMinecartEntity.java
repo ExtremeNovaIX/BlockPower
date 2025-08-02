@@ -33,8 +33,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static BlockPower.Util.Commons.sendHitStop;
-import static BlockPower.Util.Commons.sendScreenShake;
+import static BlockPower.Util.Commons.detectEntity;
+import static BlockPower.Util.Commons.knockBackEntity;
+import static BlockPower.Util.PacketSender.sendHitStop;
+import static BlockPower.Util.PacketSender.sendScreenShake;
 
 public class RushMinecartEntity extends AbstractMinecart {
 
@@ -138,7 +140,7 @@ public class RushMinecartEntity extends AbstractMinecart {
                 break;
 
             case SEEKING:
-                List<Entity> entities = detectEntity(player, 4);
+                List<Entity> entities = detectEntity(this, 4, player);
                 if (!entities.isEmpty()) {
                     entities.get(0).startRiding(this);
                     setState(State.CAPTURED);
@@ -303,41 +305,12 @@ public class RushMinecartEntity extends AbstractMinecart {
     }
 
     /**
-     * 检测半径内的非技能释放者的LivingEntity
-     *
-     * @param player 释放技能的玩家
-     * @param radius 检测半径
-     * @return 半径内的非技能释放者和非自身LivingEntity列表
-     */
-    private List<Entity> detectEntity(@NotNull Player player, double radius) {
-        //创建一个默认半径为radius的检测区域
-        AABB detectionArea = new AABB(
-                this.getX() - radius,
-                this.getY() - radius,
-                this.getZ() - radius,
-                this.getX() + radius,
-                this.getY() + radius,
-                this.getZ() + radius
-        );
-
-        //获取半径内的非技能释放者的LivingEntity
-        return this.level().getEntities(
-                this,
-                detectionArea,
-                entity -> entity != this
-                        && entity.distanceToSqr(this) <= radius * radius
-                        && entity != player
-                        && entity instanceof LivingEntity
-        );
-    }
-
-    /**
      * 伤害撞到的实体
      *
      * @param player 释放技能的玩家
      */
     private void hurtEntity(@NotNull Player player) {
-        List<Entity> entities = detectEntity(player, 4);
+        List<Entity> entities = detectEntity(this, 4, player);
         if (!entities.isEmpty()) {
             entities.forEach(entity -> {
                 entity.hurt(this.level().damageSources().mobAttack(player), 15F);
@@ -351,11 +324,11 @@ public class RushMinecartEntity extends AbstractMinecart {
                             ModSounds.MINECART_CRASH_SOUND.get(),
                             SoundSource.PLAYERS, r.nextFloat(0.5f) + 0.8f, r.nextFloat(0.5f) + 0.8f);
                 }
-                knockBackEntity(entity, 1.5);
+                knockBackEntity(this, entity, 1.5);
             });
             //玩家在车上时触发屏幕震动
             if (getState() == State.RUSHING && this.getFirstPassenger() == player) {
-                sendScreenShake(3, 3f, (ServerPlayer) player);
+                sendScreenShake(6, 3f, (ServerPlayer) player);
                 sendHitStop(3, (ServerPlayer) player);
             }
 
@@ -363,15 +336,6 @@ public class RushMinecartEntity extends AbstractMinecart {
                 setState(State.HITSTOPPING);
             }
         }
-    }
-
-    private void knockBackEntity(Entity entity, double strength) {
-        Vec3 knockbackVector = entity.position().subtract(this.position()).normalize();
-        entity.setDeltaMovement(entity.getDeltaMovement().add(
-                knockbackVector.x * strength,
-                0.6 * strength,
-                knockbackVector.z * strength
-        ));
     }
 
     private void normalMinecraftLogic() {
@@ -382,6 +346,7 @@ public class RushMinecartEntity extends AbstractMinecart {
                 entity.setPos(this.getX(), this.getY() + this.getPassengersRidingOffset() + entity.getMyRidingOffset(), this.getZ());
             }
         }
+
     }
 
     private State getState() {
