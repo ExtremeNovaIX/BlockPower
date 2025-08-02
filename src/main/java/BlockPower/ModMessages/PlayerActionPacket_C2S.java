@@ -64,7 +64,7 @@ public class PlayerActionPacket_C2S {
                 RushMinecartEntity.createRushMinecart(player);
             } else if (this.data instanceof DropAnvilData) {
                 LOGGER.info("服务端收到来自 {} 的指令：DROP_ANVIL", player.getGameProfile().getName());
-                DropAnvilEntity.createDropAnvil(player);
+                DropAnvilEntity.createDropAnvilBelow(player);
             }
             // else if (this.data instanceof AnotherC2SData anotherData) {
             //     // 如果未来有其他C2S动作，在这里继续添加 else if
