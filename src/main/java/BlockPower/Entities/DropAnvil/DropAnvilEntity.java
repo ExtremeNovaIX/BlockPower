@@ -90,6 +90,7 @@ public class DropAnvilEntity extends Entity {
         this.setDeltaMovement(this.getDeltaMovement().scale(0.98));
     }
 
+    //TODO 统一传入方法，由类自身使用this.onGround()判断生成位置
     public static void createDropAnvilAbove(ServerPlayer player) {
         DropAnvilEntity dropAnvil = new DropAnvilEntity(player);
         Vec3 spawnPos = player.position().add(player.getLookAngle().normalize().scale(1.5));
@@ -99,7 +100,6 @@ public class DropAnvilEntity extends Entity {
 
     public static void createDropAnvilBelow(ServerPlayer player) {
         DropAnvilEntity dropAnvil = new DropAnvilEntity(player);
-
         Vec3 spawnPos = player.position();
         dropAnvil.setPos(spawnPos.x, spawnPos.y - 3, spawnPos.z);
         player.level().addFreshEntity(dropAnvil);
