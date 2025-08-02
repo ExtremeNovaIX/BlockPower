@@ -6,6 +6,7 @@ import BlockPower.ModMessages.ModMessages;
 import BlockPower.ModSounds.ModSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
@@ -32,19 +33,5 @@ public class Main {
         ModEntities.ENTITY_TYPES.register(modEventBus);
         MinecraftForge.EVENT_BUS.register(this);
         ModMessages.register();
-    }
-
-    /**
-     * 发送调试信息到指定的玩家
-     * 调试信息会以“[DEBUG]”开头，并且字体颜色为金色
-     *
-     * @param player  指定的玩家
-     * @param message 要发送的调试信息
-     */
-    public static void sendDebugMessage(Player player, String message) {
-        Component debugMessage = Component.literal("[DEBUG] ")
-                .withStyle(ChatFormatting.GOLD)
-                .append(Component.literal(message).withStyle(ChatFormatting.WHITE));
-        player.sendSystemMessage(debugMessage);
     }
 }
