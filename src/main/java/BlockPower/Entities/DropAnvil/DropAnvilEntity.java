@@ -17,9 +17,12 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Random;
 
 import static BlockPower.Util.Commons.applyDamage;
+import static BlockPower.Util.PacketSender.sendHitStop;
+import static BlockPower.Util.PacketSender.sendScreenShake;
 
 public class DropAnvilEntity extends Entity {
     private int onGroundLifeTime = 100;
@@ -27,6 +30,7 @@ public class DropAnvilEntity extends Entity {
     private ServerPlayer player;
     private final Random r = new Random();
     private final Logger LOGGER = LoggerFactory.getLogger("DropAnvilEntity");
+    private boolean isActive = false;
 
     public DropAnvilEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -57,7 +61,12 @@ public class DropAnvilEntity extends Entity {
     }
 
     private void hurtEntity() {
-        applyDamage(this, player, 1.5, 10F, 9, ModSounds.ANVIL_SOUND.get());
+        List<Entity> entityList = applyDamage(this, player, 1.5, 10F, 9, ModSounds.ANVIL_SOUND.get());
+        if (isActive && !entityList.isEmpty()) {
+            setActive(false);
+            sendScreenShake(6, 3f, player);
+            sendHitStop(3, player, this);
+        }
     }
 
     private void handleAnvilDiscard() {
@@ -94,6 +103,7 @@ public class DropAnvilEntity extends Entity {
         }else{
 //            dropAnvil.setPos(spawnPos.x, spawnPos.y - 1, spawnPos.z);
         }
+        dropAnvil.setActive(true);
         player.level().addFreshEntity(dropAnvil);
     }
 
@@ -130,5 +140,13 @@ public class DropAnvilEntity extends Entity {
     @Override
     public boolean isNoGravity() {
         return false;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }

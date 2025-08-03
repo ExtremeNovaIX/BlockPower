@@ -3,14 +3,12 @@ package BlockPower.Entities.RushMinecart;
 import BlockPower.Entities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Util.Timer.ServerTickListener;
-import BlockPower.Util.Timer.TickTimer;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
@@ -27,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Random;
 
-import static BlockPower.Effects.CloudParticlesEffect.cloudParticleTimers;
 import static BlockPower.Util.Commons.*;
 import static BlockPower.Util.PacketSender.sendHitStop;
 import static BlockPower.Util.PacketSender.sendScreenShake;
@@ -123,10 +120,7 @@ public class RushMinecartEntity extends AbstractMinecart {
 
             case HITSTOPPING:
                 if (timerManager.isTimerCyclingDue(this, "hitStopTimer", 3)) {
-                    this.setDeltaMovement(this.minecartSpeed);
                     setState(State.CRASHED);
-                } else {
-                    this.setDeltaMovement(Vec3.ZERO);
                 }
                 break;
 
@@ -276,11 +270,11 @@ public class RushMinecartEntity extends AbstractMinecart {
             //玩家在车上时触发屏幕震动
             if (getState() == State.RUSHING && this.getFirstPassenger() == player) {
                 sendScreenShake(6, 3f, (ServerPlayer) player);
-                sendHitStop(3, (ServerPlayer) player);
+                sendHitStop(3, (ServerPlayer) player, this);
             }
 
             if (getState() == State.RUSHING) {
-                setState(State.HITSTOPPING);
+                setState(State.CRASHED);
             }
         }
     }

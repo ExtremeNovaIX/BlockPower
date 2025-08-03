@@ -25,7 +25,7 @@ public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     //TODO 完成全局的受伤管理计时器，防止反复触发效果
-    //TODO 完成技能实体类的继承结构，使其自动触发卡帧，震动等
+    //TODO 写一个广播震动的方法，烈度距离衰减
     public Main() {
         //不要管这个报错，它是正常的
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();

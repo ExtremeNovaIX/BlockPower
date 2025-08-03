@@ -1,13 +1,12 @@
 package BlockPower.Util;
 
-import BlockPower.ModSounds.ModSounds;
+import BlockPower.Util.Timer.ServerTickListener;
 import BlockPower.Util.Timer.TickTimer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Random;
 
-import static BlockPower.Effects.CloudParticlesEffect.cloudParticleTimers;
+import static BlockPower.Effects.GlobalEffectHandler.*;
 import static BlockPower.Util.PacketSender.sendScreenShake;
 
 public class Commons {
@@ -75,24 +74,24 @@ public class Commons {
      * 对半径内的实体造成伤害并击退
      *
      * @param mainEntity 释放技能的实体
-     * @param player 释放技能的玩家
+     * @param skillUser 释放技能的玩家
      * @param knockBackStrength 击退强度
      * @param damage 伤害值
      * @param detectRadius 检测半径
      * @param soundEvent 音效
      * @return 半径内的实体列表
      */
-    public static List<Entity> applyDamage(@NotNull Entity mainEntity, Player player, double knockBackStrength, float damage, double detectRadius, SoundEvent soundEvent) {
-        List<Entity> entities = detectEntity(mainEntity, detectRadius, player);
+    public static List<Entity> applyDamage(@NotNull Entity mainEntity, Player skillUser, double knockBackStrength, float damage, double detectRadius, SoundEvent soundEvent) {
+        List<Entity> entities = detectEntity(mainEntity, detectRadius, skillUser);
         if (!entities.isEmpty()) {
             entities.forEach(entity -> {
-                entity.hurt(mainEntity.level().damageSources().mobAttack(player), damage);
+                entity.hurt(mainEntity.level().damageSources().mobAttack(skillUser), damage);
                 //为每个被击中的实体启动粒子计时器
                 cloudParticleTimers.put(entity, new TickTimer(40));
                 if (entity instanceof ServerPlayer) {
-                    sendScreenShake(6, 3f, (ServerPlayer) player);
+                    sendScreenShake(6, 3f, (ServerPlayer) entity);
                 }
-                if (!mainEntity.level().isClientSide) {
+                if (!mainEntity.level().isClientSide && ServerTickListener.getTicks() % 10 == 0) {
                     mainEntity.level().playSound(null, mainEntity.getX(), mainEntity.getY(), mainEntity.getZ(),
                             soundEvent,
                             SoundSource.PLAYERS, r.nextFloat(0.5f) + 0.8f, r.nextFloat(0.5f) + 0.8f);
