@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Random;
 
 import static BlockPower.Util.Commons.*;
+import static BlockPower.Util.PacketSender.broadcastScreenShake;
 import static BlockPower.Util.PacketSender.sendHitStop;
-import static BlockPower.Util.PacketSender.sendScreenShake;
 
 public class RushMinecartEntity extends AbstractMinecart {
 
@@ -269,7 +269,7 @@ public class RushMinecartEntity extends AbstractMinecart {
         if (!entityList.isEmpty()) {
             //玩家在车上时触发屏幕震动
             if (getState() == State.RUSHING && this.getFirstPassenger() == player) {
-                sendScreenShake(6, 3f, (ServerPlayer) player);
+                broadcastScreenShake(this, 4, 2f, 5, 3);
                 sendHitStop(3, (ServerPlayer) player, this);
             }
 

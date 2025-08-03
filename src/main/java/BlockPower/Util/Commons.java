@@ -31,7 +31,7 @@ public class Commons {
      * @param radius 检测半径
      * @return 半径内的非技能释放者和非自身LivingEntity列表
      */
-    public static List<Entity> detectEntity(@NotNull Entity mainEntity, double radius, @NotNull Player blacklist) {
+    public static List<Entity> detectEntity(@NotNull Entity mainEntity, double radius, Player blacklist) {
         //创建一个默认半径为radius的检测区域
         AABB detectionArea = new AABB(
                 mainEntity.getX() - radius,
@@ -88,13 +88,10 @@ public class Commons {
                 entity.hurt(mainEntity.level().damageSources().mobAttack(skillUser), damage);
                 //为每个被击中的实体启动粒子计时器
                 cloudParticleTimers.put(entity, new TickTimer(40));
-                if (entity instanceof ServerPlayer) {
-                    sendScreenShake(6, 3f, (ServerPlayer) entity);
-                }
                 if (!mainEntity.level().isClientSide && ServerTickListener.getTicks() % 10 == 0) {
                     mainEntity.level().playSound(null, mainEntity.getX(), mainEntity.getY(), mainEntity.getZ(),
                             soundEvent,
-                            SoundSource.PLAYERS, r.nextFloat(0.5f) + 0.8f, r.nextFloat(0.5f) + 0.8f);
+                            SoundSource.PLAYERS, 5f, r.nextFloat(0.5f) + 0.8f);
                 }
                 knockBackEntity(mainEntity, entity, knockBackStrength);
             });
