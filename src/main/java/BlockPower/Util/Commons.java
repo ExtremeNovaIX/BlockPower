@@ -1,8 +1,14 @@
 package BlockPower.Util;
 
+import BlockPower.ModSounds.ModSounds;
+import BlockPower.Util.Timer.TickTimer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -11,8 +17,14 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Random;
+
+import static BlockPower.Effects.CloudParticlesEffect.cloudParticleTimers;
+import static BlockPower.Util.PacketSender.sendScreenShake;
 
 public class Commons {
+    private static final Random r = new Random();
+
     /**
      * 检测半径内的非技能释放者的LivingEntity
      *
@@ -57,6 +69,38 @@ public class Commons {
                 1 * strength,
                 knockbackVector.z * strength
         ));
+    }
+
+    /**
+     * 对半径内的实体造成伤害并击退
+     *
+     * @param mainEntity 释放技能的实体
+     * @param player 释放技能的玩家
+     * @param knockBackStrength 击退强度
+     * @param damage 伤害值
+     * @param detectRadius 检测半径
+     * @param soundEvent 音效
+     * @return 半径内的实体列表
+     */
+    public static List<Entity> applyDamage(@NotNull Entity mainEntity, Player player, double knockBackStrength, float damage, double detectRadius, SoundEvent soundEvent) {
+        List<Entity> entities = detectEntity(mainEntity, detectRadius, player);
+        if (!entities.isEmpty()) {
+            entities.forEach(entity -> {
+                entity.hurt(mainEntity.level().damageSources().mobAttack(player), damage);
+                //为每个被击中的实体启动粒子计时器
+                cloudParticleTimers.put(entity, new TickTimer(40));
+                if (entity instanceof ServerPlayer) {
+                    sendScreenShake(6, 3f, (ServerPlayer) player);
+                }
+                if (!mainEntity.level().isClientSide) {
+                    mainEntity.level().playSound(null, mainEntity.getX(), mainEntity.getY(), mainEntity.getZ(),
+                            soundEvent,
+                            SoundSource.PLAYERS, r.nextFloat(0.5f) + 0.8f, r.nextFloat(0.5f) + 0.8f);
+                }
+                knockBackEntity(mainEntity, entity, knockBackStrength);
+            });
+        }
+        return entities;
     }
 
     /**

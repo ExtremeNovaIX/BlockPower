@@ -5,36 +5,30 @@ import BlockPower.ModSounds.ModSounds;
 import BlockPower.Util.Timer.ServerTickListener;
 import BlockPower.Util.Timer.TickTimer;
 import BlockPower.Util.Timer.TimerManager;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
-import static BlockPower.Util.Commons.detectEntity;
-import static BlockPower.Util.Commons.knockBackEntity;
+import static BlockPower.Effects.CloudParticlesEffect.cloudParticleTimers;
+import static BlockPower.Util.Commons.*;
 import static BlockPower.Util.PacketSender.sendHitStop;
 import static BlockPower.Util.PacketSender.sendScreenShake;
 
@@ -62,8 +56,6 @@ public class RushMinecartEntity extends AbstractMinecart {
     private static final EntityDataAccessor<Integer> DATA_STATE = SynchedEntityData.defineId(RushMinecartEntity.class, EntityDataSerializers.INT);
 
     private static final Random r = new Random();
-
-    private final Map<Entity, TickTimer> particleTimers = new HashMap<>();//粒子效果计时器
 
     private static final TimerManager timerManager = TimerManager.getInstance();//全局计时器管理类
 
@@ -94,7 +86,6 @@ public class RushMinecartEntity extends AbstractMinecart {
     public void tick() {
         normalMinecraftLogic();
         handleMinecartMovement();
-        updateParticlesTimer();
         //服务端逻辑
         if (!this.level().isClientSide) {
             updateState();
@@ -228,31 +219,6 @@ public class RushMinecartEntity extends AbstractMinecart {
         }
     }
 
-    private void updateParticlesTimer() {
-        if (!this.level().isClientSide) {
-            particleTimers.entrySet().removeIf(
-                    entry -> {
-                        ServerLevel serverLevel = (ServerLevel) this.level();
-                        Entity entity = entry.getKey();
-                        TickTimer timer = entry.getValue();
-                        if (timer.isFinished()) {
-                            return true;
-                        }
-
-                        serverLevel.sendParticles(
-                                ParticleTypes.CLOUD,
-                                entity.getX(),
-                                entity.getY() + 1.0,
-                                entity.getZ(),
-                                3,
-                                0.3, 0.3, 0.3,
-                                0.05
-                        );
-                        return false;
-                    }
-            );
-        }
-    }
 
     private void spawnRailAt(Vec3 pos) {
         FakeRailEntity fakeRail = new FakeRailEntity(this.level(), pos.x(), pos.y(), pos.z(), this.getYRot());
@@ -304,28 +270,9 @@ public class RushMinecartEntity extends AbstractMinecart {
         player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), newMotion));
     }
 
-    /**
-     * 伤害撞到的实体
-     *
-     * @param player 释放技能的玩家
-     */
     private void hurtEntity(@NotNull Player player) {
-        List<Entity> entities = detectEntity(this, 4, player);
-        if (!entities.isEmpty()) {
-            entities.forEach(entity -> {
-                entity.hurt(this.level().damageSources().mobAttack(player), 15F);
-                //为每个被击中的实体启动粒子计时器
-                particleTimers.put(entity, new TickTimer(40));
-                if (entity instanceof ServerPlayer) {
-                    sendScreenShake(3, 3f, (ServerPlayer) player);
-                }
-                if (!this.level().isClientSide) {
-                    this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
-                            ModSounds.MINECART_CRASH_SOUND.get(),
-                            SoundSource.PLAYERS, r.nextFloat(0.5f) + 0.8f, r.nextFloat(0.5f) + 0.8f);
-                }
-                knockBackEntity(this, entity, 1.5);
-            });
+        List<Entity> entityList = applyDamage(this, player, 1.5, 15F, 4, ModSounds.MINECART_CRASH_SOUND.get());
+        if (!entityList.isEmpty()) {
             //玩家在车上时触发屏幕震动
             if (getState() == State.RUSHING && this.getFirstPassenger() == player) {
                 sendScreenShake(6, 3f, (ServerPlayer) player);

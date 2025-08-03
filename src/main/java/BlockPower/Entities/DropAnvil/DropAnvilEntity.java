@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
+import static BlockPower.Util.Commons.applyDamage;
+
 public class DropAnvilEntity extends Entity {
     private int onGroundLifeTime = 100;
     private int onSkyLifeTime = 600;
@@ -55,13 +57,7 @@ public class DropAnvilEntity extends Entity {
     }
 
     private void hurtEntity() {
-        Commons.detectEntity(this, 9, player).forEach(entity -> {
-            entity.hurt(this.level().damageSources().mobAttack(player), 10F);
-            Commons.knockBackEntity(this, entity, 1.5);
-            this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
-                    ModSounds.ANVIL_SOUND.get(),
-                    SoundSource.PLAYERS, r.nextFloat(0.5f) + 0.8f, r.nextFloat(0.5f) + 0.8f);
-        });
+        applyDamage(this, player, 1.5, 10F, 9, ModSounds.ANVIL_SOUND.get());
     }
 
     private void handleAnvilDiscard() {
@@ -90,18 +86,14 @@ public class DropAnvilEntity extends Entity {
         this.setDeltaMovement(this.getDeltaMovement().scale(0.98));
     }
 
-    //TODO 统一传入方法，由类自身使用this.onGround()判断生成位置
-    public static void createDropAnvilAbove(ServerPlayer player) {
-        DropAnvilEntity dropAnvil = new DropAnvilEntity(player);
-        Vec3 spawnPos = player.position().add(player.getLookAngle().normalize().scale(1.5));
-        dropAnvil.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
-        player.level().addFreshEntity(dropAnvil);
-    }
-
-    public static void createDropAnvilBelow(ServerPlayer player) {
+    public static void createDropAnvil(ServerPlayer player) {
         DropAnvilEntity dropAnvil = new DropAnvilEntity(player);
         Vec3 spawnPos = player.position();
-        dropAnvil.setPos(spawnPos.x, spawnPos.y - 3, spawnPos.z);
+        if (!player.onGround()) {
+            dropAnvil.setPos(spawnPos.x, spawnPos.y - 3, spawnPos.z);
+        }else{
+//            dropAnvil.setPos(spawnPos.x, spawnPos.y - 1, spawnPos.z);
+        }
         player.level().addFreshEntity(dropAnvil);
     }
 
