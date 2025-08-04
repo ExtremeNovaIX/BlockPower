@@ -2,6 +2,7 @@ package BlockPower.Entities.RushMinecart;
 
 import BlockPower.Entities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
+import BlockPower.Util.StateMachine.StateMachine;
 import BlockPower.Util.Timer.ServerTickListener;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -36,7 +37,7 @@ public class RushMinecartEntity extends AbstractMinecart {
     /**
      * 定义矿车的所有可能状态
      */
-    public enum State {
+    private enum State {
         INITIALIZING, //初始化逻辑
         RUSHING,      //玩家在车上, 高速冲刺
         HITSTOPPING,   //矿车被卡帧, 停止移动
@@ -46,37 +47,32 @@ public class RushMinecartEntity extends AbstractMinecart {
         ENDING        //技能结束, 准备销毁
     }
 
-    private ServerPlayer player;
+    private final ServerPlayer player;
 
     private Vec3 lastRailPlacementPos = Vec3.ZERO;//记录上一个生成点的位置
 
-    private static final EntityDataAccessor<Integer> DATA_STATE = SynchedEntityData.defineId(RushMinecartEntity.class, EntityDataSerializers.INT);
-
-    private static final Random r = new Random();
+    private final StateMachine<State> stateMachine;
 
     private static final TimerManager timerManager = TimerManager.getInstance();//全局计时器管理类
 
     private Vec3 minecartSpeed = Vec3.ZERO;
 
-    @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DATA_STATE, State.INITIALIZING.ordinal());
-    }
-
     public RushMinecartEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
         this.player = null;
+        this.stateMachine = new StateMachine<>(this, RushMinecartEntity.class, State.class, State.INITIALIZING);
     }
 
     public RushMinecartEntity(ServerPlayer player) {
         super(ModEntities.RUSH_MINECART.get(), player.level());
         this.player = player;
+        this.stateMachine = new StateMachine<>(this, RushMinecartEntity.class, State.class, State.INITIALIZING);
     }
 
     protected RushMinecartEntity(EntityType<?> entityType, Level level, double x, double y, double z, ServerPlayer player) {
         super(entityType, level, x, y, z);
         this.player = player;
+        this.stateMachine = new StateMachine<>(this, RushMinecartEntity.class, State.class, State.INITIALIZING);
     }
 
     @Override
@@ -291,11 +287,11 @@ public class RushMinecartEntity extends AbstractMinecart {
     }
 
     private State getState() {
-        return State.values()[this.entityData.get(DATA_STATE)];
+        return this.stateMachine.getState();
     }
 
     private void setState(State state) {
-        this.entityData.set(DATA_STATE, state.ordinal());
+        this.stateMachine.setState(state);
     }
 
     public Vec3 getMinecartSpeed() {
