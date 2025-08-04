@@ -96,6 +96,11 @@ public class RushMinecartEntity extends AbstractMinecart {
 
         State currentState = getState();
 
+        //速度过低时，进入撞毁状态
+        if (currentState == State.RUSHING && this.getDeltaMovement().length() < 0.5) {
+            setState(State.CRASHED);
+        }
+
         switch (currentState) {
             case INITIALIZING:
                 player.startRiding(this);
@@ -161,11 +166,6 @@ public class RushMinecartEntity extends AbstractMinecart {
     private void handleMinecartMovement() {
         State currentState = getState();
         Vec3 motion = this.getDeltaMovement();
-
-        //速度过低时，进入撞毁状态
-        if (currentState == State.RUSHING && motion.length() < 0.1) {
-            setState(State.CRASHED);
-        }
 
         //冲刺时无重力
         if (currentState == State.RUSHING || currentState == State.INITIALIZING || currentState == State.HITSTOPPING) {

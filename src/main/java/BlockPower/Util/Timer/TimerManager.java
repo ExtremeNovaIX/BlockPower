@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
-
+//TODO 添加自更新timer，不需要外部循环
 /**
  * 一个全局的、单例的计时器管理器。
  * 此管理器提供了多种创建和管理计时器的方式，包括基于唯一字符串键的全局计时器，

@@ -62,7 +62,7 @@ public class Commons {
      */
     public static void knockBackEntity(@NotNull Entity mainEntity, Entity effectedEntity, double strength) {
         if (effectedEntity == null || effectedEntity.isRemoved()) return;
-        Vec3 knockbackVector = mainEntity.position().subtract(effectedEntity.position()).normalize();
+        Vec3 knockbackVector = effectedEntity.position().subtract(mainEntity.position()).normalize();
         effectedEntity.setDeltaMovement(mainEntity.getDeltaMovement().add(
                 knockbackVector.x * strength,
                 1 * strength,
