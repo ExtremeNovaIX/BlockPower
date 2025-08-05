@@ -5,10 +5,9 @@ import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.*;
 //TODO 添加自更新timer，不需要外部循环
+
 /**
  * 一个全局的、单例的计时器管理器。
  * 此管理器提供了多种创建和管理计时器的方式，包括基于唯一字符串键的全局计时器，
@@ -19,9 +18,9 @@ public final class TimerManager {
 
     private static final TimerManager INSTANCE = new TimerManager();
 
-    private final Map<String, TickTimer> globalTimers = new HashMap<>();
-    private final Map<Entity, Map<String, TickTimer>> entityToStringTimers = new WeakHashMap<>();
-    private final Map<Entity, Map<Entity, TickTimer>> entityToEntityTimers = new WeakHashMap<>();
+    public static final Map<String, TickTimer> globalTimers = new HashMap<>();
+    public static final Map<Entity, Map<String, TickTimer>> entityToStringTimers = new WeakHashMap<>();
+    public static final Map<Entity, Map<Entity, TickTimer>> entityToEntityTimers = new WeakHashMap<>();
 
     private TimerManager() {
     }
@@ -74,6 +73,8 @@ public final class TimerManager {
         this.createTimerIfAbsent(entity, effectedEntity, tickDuration);
         return this.isFinished(entity, effectedEntity);
     }
+
+
 
     /**
      * 设置或重置一个由字符串键标识的全局计时器。

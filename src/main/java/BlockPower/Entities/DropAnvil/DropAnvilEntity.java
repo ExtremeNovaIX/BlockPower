@@ -4,6 +4,7 @@ import BlockPower.Effects.FakeItemInHandEffect;
 import BlockPower.Entities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Entities.IStateMachine;
+import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -44,15 +45,11 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
 
     private static final TimerManager timerManager = TimerManager.getInstance();
 
+    private static final TaskManager taskManager = TaskManager.getInstance();
+
     private static final EntityDataAccessor<Integer> DATA_STATE = SynchedEntityData.defineId(DropAnvilEntity.class, EntityDataSerializers.INT);
 
     private boolean isPlacedBelow = false;
-
-    private boolean canHitStop = true;
-
-    private boolean canPlaySound = true;
-
-    private boolean isAnimationPlayed = false;
 
     public enum AnvilState {
         INITIALIZING, //初始化逻辑
@@ -133,11 +130,9 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
         if (!entityList.isEmpty()) {
             broadcastScreenShake(this, 4, 2f, 9, 5);
             //触发一次卡帧动画以后不再出现卡帧动画效果
-            if (canHitStop) {
+            taskManager.runOnce(this, "hitStop", () -> {
                 sendHitStop(3, player, this);
-                canHitStop = false;
-                canPlaySound = false;
-            }
+            });
         }
     }
 
@@ -166,11 +161,12 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
         this.move(MoverType.SELF, this.getDeltaMovement());
         this.setDeltaMovement(this.getDeltaMovement().scale(0.98));
 
-        if (this.canPlaySound && this.onGround()) {
-            this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
-                    SoundEvents.ANVIL_LAND,
-                    SoundSource.PLAYERS, 5f, r.nextFloat(0.5f) + 0.8f);
-            this.canPlaySound = false;
+        if (this.onGround()) {
+            taskManager.runOnce(this, "playSound", () -> {
+                this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
+                        SoundEvents.ANVIL_LAND,
+                        SoundSource.PLAYERS, 0.5f, r.nextFloat(0.5f) + 0.8f);
+            });
         }
     }
 
@@ -181,7 +177,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
             FakeItemInHandEffect.playItemAnimation(player, new ItemStack(Items.ANVIL), 5);
             player.swing(InteractionHand.MAIN_HAND, true);
             dropAnvil.setPlacedBelow(true);
-            timerManager.runTaskAfter(5, () -> {
+            taskManager.runTaskAfterTicks(5, () -> {
                 dropAnvil.setPos(spawnPos.x, spawnPos.y - 3, spawnPos.z);
                 player.level().addFreshEntity(dropAnvil);
             });
