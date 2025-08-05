@@ -2,7 +2,7 @@ package BlockPower.Entities.RushMinecart;
 
 import BlockPower.Entities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
-import BlockPower.Util.StateMachine.StateMachine;
+import BlockPower.Entities.IStateMachine;
 import BlockPower.Util.Timer.ServerTickListener;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -24,20 +24,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Random;
 
 import static BlockPower.Util.Commons.*;
 import static BlockPower.Util.PacketSender.broadcastScreenShake;
 import static BlockPower.Util.PacketSender.sendHitStop;
 
-public class RushMinecartEntity extends AbstractMinecart {
+public class RushMinecartEntity extends AbstractMinecart implements IStateMachine<RushMinecartEntity.RushMinecartState> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("Rush_Minecart");
+    private static final Logger LOGGER = LoggerFactory.getLogger(RushMinecartEntity.class);
 
     /**
      * 定义矿车的所有可能状态
      */
-    private enum State {
+    public enum RushMinecartState {
         INITIALIZING, //初始化逻辑
         RUSHING,      //玩家在车上, 高速冲刺
         HITSTOPPING,   //矿车被卡帧, 停止移动
@@ -51,28 +50,25 @@ public class RushMinecartEntity extends AbstractMinecart {
 
     private Vec3 lastRailPlacementPos = Vec3.ZERO;//记录上一个生成点的位置
 
-    private final StateMachine<State> stateMachine;
-
     private static final TimerManager timerManager = TimerManager.getInstance();//全局计时器管理类
 
     private Vec3 minecartSpeed = Vec3.ZERO;
 
+    private static final EntityDataAccessor<Integer> DATA_STATE = SynchedEntityData.defineId(RushMinecartEntity.class, EntityDataSerializers.INT);
+
     public RushMinecartEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
         this.player = null;
-        this.stateMachine = new StateMachine<>(this, RushMinecartEntity.class, State.class, State.INITIALIZING);
     }
 
     public RushMinecartEntity(ServerPlayer player) {
         super(ModEntities.RUSH_MINECART.get(), player.level());
         this.player = player;
-        this.stateMachine = new StateMachine<>(this, RushMinecartEntity.class, State.class, State.INITIALIZING);
     }
 
     protected RushMinecartEntity(EntityType<?> entityType, Level level, double x, double y, double z, ServerPlayer player) {
         super(entityType, level, x, y, z);
         this.player = player;
-        this.stateMachine = new StateMachine<>(this, RushMinecartEntity.class, State.class, State.INITIALIZING);
     }
 
     @Override
@@ -94,22 +90,22 @@ public class RushMinecartEntity extends AbstractMinecart {
             return;
         }
 
-        State currentState = getState();
+        RushMinecartState currentState = getState();
 
         //速度过低时，进入撞毁状态
-        if (currentState == State.RUSHING && this.getDeltaMovement().length() < 0.5) {
-            setState(State.CRASHED);
+        if (currentState == RushMinecartState.RUSHING && this.getDeltaMovement().length() < 0.5) {
+            setState(RushMinecartState.CRASHED);
         }
 
         switch (currentState) {
             case INITIALIZING:
                 player.startRiding(this);
-                setState(State.RUSHING);
+                setState(RushMinecartState.RUSHING);
                 break;
 
             case RUSHING:
                 if (this.getFirstPassenger() != player) {
-                    setState(State.SEEKING);
+                    setState(RushMinecartState.SEEKING);
                     break;
                 }
 
@@ -121,7 +117,7 @@ public class RushMinecartEntity extends AbstractMinecart {
 
             case HITSTOPPING:
                 if (timerManager.isTimerCyclingDue(this, "hitStopTimer", 3)) {
-                    setState(State.CRASHED);
+                    setState(RushMinecartState.CRASHED);
                 }
                 break;
 
@@ -129,11 +125,11 @@ public class RushMinecartEntity extends AbstractMinecart {
                 List<Entity> entities = detectEntity(this, 4, player);
                 if (!entities.isEmpty()) {
                     entities.get(0).startRiding(this);
-                    setState(State.CAPTURED);
+                    setState(RushMinecartState.CAPTURED);
                 } else {
                     //如果在一定时间内没找到目标，则进入结束状态
                     if (timerManager.isTimerCyclingDue(this, "endTimer", 80)) {
-                        setState(State.ENDING);
+                        setState(RushMinecartState.ENDING);
                     }
                 }
                 break;
@@ -141,7 +137,7 @@ public class RushMinecartEntity extends AbstractMinecart {
             case CAPTURED:
                 //被捕获的生物下车后，进入结束状态
                 if (timerManager.isTimerCyclingDue(this, "endTimer", 20)) {
-                    setState(State.ENDING);
+                    setState(RushMinecartState.ENDING);
                 }
                 break;
 
@@ -153,7 +149,7 @@ public class RushMinecartEntity extends AbstractMinecart {
                     hurtEntity(player);
                 }
                 if (timerManager.isTimerCyclingDue(this, "crashTimer", 20)) {
-                    setState(State.ENDING);
+                    setState(RushMinecartState.ENDING);
                 }
                 break;
 
@@ -164,11 +160,11 @@ public class RushMinecartEntity extends AbstractMinecart {
     }
 
     private void handleMinecartMovement() {
-        State currentState = getState();
+        RushMinecartState currentState = getState();
         Vec3 motion = this.getDeltaMovement();
 
         //冲刺时无重力
-        if (currentState == State.RUSHING || currentState == State.INITIALIZING || currentState == State.HITSTOPPING) {
+        if (currentState == RushMinecartState.RUSHING || currentState == RushMinecartState.INITIALIZING || currentState == RushMinecartState.HITSTOPPING) {
             this.setDeltaMovement(new Vec3(motion.x, 0, motion.z));
         } else {
             this.setDeltaMovement(this.getDeltaMovement()
@@ -179,7 +175,7 @@ public class RushMinecartEntity extends AbstractMinecart {
     }
 
     private void handleTrailSpawning() {
-        if (getState() == State.RUSHING) {//矿车正常运作中才会生成铁轨
+        if (getState() == RushMinecartState.RUSHING) {//矿车正常运作中才会生成铁轨
             Vec3 currentPos = this.position();
             // 第一次生成时，直接在脚下生成一个并设置记录点
             if (lastRailPlacementPos.equals(Vec3.ZERO)) {
@@ -264,13 +260,13 @@ public class RushMinecartEntity extends AbstractMinecart {
         List<Entity> entityList = applyDamage(this, player, 1.5, 15F, 4, ModSounds.MINECART_CRASH_SOUND.get());
         if (!entityList.isEmpty()) {
             //玩家在车上时触发屏幕震动
-            if (getState() == State.RUSHING && this.getFirstPassenger() == player) {
+            if (getState() == RushMinecartState.RUSHING && this.getFirstPassenger() == player) {
                 broadcastScreenShake(this, 4, 2f, 5, 3);
                 sendHitStop(3, (ServerPlayer) player, this);
             }
 
-            if (getState() == State.RUSHING) {
-                setState(State.CRASHED);
+            if (getState() == RushMinecartState.RUSHING) {
+                setState(RushMinecartState.CRASHED);
             }
         }
     }
@@ -286,12 +282,21 @@ public class RushMinecartEntity extends AbstractMinecart {
 
     }
 
-    private State getState() {
-        return this.stateMachine.getState();
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        // 在构造时注册DataAccessor并设置默认State
+        this.getEntityData().define(DATA_STATE, RushMinecartState.INITIALIZING.ordinal());
     }
 
-    private void setState(State state) {
-        this.stateMachine.setState(state);
+    @Override
+    public EntityDataAccessor<Integer> getStateDataAccessor() {
+        return DATA_STATE;
+    }
+
+    @Override
+    public RushMinecartState[] getStateEnumValues() {
+        return RushMinecartState.values();
     }
 
     public Vec3 getMinecartSpeed() {
@@ -304,12 +309,12 @@ public class RushMinecartEntity extends AbstractMinecart {
 
     @Override
     public boolean canRiderInteract() {
-        return !(getState() == State.RUSHING);
+        return !(getState() == RushMinecartState.RUSHING);
     }
 
     @Override
     protected void removePassenger(@NotNull Entity passenger) {
-        if (getState() == State.CAPTURED) {
+        if (getState() == RushMinecartState.CAPTURED) {
             return;
         }
         super.removePassenger(passenger);

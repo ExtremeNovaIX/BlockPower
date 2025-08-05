@@ -3,9 +3,12 @@ package BlockPower.Entities.DropAnvil;
 import BlockPower.Effects.FakeItemInHandEffect;
 import BlockPower.Entities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
-import BlockPower.Util.StateMachine.StateMachine;
+import BlockPower.Entities.IStateMachine;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -28,7 +31,7 @@ import static BlockPower.Util.Commons.applyDamage;
 import static BlockPower.Util.PacketSender.broadcastScreenShake;
 import static BlockPower.Util.PacketSender.sendHitStop;
 
-public class DropAnvilEntity extends Entity {
+public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEntity.AnvilState> {
     private int onGroundLifeTime = 100;
 
     private int onSkyLifeTime = 600;
@@ -37,11 +40,11 @@ public class DropAnvilEntity extends Entity {
 
     private final Random r = new Random();
 
-    private final Logger LOGGER = LoggerFactory.getLogger("DropAnvilEntity");
+    private final Logger LOGGER = LoggerFactory.getLogger(DropAnvilEntity.class);
 
     private static final TimerManager timerManager = TimerManager.getInstance();
 
-    private final StateMachine<State> stateMachine;
+    private static final EntityDataAccessor<Integer> DATA_STATE = SynchedEntityData.defineId(DropAnvilEntity.class, EntityDataSerializers.INT);
 
     private boolean isPlacedBelow = false;
 
@@ -51,30 +54,33 @@ public class DropAnvilEntity extends Entity {
 
     private boolean isAnimationPlayed = false;
 
-    private enum State {
+    public enum AnvilState {
         INITIALIZING, //初始化逻辑
         ANIMATING,//动画逻辑
         DROPPING,//正常坠落逻辑
         ENDING//结束逻辑
     }
 
+    @Override
+    protected void defineSynchedData() {
+        // 在构造时注册DataAccessor并设置默认State
+        this.getEntityData().define(DATA_STATE, AnvilState.INITIALIZING.ordinal());
+    }
+
     public DropAnvilEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
         this.player = null;
-        this.stateMachine = new StateMachine<>(this, DropAnvilEntity.class, State.class, State.INITIALIZING);
     }
 
     public DropAnvilEntity(ServerPlayer player) {
         super(ModEntities.DROP_ANVIL.get(), player.level());
         this.player = player;
-        this.stateMachine = new StateMachine<>(this, DropAnvilEntity.class, State.class, State.INITIALIZING);
     }
 
     public DropAnvilEntity(ServerPlayer player, double x, double y, double z) {
         super(ModEntities.DROP_ANVIL.get(), player.level());
         this.setPos(x, y, z);
         this.player = player;
-        this.stateMachine = new StateMachine<>(this, DropAnvilEntity.class, State.class, State.INITIALIZING);
     }
 
     @Override
@@ -88,29 +94,29 @@ public class DropAnvilEntity extends Entity {
     }
 
     private void updateState() {
-        State state = getState();
+        AnvilState anvilState = getState();
         if (this.onGround()) {
-            setState(State.ENDING);
+            setState(AnvilState.ENDING);
         }
 
-        //如果不是初始化状态，且速度大于0.5，进入掉落状态
-        if (getState() != State.INITIALIZING) {
+        //如果不是初始化状态，且速度大于0.2，进入掉落状态
+        if (getState() != AnvilState.INITIALIZING) {
             if (this.getDeltaMovement().length() > 0.2) {
-                setState(State.DROPPING);
+                setState(AnvilState.DROPPING);
             } else {
                 if (timerManager.isTimerCyclingDue(this, "ending", 5)) {
-                    setState(State.ENDING);
+                    setState(AnvilState.ENDING);
                 }
             }
         }
 
-        switch (state) {
+        switch (anvilState) {
             case INITIALIZING:
                 if (!timerManager.isTimerCyclingDue(this, "initializing", 5)) {
                     //TODO 改成坐标同步式的，不要骑乘
                     player.startRiding(this);
-                }else{
-                    setState(State.DROPPING);
+                } else {
+                    setState(AnvilState.DROPPING);
                 }
                 break;
             case DROPPING:
@@ -172,20 +178,16 @@ public class DropAnvilEntity extends Entity {
         DropAnvilEntity dropAnvil = new DropAnvilEntity(player);
         Vec3 spawnPos = player.position();
         if (!player.onGround()) {
-            //TODO 改成延迟生成铁砧
             FakeItemInHandEffect.playItemAnimation(player, new ItemStack(Items.ANVIL), 5);
             player.swing(InteractionHand.MAIN_HAND, true);
             dropAnvil.setPlacedBelow(true);
-            dropAnvil.setPos(spawnPos.x, spawnPos.y - 3, spawnPos.z);
+            timerManager.runTaskAfter(5, () -> {
+                dropAnvil.setPos(spawnPos.x, spawnPos.y - 3, spawnPos.z);
+                player.level().addFreshEntity(dropAnvil);
+            });
         } else {
 //            dropAnvil.setPos(spawnPos.x, spawnPos.y - 1, spawnPos.z);
         }
-        player.level().addFreshEntity(dropAnvil);
-    }
-
-    @Override
-    protected void defineSynchedData() {
-
     }
 
     @Override
@@ -226,11 +228,13 @@ public class DropAnvilEntity extends Entity {
         isPlacedBelow = placedBelow;
     }
 
-    private DropAnvilEntity.State getState() {
-        return this.stateMachine.getState();
+    @Override
+    public EntityDataAccessor<Integer> getStateDataAccessor() {
+        return DATA_STATE;
     }
 
-    private void setState(DropAnvilEntity.State state) {
-        this.stateMachine.setState(state);
+    @Override
+    public AnvilState[] getStateEnumValues() {
+        return AnvilState.values();
     }
 }

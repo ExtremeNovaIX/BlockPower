@@ -14,7 +14,7 @@ import net.minecraftforge.network.NetworkHooks;
 
 public class FakeRailEntity extends Entity {
 
-    private int lifeTime = 40;
+    private int lifeTime = 20;
 
     private static final EntityDataAccessor<Float> DATA_YAW = SynchedEntityData.defineId(FakeRailEntity.class, EntityDataSerializers.FLOAT);
 
