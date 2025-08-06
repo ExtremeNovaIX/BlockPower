@@ -1,10 +1,9 @@
 package BlockPower.ClientEvents;
 
-import BlockPower.DTO.C2S.DropAnvilData;
-import BlockPower.DTO.C2S.MinecartData;
 import BlockPower.KeyBindings.KeyBindings;
+import BlockPower.ModMessages.C2SPacket.SpawnDropAnvilPacket_C2S;
+import BlockPower.ModMessages.C2SPacket.SpawnRushMinecartPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
-import BlockPower.ModMessages.PlayerActionPacket_C2S;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -24,11 +23,11 @@ public class ClientInputHandler {
         if (event.phase == TickEvent.Phase.END) {
             if (KeyBindings.MINECART_RUSH.consumeClick()) {
                 LOGGER.info("MINECART_RUSH key 触发!");
-                ModMessages.sendToServer(new PlayerActionPacket_C2S(new MinecartData()));
+                ModMessages.sendToServer(new SpawnRushMinecartPacket_C2S());
             }
             if (KeyBindings.DROP_ANVIL.consumeClick()) {
                 LOGGER.info("DROP_ANVIL key 触发!");
-                ModMessages.sendToServer(new PlayerActionPacket_C2S(new DropAnvilData()));
+                ModMessages.sendToServer(new SpawnDropAnvilPacket_C2S());
             }
         }
     }

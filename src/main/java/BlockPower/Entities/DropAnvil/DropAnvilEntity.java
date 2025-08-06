@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Random;
 
 import static BlockPower.Util.Commons.applyDamage;
-import static BlockPower.Util.PacketSender.broadcastScreenShake;
-import static BlockPower.Util.PacketSender.sendHitStop;
+import static BlockPower.Util.EffectSender.broadcastScreenShake;
+import static BlockPower.Util.EffectSender.sendHitStop;
 
 public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEntity.AnvilState> {
     private int onGroundLifeTime = 100;
@@ -128,10 +128,10 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
     private void hurtEntity() {
         List<Entity> entityList = applyDamage(this, player, 1.5, 10F, 9, ModSounds.ANVIL_SOUND.get());
         if (!entityList.isEmpty()) {
-            broadcastScreenShake(this, 4, 2f, 9, 5);
+            broadcastScreenShake(this, 6, 3f, 15, 7);
             //触发一次卡帧动画以后不再出现卡帧动画效果
             taskManager.runOnce(this, "hitStop", () -> {
-                sendHitStop(3, player, this);
+                sendHitStop(5, player, this);
             });
         }
     }

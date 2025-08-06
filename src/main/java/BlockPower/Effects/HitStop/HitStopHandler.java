@@ -1,4 +1,4 @@
-package BlockPower.Util.HitStop;
+package BlockPower.Effects.HitStop;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;

@@ -1,9 +1,8 @@
 package BlockPower.Util;
 
-import BlockPower.DTO.S2C.HitStopData;
-import BlockPower.DTO.S2C.ShakeData;
 import BlockPower.Effects.GlobalEffectHandler;
-import BlockPower.ModMessages.PlayerActionPacket_S2C;
+import BlockPower.ModMessages.S2CPacket.HitStopPacket_S2C;
+import BlockPower.ModMessages.S2CPacket.ShakePacket_S2C;
 import BlockPower.Util.Timer.TickTimer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -16,7 +15,7 @@ import java.util.Map;
 
 import static BlockPower.ModMessages.ModMessages.sendToPlayer;
 
-public class PacketSender {
+public class EffectSender {
 
     /**
      * 触发玩家屏幕震动
@@ -26,7 +25,7 @@ public class PacketSender {
      * @param serverPlayer 目标玩家
      */
     public static void sendScreenShake(int duration, float strength, ServerPlayer serverPlayer) {
-        sendToPlayer(new PlayerActionPacket_S2C(new ShakeData(duration, strength)), serverPlayer);
+        sendToPlayer(new ShakePacket_S2C(duration, strength), serverPlayer);
     }
 
 
@@ -61,7 +60,7 @@ public class PacketSender {
 
                     // 如果计算出的强度大于0，则向该玩家发送数据包
                     if (calculatedStrength > 0) {
-                        sendToPlayer(new PlayerActionPacket_S2C(new ShakeData(duration, calculatedStrength)), player);
+                        sendToPlayer(new ShakePacket_S2C(duration, calculatedStrength), player);
                     }
                 }
             }
@@ -81,7 +80,7 @@ public class PacketSender {
             GlobalEffectHandler.hitStopTimers.put(skillEntity, entry);
             skillEntity.setDeltaMovement(Vec3.ZERO);
         }
-        sendToPlayer(new PlayerActionPacket_S2C(new HitStopData(duration)), serverPlayer);
+        sendToPlayer(new HitStopPacket_S2C(duration), serverPlayer);
     }
 
 }

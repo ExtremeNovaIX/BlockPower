@@ -26,8 +26,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import static BlockPower.Util.Commons.*;
-import static BlockPower.Util.PacketSender.broadcastScreenShake;
-import static BlockPower.Util.PacketSender.sendHitStop;
+import static BlockPower.Util.EffectSender.broadcastScreenShake;
+import static BlockPower.Util.EffectSender.sendHitStop;
 
 public class RushMinecartEntity extends AbstractMinecart implements IStateMachine<RushMinecartEntity.RushMinecartState> {
 
@@ -261,8 +261,8 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
         if (!entityList.isEmpty()) {
             //玩家在车上时触发屏幕震动
             if (getState() == RushMinecartState.RUSHING && this.getFirstPassenger() == player) {
-                broadcastScreenShake(this, 4, 2f, 5, 3);
-                sendHitStop(3, (ServerPlayer) player, this);
+                broadcastScreenShake(this, 6, 2.5f, 5, 3);
+                sendHitStop(4, (ServerPlayer) player, this);
             }
 
             if (getState() == RushMinecartState.RUSHING) {

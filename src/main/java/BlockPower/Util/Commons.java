@@ -5,7 +5,6 @@ import BlockPower.Util.Timer.TickTimer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -19,7 +18,6 @@ import java.util.List;
 import java.util.Random;
 
 import static BlockPower.Effects.GlobalEffectHandler.*;
-import static BlockPower.Util.PacketSender.sendScreenShake;
 
 public class Commons {
     private static final Random r = new Random();
