@@ -4,6 +4,7 @@ import BlockPower.ModMessages.C2SPacket.SpawnDropAnvilPacket_C2S;
 import BlockPower.ModMessages.C2SPacket.SpawnRushMinecartPacket_C2S;
 import BlockPower.ModMessages.S2CPacket.HitStopPacket_S2C;
 import BlockPower.ModMessages.S2CPacket.ShakePacket_S2C;
+import BlockPower.ModMessages.S2CPacket.SneakPacket_S2C;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -61,6 +62,12 @@ public class ModMessages {
                 .decoder(HitStopPacket_S2C::new)
                 .encoder(HitStopPacket_S2C::toBytes)
                 .consumerMainThread(HitStopPacket_S2C::handle)
+                .add();
+
+        net.messageBuilder(SneakPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SneakPacket_S2C::new)
+                .encoder(SneakPacket_S2C::toBytes)
+                .consumerMainThread(SneakPacket_S2C::handle)
                 .add();
 
         net.messageBuilder(ShakePacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)

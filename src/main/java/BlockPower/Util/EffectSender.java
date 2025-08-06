@@ -3,6 +3,7 @@ package BlockPower.Util;
 import BlockPower.Effects.GlobalEffectHandler;
 import BlockPower.ModMessages.S2CPacket.HitStopPacket_S2C;
 import BlockPower.ModMessages.S2CPacket.ShakePacket_S2C;
+import BlockPower.ModMessages.S2CPacket.SneakPacket_S2C;
 import BlockPower.Util.Timer.TickTimer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -81,6 +82,16 @@ public class EffectSender {
             skillEntity.setDeltaMovement(Vec3.ZERO);
         }
         sendToPlayer(new HitStopPacket_S2C(duration), serverPlayer);
+    }
+
+    /**
+     * 触发玩家潜行效果
+     *
+     * @param serverPlayer 目标玩家
+     * @param state        潜行状态
+     */
+    public static void sendPlayerSneak(ServerPlayer serverPlayer, boolean state) {
+        sendToPlayer(new SneakPacket_S2C(state), serverPlayer);
     }
 
 }

@@ -93,7 +93,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
         RushMinecartState currentState = getState();
 
         //速度过低时，进入撞毁状态
-        if (currentState == RushMinecartState.RUSHING && this.getDeltaMovement().length() < 0.5) {
+        if (currentState == RushMinecartState.RUSHING && this.getDeltaMovement().length() < 0.8) {
             setState(RushMinecartState.CRASHED);
         }
 
@@ -169,7 +169,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
             this.setDeltaMovement(new Vec3(motion.x, 0, motion.z));
         } else {
             this.setDeltaMovement(this.getDeltaMovement()
-                    .multiply(0.97, 1.0, 0.97)
+                    .multiply(0.94, 1.0, 0.94)
                     .add(0.0, -0.1D, 0.0));
         }
         this.move(MoverType.SELF, new Vec3(motion.x, motion.y, motion.z));

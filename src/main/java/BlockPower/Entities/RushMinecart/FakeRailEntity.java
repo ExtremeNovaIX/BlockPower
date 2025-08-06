@@ -17,7 +17,7 @@ public class FakeRailEntity extends Entity {
     private int lifeTime = 20;
 
     private static final EntityDataAccessor<Float> DATA_YAW = SynchedEntityData.defineId(FakeRailEntity.class, EntityDataSerializers.FLOAT);
-
+//TODO 添加销毁动画
     public FakeRailEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }

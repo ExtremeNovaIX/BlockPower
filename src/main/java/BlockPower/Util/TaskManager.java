@@ -13,7 +13,7 @@ public class TaskManager {
     private static final TaskManager INSTANCE = new TaskManager();
     public static final List<Map.Entry<Runnable, Integer>> scheduledTasks = new ArrayList<>();
     public static final Map<Entity, Map<String, Integer>> methodExecutionCounter = new WeakHashMap<>();
-    private static int d1 = 0;
+    //TODO 添加初始执行一次的计时器自动刷新任务
 
     private TaskManager() {
     }
@@ -69,19 +69,6 @@ public class TaskManager {
                 return true;
             }
             return false;
-        });
-    }
-
-    private static void updateMethodExecutionCounter() {
-        d1++;
-        if (!(d1 % 36000 == 0)) {
-            return;
-        }
-        d1 = 0;
-        methodExecutionCounter.forEach((entity, map) -> {
-            if (entity.isRemoved()) {
-                methodExecutionCounter.remove(entity);
-            }
         });
     }
 }

@@ -39,13 +39,9 @@ public class DebugItem extends Item {
 
     private void testServerMethod(Player player) {
         LOGGER.info("testServerMethod");
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                ModSounds.ANVIL_SOUND.get(),
-                SoundSource.PLAYERS, 1f,1f);
     }
 
     private void testClientMethod(Player player) {
         LOGGER.info("testClientMethod");
-
     }
 }

@@ -1,12 +1,17 @@
 package BlockPower.Entities.DropAnvil;
 
 import BlockPower.Effects.FakeItemInHandEffect;
+import BlockPower.Effects.PlayerSneakEffect;
 import BlockPower.Entities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Entities.IStateMachine;
+import BlockPower.Util.EffectSender;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -17,6 +22,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -25,8 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static BlockPower.Util.Commons.applyDamage;
 import static BlockPower.Util.EffectSender.broadcastScreenShake;
@@ -49,7 +55,13 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
 
     private static final EntityDataAccessor<Integer> DATA_STATE = SynchedEntityData.defineId(DropAnvilEntity.class, EntityDataSerializers.INT);
 
+    private static final EntityDataAccessor<java.util.Optional<java.util.UUID>> DATA_OWNER_UUID = SynchedEntityData.defineId(DropAnvilEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+
     private boolean isPlacedBelow = false;
+
+    private boolean isPlayerStandingOnAnvil = false;
+
+    private boolean lastTickIsPlayerStandingOnAnvil = false;
 
     public enum AnvilState {
         INITIALIZING, //初始化逻辑
@@ -62,6 +74,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
     protected void defineSynchedData() {
         // 在构造时注册DataAccessor并设置默认State
         this.getEntityData().define(DATA_STATE, AnvilState.INITIALIZING.ordinal());
+        this.getEntityData().define(DATA_OWNER_UUID, Optional.empty());
     }
 
     public DropAnvilEntity(EntityType<?> entityType, Level level) {
@@ -72,12 +85,14 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
     public DropAnvilEntity(ServerPlayer player) {
         super(ModEntities.DROP_ANVIL.get(), player.level());
         this.player = player;
+        this.getEntityData().set(DATA_OWNER_UUID, Optional.of(player.getUUID()));
     }
 
     public DropAnvilEntity(ServerPlayer player, double x, double y, double z) {
         super(ModEntities.DROP_ANVIL.get(), player.level());
         this.setPos(x, y, z);
         this.player = player;
+        this.getEntityData().set(DATA_OWNER_UUID, Optional.of(player.getUUID()));
     }
 
     @Override
@@ -85,9 +100,31 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
         super.tick();
         handleAnvilDiscard();
         handleAnvilMovement();
+        handlePlayerSneak();
         if (!this.level().isClientSide) {
             updateState();
         }
+    }
+
+    private void handlePlayerSneak() {
+        if (!this.level().isClientSide && player.isShiftKeyDown()) {
+            isPlayerStandingOnAnvil = false;
+        }
+        boolean needSendPacket = (lastTickIsPlayerStandingOnAnvil != isPlayerStandingOnAnvil);
+
+        if (isPlayerStandingOnAnvil) {
+            //TODO 正确吸附，优化结构
+            Vec3 newMotion = this.position().subtract(player.position()).normalize().scale(3);
+            player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), newMotion));
+            if (needSendPacket) {
+                EffectSender.sendPlayerSneak(player, true);
+            }
+        } else {
+            if (needSendPacket) {
+                EffectSender.sendPlayerSneak(player, false);
+            }
+        }
+        lastTickIsPlayerStandingOnAnvil = isPlayerStandingOnAnvil;
     }
 
     private void updateState() {
@@ -110,8 +147,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
         switch (anvilState) {
             case INITIALIZING:
                 if (!timerManager.isTimerCyclingDue(this, "initializing", 5)) {
-                    //TODO 改成坐标同步式的，不要骑乘
-                    player.startRiding(this);
+                    isPlayerStandingOnAnvil = true;
                 } else {
                     setState(AnvilState.DROPPING);
                 }
@@ -150,6 +186,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
         }
 
         if (onSkyLifeTime <= 0 || onGroundLifeTime <= 0) {
+            isPlayerStandingOnAnvil = false;
             this.discard();
         }
     }
