@@ -142,6 +142,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
                 break;
 
             case CRASHED:
+                //TODO 修改为按速度大小决定伤害检测范围
                 if (this.getFirstPassenger() == player) {
                     player.stopRiding();
                 }

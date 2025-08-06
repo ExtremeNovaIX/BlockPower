@@ -25,7 +25,6 @@ public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     //TODO 完成全局的受伤管理计时器，防止反复触发效果
-    //TODO 修复有时音效播放异常问题
     public Main() {
         printWelcome();
         //不要管这个报错，它是正常的

@@ -2,6 +2,7 @@ package BlockPower.Util;
 
 import BlockPower.Util.Timer.ServerTickListener;
 import BlockPower.Util.Timer.TickTimer;
+import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -21,6 +22,8 @@ import static BlockPower.Effects.GlobalEffectHandler.*;
 
 public class Commons {
     private static final Random r = new Random();
+
+    private static final TimerManager timerManager = TimerManager.getInstance();
 
     /**
      * 检测半径内的非技能释放者的LivingEntity
@@ -86,7 +89,7 @@ public class Commons {
                 entity.hurt(mainEntity.level().damageSources().mobAttack(skillUser), damage);
                 //为每个被击中的实体启动粒子计时器
                 cloudParticleTimers.put(entity, new TickTimer(40));
-                if (!mainEntity.level().isClientSide && ServerTickListener.getTicks() % 10 == 0) {
+                if (!mainEntity.level().isClientSide) {
                     mainEntity.level().playSound(null, mainEntity.getX(), mainEntity.getY(), mainEntity.getZ(),
                             soundEvent,
                             SoundSource.PLAYERS, 5f, r.nextFloat(0.5f) + 0.8f);
