@@ -6,7 +6,7 @@ plugins {
 }
 
 // 模组基本信息配置
-version = '0.0.2' // 模组版本号
+version = '0.0.3' // 模组版本号
 group = 'BlockPower' // 模组组ID
 base {
     archivesName = 'BlockPower' // 生成的jar文件名
