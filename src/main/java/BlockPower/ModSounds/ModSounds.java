@@ -12,7 +12,14 @@ public class ModSounds {
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
             DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, Main.MOD_ID);
 
-    public static final RegistryObject<SoundEvent> MINECART_CRASH = registerSoundEvent("minecart_crash");
+    public static final RegistryObject<SoundEvent> ANVIL_SOUND = registerSoundEvent("anvil_sound");
+    public static final RegistryObject<SoundEvent> FLY_SOUND = registerSoundEvent("fly_sound");
+    public static final RegistryObject<SoundEvent> HIT_SOUND = registerSoundEvent("hit_sound");
+    public static final RegistryObject<SoundEvent> KILL_FINISH_SOUND = registerSoundEvent("kill_finish_sound");
+    public static final RegistryObject<SoundEvent> MAGMA_BLOCK_SOUND = registerSoundEvent("magma_block_sound");
+    public static final RegistryObject<SoundEvent> MINECART_CRASH_SOUND = registerSoundEvent("minecart_crash_sound");
+    public static final RegistryObject<SoundEvent> SWEEPING_KNOCKBACK_SOUND = registerSoundEvent("sweeping_knockback_sound");
+
 
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(Main.MOD_ID, name)));

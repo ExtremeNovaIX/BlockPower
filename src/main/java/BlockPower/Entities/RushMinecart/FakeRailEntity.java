@@ -1,23 +1,34 @@
-package BlockPower.Entities.FakeRail;
+package BlockPower.Entities.RushMinecart;
 
 import BlockPower.Entities.ModEntities;
+import BlockPower.Util.TaskManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkHooks;
+
+import java.util.Random;
 
 public class FakeRailEntity extends Entity {
 
-    private int lifeTime = 10;
+    private int lifeTime = 20;
+
+    private static final Random r = new Random();
+
+    private static final TaskManager taskManager = TaskManager.getInstance();
 
     private static final EntityDataAccessor<Float> DATA_YAW = SynchedEntityData.defineId(FakeRailEntity.class, EntityDataSerializers.FLOAT);
-
     public FakeRailEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }
@@ -34,9 +45,24 @@ public class FakeRailEntity extends Entity {
         //服务器端逻辑
         if (!this.level().isClientSide) {
             if (lifeTime-- <= 0) {
+                spawnFakeItem(this, new ItemStack(Items.POWERED_RAIL));
                 this.discard(); // 销毁实体
             }
         }
+    }
+
+    public void spawnFakeItem(Entity entity, ItemStack itemStack) {
+        Level level = entity.level();
+        Vec3 position = entity.position();
+        ItemEntity itemEntity = new ItemEntity(level, position.x(), position.y(), position.z(), itemStack);
+        itemEntity.setDeltaMovement(r.nextDouble() * 0.1, r.nextDouble() * 0.4, r.nextDouble() * 0.1);
+        itemEntity.setPickUpDelay(32767);
+        taskManager.runTaskAfterTicks(5, () -> {
+            if (!itemEntity.isRemoved()) {
+                itemEntity.discard();
+            }
+        });
+        level.addFreshEntity(itemEntity);
     }
 
     @Override
@@ -68,4 +94,10 @@ public class FakeRailEntity extends Entity {
         //让客户端知道实体被创建的数据包
         return NetworkHooks.getEntitySpawningPacket(this);
     }
+
+    @Override
+    public boolean canCollideWith(Entity entity) {
+        return false;
+    }
+
 }

@@ -223,7 +223,7 @@
  - 47.0.26 Fix ignoring maxUpStep method overrides on entities (#9583)
  - 47.0.25 Add missing damage type tag provider modid, existing file helper constructor overload (#9581)
  - 47.0.24 Expose holder lookup registry provider as a helper in RegistriesDatapackGenerator (#9580)
- - 47.0.23 Fix gametest collection causing secondary crash in loading error state (#9568)
+ - 47.0.23 Fix gametest collection causing secondary crash in loading error anvilState (#9568)
  - 47.0.22 Fix SpriteCoordinateExpander not working with chained methods (MC-263524) (#9564)
  - 47.0.21 Expose EntityRendererProvider.Context to AddLayers event (#9562)
  - 47.0.20 [1.20] Add events for checking spawn conditions (SpawnPlacementCheck and PositionCheck) (#9469)
@@ -258,7 +258,7 @@
  - 46.0.11 Re-implement missing level-sensitive block light hook in ChunkAccess (#9536)
  - 46.0.10 Fix issues in the deserialization of empty ingredients (#9537)
  - 46.0.9  Fix wrong variable passed into EnchantmentClue lookup Fixes #9543 (#9544)
- - 46.0.8  Fix incorrect depth test state in debug graph rendering Fixes #9534 (#9539)
+ - 46.0.8  Fix incorrect depth test anvilState in debug graph rendering Fixes #9534 (#9539)
  - 46.0.7  Fix initCapabilities patch location in ServerLevel Fixes #9526 (#9531)
  - 46.0.6  Use Spinning Effect Intensity instead of Partial Tick for Portal Overlay Fixes #9529 (#9530)
  - 46.0.5  Fix getArmorModelHook patch, Fixex #9523 (#9528)
@@ -840,7 +840,7 @@
             - Rename IModelGeometry to IUnbakedGeometry
             - Rename IModelConfiguration to IGeometryBakingContext
             - Rename other elements to match vanilla naming
-            - Remove current changes to ModelState, as they do not belong there. Transforms should be specified through vanilla's system. ModelState is intended to transfer state from the blockstate JSON
+            - Remove current changes to ModelState, as they do not belong there. Transforms should be specified through vanilla's system. ModelState is intended to transfer anvilState from the blockstate JSON
             - Remove multipart geometries and geometry parts. After some discussion, these should not be exposed. Instead, geometries should be baked with only the necessary parts enabled
             * Make render types a first-class citizen in baked models
             - Add named render types (block + entity + fabulous entity)

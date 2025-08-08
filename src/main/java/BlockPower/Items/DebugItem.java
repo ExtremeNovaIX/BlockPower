@@ -1,9 +1,11 @@
 package BlockPower.Items;
 
 import BlockPower.Main.Main;
-import BlockPower.Util.ImpactVFX.ImpactVFXHandler;
 
+import BlockPower.ModSounds.ModSounds;
+import BlockPower.Util.Commons;
 import com.mojang.logging.LogUtils;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.Item;
@@ -25,10 +27,10 @@ public class DebugItem extends Item {
         BlockPos pos = player.getOnPos();
 
         if (!level.isClientSide) {
-            Main.sendDebugMessage(player, "Server:调试物品使用于位置: " + pos.toShortString());
+            Commons.sendDebugMessage(player, "Server:调试物品使用于位置: " + pos.toShortString());
             testServerMethod(player);
         }else{
-            Main.sendDebugMessage(player, "Client:调试物品使用于位置: " + pos.toShortString());
+            Commons.sendDebugMessage(player, "Client:调试物品使用于位置: " + pos.toShortString());
             testClientMethod(player);
         }
 

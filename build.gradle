@@ -6,7 +6,7 @@ plugins {
 }
 
 // 模组基本信息配置
-version = '0.0.2' // 模组版本号
+version = '0.0.3' // 模组版本号
 group = 'BlockPower' // 模组组ID
 base {
     archivesName = 'BlockPower' // 生成的jar文件名
@@ -30,7 +30,6 @@ minecraft {
             property 'forge.logging.console.level', 'info'
             property 'forge.logging.log4j.level', 'INFO'
             property 'forge.enabledGameTestNamespaces', 'blockpower'
-            jvmArgs '--add-opens=java.base/java.lang=com.google.gson', '--add-opens=java.base/java.util=com.google.gson'
             mods {
                 blockpower {
                     source sourceSets.main
@@ -42,7 +41,6 @@ minecraft {
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'info'
             property 'forge.logging.log4j.level', 'INFO'
-            jvmArgs '--add-opens=java.base/java.lang=com.google.gson', '--add-opens=java.base/java.util=com.google.gson'
             mods {
                 blockpower {
                     source sourceSets.main
@@ -110,23 +108,4 @@ publishing {
             url "file://${project.projectDir}/mcmodsrepo"
         }
     }
-}
-
-jar {
-
-    manifest {
-
-        attributes([
-
-                // 将 "--add-opens=java.base/java.lang=com.google.gson"
-
-                // 的信息添加到 MANIFEST.MF 文件中。
-
-                // 这是Java 9+ 模块系统的标准做法。
-
-                "Add-Opens": "java.base/java.lang=com.google.gson java.base/java.util=com.google.gson"
-        ])
-
-    }
-
 }
