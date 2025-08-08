@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-//TODO 添加第一次返回true的isTimerCyclingDue方法
 
 /**
  * 一个全局的、单例的计时器管理器。
