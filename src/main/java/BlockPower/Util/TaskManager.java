@@ -14,7 +14,7 @@ public class TaskManager {
     private static final TaskManager INSTANCE = new TaskManager();
     public static final List<Map.Entry<Runnable, Integer>> scheduledTasks = new ArrayList<>();// 自更新timer池
     public static final Map<Entity, Map<String, Integer>> taskExecutionCounter = new WeakHashMap<>();// 挂载在实体下的任务执行次数Map
-    private final Map<Entity, Set<String>> coolingDownTasks = new WeakHashMap<>();// 挂载在实体下的冷却中任务Map
+    private static final Map<Entity, Set<String>> coolingDownTasks = new WeakHashMap<>();// 挂载在实体下的冷却中任务Map
     private static final TimerManager timerManager = TimerManager.getInstance();
 
 
