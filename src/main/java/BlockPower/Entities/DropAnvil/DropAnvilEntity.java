@@ -100,31 +100,41 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
         super.tick();
         handleAnvilDiscard();
         handleAnvilMovement();
-        handlePlayerSneak();
         if (!this.level().isClientSide) {
             updateState();
+            handlePlayerSneak();
         }
     }
 
     private void handlePlayerSneak() {
-        if (!this.level().isClientSide && player.isShiftKeyDown()) {
-            isPlayerStandingOnAnvil = false;
+        if (this.player.isShiftKeyDown()) {
+            this.isPlayerStandingOnAnvil = false;
         }
-        boolean needSendPacket = (lastTickIsPlayerStandingOnAnvil != isPlayerStandingOnAnvil);
 
-        if (isPlayerStandingOnAnvil) {
-            //TODO 正确吸附，优化结构
-            Vec3 newMotion = this.position().subtract(player.position()).normalize().scale(3);
-            player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), newMotion));
-            if (needSendPacket) {
-                EffectSender.sendPlayerSneak(player, true);
-            }
-        } else {
-            if (needSendPacket) {
-                EffectSender.sendPlayerSneak(player, false);
-            }
+        boolean stateChanged = this.lastTickIsPlayerStandingOnAnvil != this.isPlayerStandingOnAnvil;
+        if (stateChanged) {
+            EffectSender.sendPlayerSneak(this.player, this.isPlayerStandingOnAnvil);
         }
-        lastTickIsPlayerStandingOnAnvil = isPlayerStandingOnAnvil;
+
+        if (this.isPlayerStandingOnAnvil) {
+            taskManager.runOnce(this, "reset_speed", () -> {
+                player.setDeltaMovement(Vec3.ZERO);
+                player.noPhysics = true;
+                player.setNoGravity(true);
+            });
+            Vec3 targetPosition = new Vec3(this.getX(), this.getY() + 3, this.getZ());
+            // 计算从玩家当前位置指向目标位置的矢量
+            Vec3 desiredVelocity = targetPosition.subtract(player.position());
+            // 将这个矢量直接设置为玩家的运动矢量
+            player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), desiredVelocity));
+        } else {
+            taskManager.runOnce(this, "reset_player", () -> {
+                player.noPhysics = false;
+                player.setNoGravity(false);
+            });
+        }
+
+        this.lastTickIsPlayerStandingOnAnvil = this.isPlayerStandingOnAnvil;
     }
 
     private void updateState() {
@@ -187,6 +197,8 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
 
         if (onSkyLifeTime <= 0 || onGroundLifeTime <= 0) {
             isPlayerStandingOnAnvil = false;
+            player.noPhysics = false;
+            player.setNoGravity(false);
             this.discard();
         }
     }

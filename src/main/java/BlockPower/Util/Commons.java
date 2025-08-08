@@ -24,6 +24,7 @@ public class Commons {
     private static final Random r = new Random();
 
     private static final TimerManager timerManager = TimerManager.getInstance();
+    private static final TaskManager taskManager = TaskManager.getInstance();
 
     /**
      * 检测半径内的非技能释放者的LivingEntity
@@ -90,9 +91,11 @@ public class Commons {
                 //为每个被击中的实体启动粒子计时器
                 cloudParticleTimers.put(entity, new TickTimer(40));
                 if (!mainEntity.level().isClientSide) {
-                    mainEntity.level().playSound(null, mainEntity.getX(), mainEntity.getY(), mainEntity.getZ(),
-                            soundEvent,
-                            SoundSource.PLAYERS, 5f, r.nextFloat(0.5f) + 0.8f);
+                    //限制5tick内最多播放3次声音
+                    taskManager.runTimesWithCooldown(mainEntity, "play_sound", 3, 5, () ->
+                            mainEntity.level().playSound(null,
+                                    mainEntity.getX(), mainEntity.getY(), mainEntity.getZ(),
+                                    soundEvent, SoundSource.PLAYERS, 5f, r.nextFloat(0.5f) + 0.8f));
                 }
                 knockBackEntity(mainEntity, entity, knockBackStrength);
             });

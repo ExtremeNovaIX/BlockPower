@@ -1,7 +1,9 @@
 package BlockPower.Effects;
 
 import BlockPower.Main.Main;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.PlayerModel;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
@@ -34,13 +36,17 @@ public class PlayerSneakEffect {
     public static void onRenderPlayerPre(RenderPlayerEvent.Pre event) {
         Player player = event.getEntity();
         UUID playerUUID = player.getUUID();
-
-        // 检查当前渲染的玩家是否在我们列表中
+        // 检查当前渲染的玩家是否在列表中
         if (playersToForceSneak.contains(playerUUID)) {
-
+            PlayerModel<?> model = event.getRenderer().getModel();
             // 强行设置为潜行姿势
             player.setPose(Pose.CROUCHING);
-            event.getRenderer().getModel().crouching = true;
+            model.crouching = true;
+
+            PoseStack poseStack = event.getPoseStack();
+            poseStack.pushPose();
+            poseStack.translate(0, 0.75F, 0);
+            poseStack.popPose();
         }
     }
 
