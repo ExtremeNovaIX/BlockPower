@@ -1,5 +1,6 @@
 package BlockPower.KeyBindings;
 
+import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
 import BlockPower.ModMessages.C2SPacket.SpawnDropAnvilPacket_C2S;
 import BlockPower.ModMessages.C2SPacket.SpawnRushMinecartPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
@@ -20,6 +21,10 @@ public class ClientInputHandler {
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
+            if (KeyBindings.MINER_MODE.consumeClick()) {
+                LOGGER.info("MINER_MODE key 触发!");
+                ModMessages.sendToServer(new ChangeMinerStatePacket_C2S());
+            }
             if (KeyBindings.MINECART_RUSH.consumeClick()) {
                 LOGGER.info("MINECART_RUSH key 触发!");
                 ModMessages.sendToServer(new SpawnRushMinecartPacket_C2S());

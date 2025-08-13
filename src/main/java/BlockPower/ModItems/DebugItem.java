@@ -38,5 +38,6 @@ public class DebugItem extends Item {
 
     private void testClientMethod(Player player) {
         LOGGER.info("testClientMethod");
+
     }
 }

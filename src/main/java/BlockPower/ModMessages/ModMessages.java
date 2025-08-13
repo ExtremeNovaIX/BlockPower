@@ -1,5 +1,6 @@
 package BlockPower.ModMessages;
 
+import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
 import BlockPower.ModMessages.C2SPacket.SpawnDropAnvilPacket_C2S;
 import BlockPower.ModMessages.C2SPacket.SpawnRushMinecartPacket_C2S;
 import BlockPower.ModMessages.S2CPacket.HitStopPacket_S2C;
@@ -55,6 +56,12 @@ public class ModMessages {
                 .decoder(SpawnRushMinecartPacket_C2S::new)
                 .encoder(SpawnRushMinecartPacket_C2S::toBytes)
                 .consumerMainThread(SpawnRushMinecartPacket_C2S::handle)
+                .add();
+
+        net.messageBuilder(ChangeMinerStatePacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(ChangeMinerStatePacket_C2S::new)
+                .encoder(ChangeMinerStatePacket_C2S::toBytes)
+                .consumerMainThread(ChangeMinerStatePacket_C2S::handle)
                 .add();
 
         //Client
