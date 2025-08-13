@@ -1,4 +1,4 @@
-package BlockPower.Exception;
+package BlockPower.ModException;
 
 /**
  * 与 TimerManager 相关的操作中发生的特定异常。

@@ -1,4 +1,4 @@
-package BlockPower.Items;
+package BlockPower.ModItems;
 
 import BlockPower.Main.Main;
 import net.minecraft.world.item.Item;

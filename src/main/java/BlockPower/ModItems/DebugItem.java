@@ -1,11 +1,6 @@
-package BlockPower.Items;
+package BlockPower.ModItems;
 
-import BlockPower.Main.Main;
-
-import BlockPower.ModSounds.ModSounds;
 import BlockPower.Util.Commons;
-import com.mojang.logging.LogUtils;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.Item;

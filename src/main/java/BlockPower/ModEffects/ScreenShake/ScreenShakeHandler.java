@@ -1,4 +1,4 @@
-package BlockPower.Effects.ScreenShake;
+package BlockPower.ModEffects.ScreenShake;
 
 public class ScreenShakeHandler {
 

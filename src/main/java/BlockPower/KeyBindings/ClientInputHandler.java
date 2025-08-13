@@ -1,6 +1,5 @@
-package BlockPower.ClientEvents;
+package BlockPower.KeyBindings;
 
-import BlockPower.KeyBindings.KeyBindings;
 import BlockPower.ModMessages.C2SPacket.SpawnDropAnvilPacket_C2S;
 import BlockPower.ModMessages.C2SPacket.SpawnRushMinecartPacket_C2S;
 import BlockPower.ModMessages.ModMessages;

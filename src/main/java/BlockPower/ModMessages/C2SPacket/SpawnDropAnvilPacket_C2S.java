@@ -1,6 +1,6 @@
 package BlockPower.ModMessages.C2SPacket;
 
-import BlockPower.Entities.DropAnvil.DropAnvilEntity;
+import BlockPower.ModEntities.DropAnvil.DropAnvilEntity;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;

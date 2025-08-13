@@ -1,6 +1,6 @@
 package BlockPower.Util;
 
-import BlockPower.Effects.GlobalEffectHandler;
+import BlockPower.ModEffects.GlobalEffectHandler;
 import BlockPower.ModMessages.S2CPacket.HitStopPacket_S2C;
 import BlockPower.ModMessages.S2CPacket.ShakePacket_S2C;
 import BlockPower.ModMessages.S2CPacket.SneakPacket_S2C;

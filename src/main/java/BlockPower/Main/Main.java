@@ -1,14 +1,9 @@
 package BlockPower.Main;
 
-import BlockPower.Entities.ModEntities;
-import BlockPower.Items.ModItems;
+import BlockPower.ModEntities.ModEntities;
+import BlockPower.ModItems.ModItems;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.ModSounds.ModSounds;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;

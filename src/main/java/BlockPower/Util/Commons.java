@@ -1,6 +1,5 @@
 package BlockPower.Util;
 
-import BlockPower.Util.Timer.ServerTickListener;
 import BlockPower.Util.Timer.TickTimer;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.ChatFormatting;
@@ -18,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Random;
 
-import static BlockPower.Effects.GlobalEffectHandler.*;
+import static BlockPower.ModEffects.GlobalEffectHandler.*;
 
 public class Commons {
     private static final Random r = new Random();

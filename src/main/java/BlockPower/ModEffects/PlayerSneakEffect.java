@@ -1,4 +1,4 @@
-package BlockPower.Effects;
+package BlockPower.ModEffects;
 
 import BlockPower.Main.Main;
 import com.mojang.blaze3d.vertex.PoseStack;

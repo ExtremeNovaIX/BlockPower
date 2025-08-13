@@ -1,4 +1,4 @@
-package BlockPower.Entities.RushMinecart;
+package BlockPower.ModEntities.RushMinecart;
 
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;

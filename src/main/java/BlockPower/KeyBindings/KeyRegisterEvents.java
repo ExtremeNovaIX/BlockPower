@@ -1,14 +1,7 @@
-package BlockPower.ClientEvents;
+package BlockPower.KeyBindings;
 
-import BlockPower.Entities.DropAnvil.DropAnvilRenderer;
-import BlockPower.Entities.RushMinecart.FakeRailRenderer;
-import BlockPower.Entities.ModEntities;
-import BlockPower.Entities.RushMinecart.RushMinecartRenderer;
-import BlockPower.KeyBindings.KeyBindings;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -22,7 +15,7 @@ import static BlockPower.Main.Main.MOD_ID;
 
 //客户端事件处理类
 @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-public class ClientEvents {
+public class KeyRegisterEvents {
 
     private static final Logger LOGGER = LogManager.getLogger("ClientEvents");
 
@@ -43,12 +36,5 @@ public class ClientEvents {
                 }
             }
         }
-    }
-
-    @SubscribeEvent
-    public static void onRenderRegister(final EntityRenderersEvent.RegisterRenderers event) {
-        EntityRenderers.register(ModEntities.FAKE_RAIL_ENTITY.get(), FakeRailRenderer::new);
-        EntityRenderers.register(ModEntities.RUSH_MINECART.get(), RushMinecartRenderer::new);
-        EntityRenderers.register(ModEntities.DROP_ANVIL.get(), DropAnvilRenderer::new);
     }
 }

@@ -1,6 +1,6 @@
 package BlockPower.ModMessages.S2CPacket;
 
-import BlockPower.Effects.HitStop.HitStopHandler;
+import BlockPower.ModEffects.HitStop.HitStopHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
