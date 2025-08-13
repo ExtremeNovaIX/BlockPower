@@ -1,8 +1,8 @@
-package BlockPower.Entities.RushMinecart;
+package BlockPower.ModEntities.RushMinecart;
 
-import BlockPower.Entities.ModEntities;
+import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
-import BlockPower.Entities.IStateMachine;
+import BlockPower.ModEntities.IStateMachine;
 import BlockPower.Util.Timer.ServerTickListener;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;

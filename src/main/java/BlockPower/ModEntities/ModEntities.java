@@ -1,8 +1,8 @@
-package BlockPower.Entities;
+package BlockPower.ModEntities;
 
-import BlockPower.Entities.DropAnvil.DropAnvilEntity;
-import BlockPower.Entities.RushMinecart.FakeRailEntity;
-import BlockPower.Entities.RushMinecart.RushMinecartEntity;
+import BlockPower.ModEntities.DropAnvil.DropAnvilEntity;
+import BlockPower.ModEntities.RushMinecart.FakeRailEntity;
+import BlockPower.ModEntities.RushMinecart.RushMinecartEntity;
 import BlockPower.Main.Main;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;

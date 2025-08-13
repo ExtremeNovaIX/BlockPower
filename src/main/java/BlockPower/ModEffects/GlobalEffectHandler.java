@@ -1,17 +1,14 @@
-package BlockPower.Effects;
+package BlockPower.ModEffects;
 
-import BlockPower.Util.Commons;
 import BlockPower.Util.Timer.TickTimer;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 

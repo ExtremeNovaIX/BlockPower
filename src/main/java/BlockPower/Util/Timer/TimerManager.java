@@ -1,9 +1,8 @@
 package BlockPower.Util.Timer;
 
-import BlockPower.Exception.TimerException;
+import BlockPower.ModException.TimerException;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -72,7 +71,6 @@ public final class TimerManager {
         this.createTimerIfAbsent(entity, effectedEntity, tickDuration);
         return this.isFinished(entity, effectedEntity);
     }
-
 
 
     /**

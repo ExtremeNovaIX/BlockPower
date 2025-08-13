@@ -1,4 +1,4 @@
-package BlockPower.Effects;
+package BlockPower.ModEffects;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;

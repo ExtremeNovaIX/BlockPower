@@ -1,4 +1,4 @@
-package BlockPower.Entities;
+package BlockPower.ModEntities;
 
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.world.entity.Entity;

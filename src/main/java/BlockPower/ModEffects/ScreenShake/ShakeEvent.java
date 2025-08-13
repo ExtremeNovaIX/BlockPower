@@ -1,4 +1,4 @@
-package BlockPower.Effects.ScreenShake;
+package BlockPower.ModEffects.ScreenShake;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ViewportEvent;

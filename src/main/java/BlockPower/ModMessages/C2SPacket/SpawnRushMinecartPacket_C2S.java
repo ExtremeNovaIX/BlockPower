@@ -1,7 +1,7 @@
 package BlockPower.ModMessages.C2SPacket;
 
 
-import BlockPower.Entities.RushMinecart.RushMinecartEntity;
+import BlockPower.ModEntities.RushMinecart.RushMinecartEntity;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.LoggerFactory;
