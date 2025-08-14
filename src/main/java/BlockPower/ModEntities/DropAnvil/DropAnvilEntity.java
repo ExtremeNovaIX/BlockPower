@@ -171,9 +171,9 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
         if (!entityList.isEmpty()) {
             broadcastScreenShake(this, 6, 3f, 15, 7);
             //触发一次卡帧动画以后不再出现卡帧动画效果
-            taskManager.runOnce(this, "hitStop", () -> {
-                sendHitStop(5, player, this);
-            });
+//            taskManager.runOnce(this, "hitStop", () -> {
+//                sendHitStop(5, player, this);
+//            });
         }
     }
 
@@ -192,8 +192,10 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
 
         if (onSkyLifeTime <= 0 || onGroundLifeTime <= 0) {
             isPlayerStandingOnAnvil = false;
-            player.noPhysics = false;
-            player.setNoGravity(false);
+            if (player != null) {
+                player.noPhysics = false;
+                player.setNoGravity(false);
+            }
             this.discard();
         }
     }
