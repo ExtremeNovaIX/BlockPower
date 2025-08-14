@@ -54,7 +54,7 @@ public class TaskManager {
      * @param runnable 执行的方法或者语句
      * @param maxExecutions 执行次数
      */
-    public void runTimes(@NotNull Entity entity, @NotNull String methodName, @NotNull Integer maxExecutions,@NotNull Runnable runnable) {
+    public void runTimes(@NotNull Entity entity, @NotNull String methodName, @NotNull Integer maxExecutions, @NotNull Runnable runnable) {
         if (entity.isRemoved()) {
             taskExecutionCounter.remove(entity);
             return;
@@ -76,7 +76,7 @@ public class TaskManager {
      * @param runnable 执行的方法或者语句
      */
     public void runOnceWithCooldown(@NotNull Entity entity, @NotNull String methodName, Integer cooldownTicks, @NotNull Runnable runnable) {
-        runTimesWithCooldown(entity, methodName, cooldownTicks, 1, runnable);
+        runTimesWithCooldown(entity, methodName, 1, cooldownTicks, runnable);
     }
 
     /**
