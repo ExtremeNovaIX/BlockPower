@@ -1,0 +1,103 @@
+package BlockPower.Skills.MinerState;
+
+import BlockPower.ModMessages.ModMessages;
+import BlockPower.ModMessages.S2CPacket.ResourceSyncPacket_S2C;
+import BlockPower.Util.TaskManager;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.PacketDistributor;
+
+import java.util.Map;
+import java.util.Random;
+import java.util.WeakHashMap;
+
+@Mod.EventBusSubscriber
+public class MinerStateEvent {
+    private static final TaskManager taskManager = TaskManager.getInstance();
+    public static final Map<Player, Boolean> minerStateMap = new WeakHashMap<>();
+    private static final Random random = new Random();
+    private static final PlayerResourceManager resourceManager = PlayerResourceManager.getInstance();
+
+    @SubscribeEvent
+    public static void handleMinerState(PlayerInteractEvent.LeftClickBlock event) {
+        Player player = event.getEntity();
+        if (minerStateMap.getOrDefault(player, false)) {
+            event.setCanceled(true);
+            taskManager.runOnceWithCooldown(player, "minerState", 3, () -> {
+                spawnSource(event, player);
+            });
+        }
+    }
+
+    /**
+     * 执行资源生成和视觉效果的核心逻辑。
+     * @param event 事件对象，用于获取位置信息。
+     * @param player 触发事件的玩家。
+     */
+    private static void spawnSource(PlayerInteractEvent.LeftClickBlock event, Player player) {
+        Level level = player.level();
+
+        // 资源生成：通过带权重的随机算法决定本次获得的资源类型。
+        ResourceType resourceType = getRandomResourceType();
+
+        // 数据更新：调用资源管理器，为玩家添加新获取的资源。
+        var playerData = resourceManager.getPlayerData(player);
+        playerData.addResource(resourceType);
+
+        // 当服务端数据更新后，发送数据包给客户端。
+        if (player instanceof ServerPlayer serverPlayer) {
+            Map<ResourceType, Double> visualData = playerData.getResourceCounts();
+            ModMessages.sendToPlayer(new ResourceSyncPacket_S2C(visualData), serverPlayer);
+        }
+
+        // 视觉与音效表现
+        Vec3 position = event.getPos().getCenter();
+        // 根据随机到的资源类型，创建一个对应的ItemStack用于显示。
+        ItemStack displayStack = new ItemStack(resourceType.getCorrespondingItem());
+        ItemEntity itemEntity = new ItemEntity(level, position.x(), position.y() + 0.3, position.z(), displayStack);
+        // 设置一个极高的拾取延迟，防止玩家捡起这个仅作为视觉效果的物品。
+        itemEntity.setPickUpDelay(32767);
+
+        if (!level.isClientSide()) {
+            level.playSound(null, position.x(), position.y(), position.z(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 3F, random.nextFloat() * 0.1F + 0.9F);
+        }
+
+        // 6tick后移除物品实体
+        taskManager.runTaskAfterTicks(6, () -> {
+            if (!itemEntity.isRemoved()) {
+                itemEntity.discard();
+            }
+        });
+
+        level.addFreshEntity(itemEntity);
+    }
+
+    /**
+     * 根据预设的权重概率，随机获取一种资源类型。
+     * @return 随机选中的资源类型 (ResourceType)。
+     */
+    private static ResourceType getRandomResourceType() {
+        double chance = random.nextDouble();
+        if (chance < 0.40) { // 40% 的概率落在 [0.0, 0.40)
+            return ResourceType.DIRT;
+        } else if (chance < 0.70) { // 30% 的概率落在 [0.40, 0.70)
+            return ResourceType.WOOD;
+        } else if (chance < 0.90) { // 20% 的概率落在 [0.70, 0.90)
+            return ResourceType.STONE;
+        } else if (chance < 0.98) { // 8% 的概率落在 [0.90, 0.98)
+            return ResourceType.IRON;
+        } else { // 剩下 2% 的概率落在 [0.98, 1.0)
+            return ResourceType.GOLD;
+        }
+    }
+}

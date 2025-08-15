@@ -117,6 +117,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
                 player.noPhysics = true;
                 player.setNoGravity(true);
             });
+            //TODO 解决玩家和铁砧距离越来越远问题
             Vec3 targetPosition = new Vec3(this.getX(), this.getY() + 3, this.getZ());
             // 计算从玩家当前位置指向目标位置的矢量
             Vec3 desiredVelocity = targetPosition.subtract(player.position());
