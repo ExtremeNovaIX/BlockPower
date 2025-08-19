@@ -1,4 +1,4 @@
-package BlockPower.Skills.MinerState;
+package BlockPower.Skills.MinerState.server;
 
 import net.minecraft.world.entity.player.Player;
 import java.util.Map;
@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PlayerResourceManager {
     private static final PlayerResourceManager INSTANCE = new PlayerResourceManager();
 
-    // ConcurrentHashMap确保在多线程环境下（例如玩家登录/退出）的数据安全访问
     private final Map<UUID, PlayerResourceData> playerData = new ConcurrentHashMap<>();
 
     private PlayerResourceManager() {}
@@ -33,5 +32,18 @@ public class PlayerResourceManager {
      */
     public PlayerResourceData getPlayerData(Player player) {
         return playerData.computeIfAbsent(player.getUUID(), k -> new PlayerResourceData());
+    }
+
+    public void clear() {
+        playerData.clear();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        playerData.forEach((uuid, data) -> {
+            sb.append(uuid).append(":").append(data.toString()).append("\n");
+        });
+        return sb.toString();
     }
 }

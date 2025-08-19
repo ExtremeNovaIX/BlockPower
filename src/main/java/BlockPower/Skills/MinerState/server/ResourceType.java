@@ -1,4 +1,4 @@
-package BlockPower.Skills.MinerState;
+package BlockPower.Skills.MinerState.server;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;

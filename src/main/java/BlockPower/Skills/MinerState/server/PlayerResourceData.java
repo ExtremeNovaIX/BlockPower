@@ -1,4 +1,4 @@
-package BlockPower.Skills.MinerState;
+package BlockPower.Skills.MinerState.server;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -94,5 +94,18 @@ public class PlayerResourceData {
      */
     public double getMaxCapacity() {
         return MAX_CAPACITY;
+    }
+
+    public static double getCompressionThreshold() {
+        return UI_COMPRESSION_START;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        trueResourceCounts.forEach((type, count) -> {
+            sb.append(type).append(":").append(count).append(",");
+        });
+        return sb.toString();
     }
 }

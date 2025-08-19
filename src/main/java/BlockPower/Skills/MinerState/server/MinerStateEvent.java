@@ -1,4 +1,4 @@
-package BlockPower.Skills.MinerState;
+package BlockPower.Skills.MinerState.server;
 
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.ModMessages.S2CPacket.ResourceSyncPacket_S2C;
@@ -9,13 +9,11 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
 
 import java.util.Map;
 import java.util.Random;

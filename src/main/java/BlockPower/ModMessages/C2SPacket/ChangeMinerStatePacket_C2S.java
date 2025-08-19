@@ -5,7 +5,7 @@ import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static BlockPower.Skills.MinerState.MinerStateEvent.minerStateMap;
+import static BlockPower.Skills.MinerState.server.MinerStateEvent.minerStateMap;
 
 
 public class ChangeMinerStatePacket_C2S extends AbstractC2SPacket {

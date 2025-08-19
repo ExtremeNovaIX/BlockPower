@@ -1,6 +1,9 @@
-package BlockPower.Skills.MinerState;
+package BlockPower.Skills.MinerState.client;
 
 import BlockPower.Main.Main;
+import BlockPower.Skills.MinerState.server.MinerStateEvent;
+import BlockPower.Skills.MinerState.server.PlayerResourceData;
+import BlockPower.Skills.MinerState.server.ResourceType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -35,12 +38,9 @@ public class ResourceBarHud {
                 return;
             }
 
-            // --- 数据获取：从客户端缓存读取，而不是直接访问管理器 ---
             Map<ResourceType, Double> resourceCounts = ClientResourceData.getResources();
-            double totalVisualAmount = resourceCounts.values().stream().mapToDouble(Double::doubleValue).sum();
-
-            if (totalVisualAmount <= 0) {
-                return;
+            if (resourceCounts.isEmpty() || resourceCounts.values().stream().allMatch(v -> v <= 0)) {
+                return; // 如果没有任何资源，则不渲染
             }
 
             int screenWidth = event.getWindow().getGuiScaledWidth();
@@ -53,24 +53,20 @@ public class ResourceBarHud {
 
             GuiGraphics guiGraphics = event.getGuiGraphics();
 
-            // 绘制背景/边框
             guiGraphics.fill(barX - 1, barY - 1, barX + barTotalWidth + 1, barY + barHeight + 1, 0xFF000000);
 
             int currentX = barX;
-            // 确保总宽度精确，避免浮点数误差导致最后有1像素缝隙
-            int accumulatedWidth = 0;
+
+            // 获取固定的压缩阈值作为计算百分比的分母
+            double barCapacity = PlayerResourceData.getCompressionThreshold();
 
             for (ResourceType type : ResourceType.values()) {
                 double visualAmount = resourceCounts.getOrDefault(type, 0.0);
                 if (visualAmount <= 0) continue;
 
-                int segmentWidth = (int) Math.round((visualAmount / totalVisualAmount) * barTotalWidth);
+                // 使用固定的barCapacity作为分母
+                int segmentWidth = (int) Math.round((visualAmount / barCapacity) * barTotalWidth);
                 if(segmentWidth <= 0) continue;
-
-                // 修正最后一个分段的宽度，确保填满
-                if (accumulatedWidth + segmentWidth > barTotalWidth) {
-                    segmentWidth = barTotalWidth - accumulatedWidth;
-                }
 
                 TextureAtlasSprite sprite = getSpriteForResource(type);
                 if (sprite != null) {
@@ -78,7 +74,6 @@ public class ResourceBarHud {
                 }
 
                 currentX += segmentWidth;
-                accumulatedWidth += segmentWidth;
             }
         }
     }
