@@ -31,7 +31,7 @@ public class PlayerResourceData {
 
     /**
      * 为指定的资源类型增加【真实】数量。
-     * 此方法只修改真实数据，与视觉表现无关。
+     * 此方法只修改trueResourceCounts的数据，与视觉表现无关。
      *
      * @param type 要增加的资源类型。
      */
@@ -62,7 +62,7 @@ public class PlayerResourceData {
     /**
      * 动态计算并获取供GUI渲染的【视觉】资源映射表。
      * 如果真实总量未达到压缩点，视觉量 = 真实量。
-     * 如果真实总量超过压缩点，所有视觉量将根据真实占比进行等比压缩，使视觉总和等于压缩点。
+     * 如果真实总量超过压缩点，视觉量将进行压缩
      *
      * @return 一个包含所有资源类型及其【视觉】数量的Map，可直接用于渲染，无需修改。
      */
@@ -75,6 +75,7 @@ public class PlayerResourceData {
             visualCounts.putAll(trueResourceCounts);
             return visualCounts;
         }
+
         //进入压缩逻辑
         double specialAmount = getSpecialResourceAmount();
 

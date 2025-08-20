@@ -1,5 +1,6 @@
 package BlockPower.Skills.MinerState.server;
 
+import BlockPower.ModEntities.FakeItem.FakeItem;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.ModMessages.S2CPacket.ResourceSyncPacket_S2C;
 import BlockPower.Util.TaskManager;
@@ -39,7 +40,8 @@ public class MinerStateEvent {
 
     /**
      * 执行资源生成和视觉效果的核心逻辑。
-     * @param event 事件对象，用于获取位置信息。
+     *
+     * @param event  事件对象，用于获取位置信息。
      * @param player 触发事件的玩家。
      */
     private static void spawnSource(PlayerInteractEvent.LeftClickBlock event, Player player) {
@@ -59,29 +61,21 @@ public class MinerStateEvent {
         }
 
         // 视觉与音效表现
-        Vec3 position = event.getPos().getCenter();
+        Vec3 position = event.getPos().getCenter().add(0, 0.4, 0);
+        Vec3 velocity = new Vec3(0, 0.35, 0);
         // 根据随机到的资源类型，创建一个对应的ItemStack用于显示。
         ItemStack displayStack = new ItemStack(resourceType.getCorrespondingItem());
-        ItemEntity itemEntity = new ItemEntity(level, position.x(), position.y() + 0.3, position.z(), displayStack);
-        // 设置一个极高的拾取延迟，防止玩家捡起这个仅作为视觉效果的物品。
-        itemEntity.setPickUpDelay(32767);
+        FakeItem fakeItem = new FakeItem(level, position, velocity, displayStack, 6);
+        level.addFreshEntity(fakeItem);
 
         if (!level.isClientSide()) {
             level.playSound(null, position.x(), position.y(), position.z(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 3F, random.nextFloat() * 0.1F + 0.9F);
         }
-
-        // 6tick后移除物品实体
-        taskManager.runTaskAfterTicks(6, () -> {
-            if (!itemEntity.isRemoved()) {
-                itemEntity.discard();
-            }
-        });
-
-        level.addFreshEntity(itemEntity);
     }
 
     /**
      * 根据预设的权重概率，随机获取一种资源类型。
+     *
      * @return 随机选中的资源类型 (ResourceType)。
      */
     private static ResourceType getRandomResourceType() {

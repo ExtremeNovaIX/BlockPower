@@ -1,5 +1,6 @@
 package BlockPower.ModEntities.RushMinecart;
 
+import BlockPower.ModEntities.FakeItem.FakeItem;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.Util.TaskManager;
 import net.minecraft.nbt.CompoundTag;
@@ -28,6 +29,7 @@ public class FakeRailEntity extends Entity {
     private static final TaskManager taskManager = TaskManager.getInstance();
 
     private static final EntityDataAccessor<Float> DATA_YAW = SynchedEntityData.defineId(FakeRailEntity.class, EntityDataSerializers.FLOAT);
+
     public FakeRailEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }
@@ -53,15 +55,9 @@ public class FakeRailEntity extends Entity {
     public void spawnFakeItem(Entity entity, ItemStack itemStack) {
         Level level = entity.level();
         Vec3 position = entity.position();
-        ItemEntity itemEntity = new ItemEntity(level, position.x(), position.y(), position.z(), itemStack);
-        itemEntity.setDeltaMovement(r.nextDouble() * 0.1, r.nextDouble() * 0.4, r.nextDouble() * 0.1);
-        itemEntity.setPickUpDelay(32767);
-        taskManager.runTaskAfterTicks(5, () -> {
-            if (!itemEntity.isRemoved()) {
-                itemEntity.discard();
-            }
-        });
-        level.addFreshEntity(itemEntity);
+        Vec3 velocity = new Vec3(r.nextDouble() * 0.1, r.nextDouble() * 0.4, r.nextDouble() * 0.1);
+        FakeItem fakeItem = new FakeItem(level, position, velocity, itemStack, 10);
+        level.addFreshEntity(fakeItem);
     }
 
     @Override
