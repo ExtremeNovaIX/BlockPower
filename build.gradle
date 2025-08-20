@@ -5,33 +5,32 @@ plugins {
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
 
-// 模组基本信息配置
-version = '0.0.3' // 模组版本号
-group = 'BlockPower' // 模组组ID
+// 从 gradle.properties 读取模组信息
+version = mod_version
+group = mod_group_id
 base {
-    archivesName = 'BlockPower' // 生成的jar文件名
+    archivesName = archives_base_name
 }
 
-// Java版本设置 (Minecraft 1.20.1需要Java 17)
+// Java 版本设置
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    // 使用官方映射表
-    mappings channel: 'official', version: '1.20.1'
+    // 映射设置
+    mappings channel: mapping_channel, version: mapping_version
 
     // 开发环境配置
     copyIdeResources = true
 
-    // 运行配置
     runs {
         client {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'info'
             property 'forge.logging.log4j.level', 'INFO'
-            property 'forge.enabledGameTestNamespaces', 'blockpower'
+            property 'forge.enabledGameTestNamespaces', mod_id
             mods {
-                blockpower {
+                "${mod_id}" {
                     source sourceSets.main
                 }
             }
@@ -42,7 +41,7 @@ minecraft {
             property 'forge.logging.console.level', 'info'
             property 'forge.logging.log4j.level', 'INFO'
             mods {
-                blockpower {
+                "${mod_id}" {
                     source sourceSets.main
                 }
             }
@@ -52,32 +51,35 @@ minecraft {
 
 // 依赖配置
 dependencies {
-    // Forge核心依赖
-    minecraft "net.minecraftforge:forge:1.20.1-47.4.0"
-
-    // 示例：添加JEI依赖 (取消注释即可启用)
-    // runtimeOnly fg.deobf("mezz.jei:jei-1.20.1-forge:15.0.0")
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 }
 
 // 资源处理
 tasks.named('processResources', ProcessResources).configure {
-    var replaceProperties = [
-            minecraft_version: '1.20.1',
-            minecraft_version_range: '[1.20.1,1.21)',
-            forge_version: '47.4.0',
-            forge_version_range: '[47,)',
-            loader_version_range: '[47,)',
-            mod_id: 'blockpower',
-            mod_name: 'Block Power',
-            mod_license: 'All Rights Reserved',
-            mod_version: '0.1.0',
-            mod_authors: 'K2536,ExtremaNovaIX,LJH',
-            mod_description: '一个致力于为我的世界添加更加多样的连招系统的模组'
-    ]
-    inputs.properties replaceProperties
+    inputs.properties([
+            'mod_id'                  : project.mod_id,
+            'mod_version'             : project.mod_version,
+            'mod_name'                : project.mod_name,
+            'mod_license'             : project.mod_license,
+            'mod_authors'             : project.mod_authors,
+            'mod_description'         : project.mod_description,
+            'loader_version_range'    : project.loader_version_range,
+            'forge_version_range'     : project.forge_version_range,
+            'minecraft_version_range' : project.minecraft_version_range
+    ])
 
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
-        expand replaceProperties
+        expand(
+                'mod_id'                  : project.mod_id,
+                'mod_version'             : project.mod_version,
+                'mod_name'                : project.mod_name,
+                'mod_license'             : project.mod_license,
+                'mod_authors'             : project.mod_authors,
+                'mod_description'         : project.mod_description,
+                'loader_version_range'    : project.loader_version_range,
+                'forge_version_range'     : project.forge_version_range,
+                'minecraft_version_range' : project.minecraft_version_range
+        )
     }
 }
 
@@ -85,12 +87,12 @@ tasks.named('processResources', ProcessResources).configure {
 tasks.named('jar', Jar).configure {
     manifest {
         attributes([
-                'Specification-Title'     : 'blockpower',
-                'Specification-Vendor'    : 'K2536,ExtremaNovaIX,LJH',
-                'Specification-Version'   : '1',
-                'Implementation-Title'   : project.name,
-                'Implementation-Version' : project.jar.archiveVersion,
-                'Implementation-Vendor'  : 'K2536,ExtremaNovaIX,LJH'
+                'Specification-Title'     : mod_id,
+                'Specification-Vendor'    : mod_authors,
+                'Specification-Version'   : mod_version,
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : mod_authors
         ])
     }
     finalizedBy 'reobfJar'
