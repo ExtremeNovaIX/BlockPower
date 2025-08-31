@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import static BlockPower.Main.Main.MOD_ID;
 
 @Mod(MOD_ID)
-public class Main {
+public class Main {//TODO 做消耗资源的技能系统
 
     public static final String MOD_ID = "blockpower";
     private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);

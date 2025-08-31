@@ -1,10 +1,10 @@
 package BlockPower.ModEntities;
 
+import BlockPower.Main.Main;
 import BlockPower.ModEntities.DropAnvil.DropAnvilEntity;
 import BlockPower.ModEntities.FakeItem.FakeItem;
 import BlockPower.ModEntities.RushMinecart.FakeRailEntity;
 import BlockPower.ModEntities.RushMinecart.RushMinecartEntity;
-import BlockPower.Main.Main;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.registries.DeferredRegister;

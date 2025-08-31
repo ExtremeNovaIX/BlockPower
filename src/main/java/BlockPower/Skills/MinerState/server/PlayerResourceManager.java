@@ -1,6 +1,7 @@
 package BlockPower.Skills.MinerState.server;
 
 import net.minecraft.world.entity.player.Player;
+
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;

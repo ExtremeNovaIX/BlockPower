@@ -2,7 +2,6 @@ package BlockPower.ModEvents;
 
 import BlockPower.Main.Main;
 import BlockPower.Skills.MinerState.server.PlayerResourceManager;
-import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

@@ -4,7 +4,9 @@ import BlockPower.ModException.TimerException;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * 一个全局的、单例的计时器管理器。

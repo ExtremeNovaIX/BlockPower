@@ -3,6 +3,7 @@ package BlockPower.ModMessages.S2CPacket;
 import BlockPower.Skills.MinerState.client.ClientResourceData;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import net.minecraft.network.FriendlyByteBuf;
+
 import java.util.EnumMap;
 import java.util.Map;
 

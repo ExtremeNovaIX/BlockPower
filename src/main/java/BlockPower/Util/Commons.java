@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Random;
 
-import static BlockPower.ModEffects.GlobalEffectHandler.*;
+import static BlockPower.ModEffects.GlobalEffectHandler.cloudParticleTimers;
 
 public class Commons {
     private static final Random r = new Random();

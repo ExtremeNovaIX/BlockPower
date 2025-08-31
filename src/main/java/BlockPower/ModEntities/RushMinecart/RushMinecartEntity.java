@@ -1,8 +1,8 @@
 package BlockPower.ModEntities.RushMinecart;
 
+import BlockPower.ModEntities.IStateMachine;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
-import BlockPower.ModEntities.IStateMachine;
 import BlockPower.Util.Timer.ServerTickListener;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -25,7 +25,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static BlockPower.Util.Commons.*;
+import static BlockPower.Util.Commons.applyDamage;
+import static BlockPower.Util.Commons.detectEntity;
 import static BlockPower.Util.EffectSender.broadcastScreenShake;
 import static BlockPower.Util.EffectSender.sendHitStop;
 

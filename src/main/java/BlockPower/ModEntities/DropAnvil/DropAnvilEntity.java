@@ -1,9 +1,9 @@
 package BlockPower.ModEntities.DropAnvil;
 
 import BlockPower.ModEffects.FakeItemInHandEffect;
+import BlockPower.ModEntities.IStateMachine;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
-import BlockPower.ModEntities.IStateMachine;
 import BlockPower.Util.EffectSender;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
@@ -27,11 +27,12 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
 import static BlockPower.Util.Commons.applyDamage;
 import static BlockPower.Util.EffectSender.broadcastScreenShake;
-import static BlockPower.Util.EffectSender.sendHitStop;
 
 public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEntity.AnvilState> {
     private int onGroundLifeTime = 100;

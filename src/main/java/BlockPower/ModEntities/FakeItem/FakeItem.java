@@ -1,7 +1,6 @@
 package BlockPower.ModEntities.FakeItem;
 
 import BlockPower.ModEntities.ModEntities;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.item.ItemEntity;
