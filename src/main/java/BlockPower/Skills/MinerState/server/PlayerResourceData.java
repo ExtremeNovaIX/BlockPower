@@ -1,7 +1,10 @@
 package BlockPower.Skills.MinerState.server;
 
+import BlockPower.Util.Commons;
+
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.function.Function;
 //TODO 根据不同镐子获取资源效率产生区分
 
 /**
@@ -11,20 +14,20 @@ import java.util.Map;
  */
 public class PlayerResourceData {
     // 用于存储每种资源的【真实】数量。
-    private final Map<ResourceType, Double> trueResourceCounts = new EnumMap<>(ResourceType.class);
+    private final Map<AllResourceType, Double> trueResourceCounts = new EnumMap<>(AllResourceType.class);
 
     // 临界值1：开始挤压。当【真实】总量超过此值，视觉资源将被等比压缩。
-    private static final double UI_COMPRESSION_START = 600.0;
+    private static final double UI_COMPRESSION_START = 100.0;
     // 临界值2：存满。当【真实】总量达到此值，将不再接受任何新资源。
-    private static final double MAX_CAPACITY = 800.0;
+    private static final double MAX_CAPACITY = 200.0;
     // 每次获取资源时增加的量。
-    private static final double RESOURCE_GAIN_AMOUNT = 5.0;
+    private static final double RESOURCE_GAIN_AMOUNT = 1.0;
 
     /**
      * 构造函数，初始化所有资源的真实数量为0。
      */
     public PlayerResourceData() {
-        for (ResourceType type : ResourceType.values()) {
+        for (AllResourceType type : AllResourceType.values()) {
             trueResourceCounts.put(type, 0.0);
         }
     }
@@ -35,28 +38,26 @@ public class PlayerResourceData {
      *
      * @param type 要增加的资源类型。
      */
-    public void addResource(ResourceType type) {
-        double currentTrueTotal = this.getTrueTotal();
+    public void addResource(AllResourceType type) {
+        double amountToAdd;
+        if (AllResourceType.getNormalResourceType().contains(type)) {//普通资源添加逻辑
+            double currentTrueTotal = this.getNormalResourceTotal();
+            // 检查真实资源总量是否已满
 
-        // 检查真实资源总量是否已满
-        if (currentTrueTotal >= MAX_CAPACITY) {
-            return;
+            if (currentTrueTotal >= MAX_CAPACITY) return;
+
+            // 计算本次实际能增加的资源量，确保真实总量不会超过上限。
+            amountToAdd = Math.min(RESOURCE_GAIN_AMOUNT, MAX_CAPACITY - currentTrueTotal);
+
+        } else {//特殊资源添加逻辑
+            Double currentAmount = trueResourceCounts.getOrDefault(type, 0.0);
+            if (currentAmount >= 64) return;//返回数据无效或者大于64时，不执行添加逻辑
+            amountToAdd = 1.0;
         }
 
-        // 计算本次实际能增加的资源量，确保真实总量不会超过上限。
-        double amountToAdd = Math.min(RESOURCE_GAIN_AMOUNT, MAX_CAPACITY - currentTrueTotal);
-
         // 更新对应资源的真实数量。这里的数值只会增加，不会减少。
-        trueResourceCounts.compute(type, (k, v) -> (v == null ? 0 : v) + amountToAdd);
-    }
-
-    /**
-     * 计算并获取当前真实的资源总量。
-     *
-     * @return 真实的资源总量。
-     */
-    private double getTrueTotal() {
-        return trueResourceCounts.values().stream().mapToDouble(Double::doubleValue).sum();
+        double finalAmountToAdd = amountToAdd;
+        trueResourceCounts.compute(type, (k, v) -> (v == null ? 0 : v) + finalAmountToAdd);
     }
 
     /**
@@ -66,9 +67,9 @@ public class PlayerResourceData {
      *
      * @return 一个包含所有资源类型及其【视觉】数量的Map，可直接用于渲染，无需修改。
      */
-    public Map<ResourceType, Double> getResourceCounts() {
-        Map<ResourceType, Double> visualCounts = new EnumMap<>(ResourceType.class);
-        double trueTotal = getTrueTotal();
+    public Map<AllResourceType, Double> getResourceCounts() {
+        Map<AllResourceType, Double> visualCounts = new EnumMap<>(AllResourceType.class);
+        double trueTotal = getNormalResourceTotal();
 
         // 未达到压缩临界值，视觉数量等于真实数量，直接返回。
         if (trueTotal <= UI_COMPRESSION_START) {
@@ -77,13 +78,12 @@ public class PlayerResourceData {
         }
 
         //进入压缩逻辑
-        double specialAmount = getSpecialResourceAmount();
-
-        //处理特殊资源（金和铁）已经占满或超出压缩条的情况
-        if (specialAmount >= UI_COMPRESSION_START) {
-            // 此时，只显示金和铁，其他资源的视觉大小为0
-            for (Map.Entry<ResourceType, Double> entry : trueResourceCounts.entrySet()) {
-                if (entry.getKey() == ResourceType.GOLD || entry.getKey() == ResourceType.IRON) {
+        double IronAmount = trueResourceCounts.get(AllResourceType.IRON);
+        //处理铁已经占满或超出压缩条的情况
+        if (IronAmount >= UI_COMPRESSION_START) {
+            // 此时，资源条内只显示铁，其他资源的视觉大小为0
+            for (Map.Entry<AllResourceType, Double> entry : trueResourceCounts.entrySet()) {
+                if (AllResourceType.getNoCompressionResourceType().contains(entry.getKey())) {
                     visualCounts.put(entry.getKey(), entry.getValue());
                 } else {
                     visualCounts.put(entry.getKey(), 0.0);
@@ -93,53 +93,37 @@ public class PlayerResourceData {
         }
 
         // 计算需要被压缩的资源的总量
-        double compressibleTotal = trueTotal - specialAmount;
+        double compressibleTotal = trueTotal - IronAmount;
 
         // 处理没有可压缩资源的情况，防止除以零
         if (compressibleTotal <= 0) {
-            // 此时说明只有金和铁，直接返回即可
+            // 此时说明只有铁，直接返回
             visualCounts.putAll(trueResourceCounts);
             return visualCounts;
         }
 
         // 计算剩余的视觉空间和压缩比例
-        double remainingVisualSpace = UI_COMPRESSION_START - specialAmount;
+        double remainingVisualSpace = UI_COMPRESSION_START - IronAmount;
         double scalingFactor = remainingVisualSpace / compressibleTotal;
 
         // 应用缩放
-        for (Map.Entry<ResourceType, Double> entry : trueResourceCounts.entrySet()) {
-            ResourceType type = entry.getKey();
+        for (Map.Entry<AllResourceType, Double> entry : trueResourceCounts.entrySet()) {
+            AllResourceType type = entry.getKey();
             double value = entry.getValue();
-            if (type == ResourceType.GOLD || type == ResourceType.IRON) {
+            if (AllResourceType.getNoCompressionResourceType().contains(type)) {
                 visualCounts.put(type, value); // 特殊资源使用原值
             } else {
                 visualCounts.put(type, value * scalingFactor); // 普通资源使用缩放后的值
             }
         }
-
         return visualCounts;
     }
 
-    public double getSpecialResourceAmount() {
-        return trueResourceCounts.get(ResourceType.GOLD) + trueResourceCounts.get(ResourceType.IRON);
-    }
-
-    /**
-     * 获取玩家当前的真实资源总量，可用于在UI上显示数值文本，如 "125/150"。
-     *
-     * @return 真实的资源总量。
-     */
-    public double getCurrentTrueTotal() {
-        return getTrueTotal();
-    }
-
-    /**
-     * 获取资源条的真实容量上限。
-     *
-     * @return 真实容量上限。
-     */
-    public double getMaxCapacity() {
-        return MAX_CAPACITY;
+    private double getNormalResourceTotal() {
+        return trueResourceCounts.entrySet().stream()
+                .filter(entry -> AllResourceType.getNormalResourceType().contains(entry.getKey()))
+                .mapToDouble(Map.Entry::getValue)
+                .sum();
     }
 
     public static double getCompressionThreshold() {

@@ -1,7 +1,7 @@
 package BlockPower.ModMessages.S2CPacket;
 
 import BlockPower.Skills.MinerState.client.ClientResourceData;
-import BlockPower.Skills.MinerState.server.ResourceType;
+import BlockPower.Skills.MinerState.server.AllResourceType;
 import net.minecraft.network.FriendlyByteBuf;
 import java.util.EnumMap;
 import java.util.Map;
@@ -12,7 +12,7 @@ import java.util.Map;
 public class ResourceSyncPacket_S2C extends AbstractS2CPacket {
 
     // 存储要同步的资源数据
-    private final Map<ResourceType, Double> resourceData;
+    private final Map<AllResourceType, Double> resourceData;
 
     /**
      * 客户端接收并解码时使用的构造函数。
@@ -22,10 +22,10 @@ public class ResourceSyncPacket_S2C extends AbstractS2CPacket {
         // 从字节流中读取Map的大小
         int size = buf.readInt();
         // 创建一个新的EnumMap用于存放解码后的数据
-        this.resourceData = new EnumMap<>(ResourceType.class);
+        this.resourceData = new EnumMap<>(AllResourceType.class);
         // 根据大小循环读取每个键值对
         for (int i = 0; i < size; i++) {
-            ResourceType type = buf.readEnum(ResourceType.class);
+            AllResourceType type = buf.readEnum(AllResourceType.class);
             double amount = buf.readDouble();
             this.resourceData.put(type, amount);
         }
@@ -35,7 +35,7 @@ public class ResourceSyncPacket_S2C extends AbstractS2CPacket {
      * 服务端创建并发送时使用的构造函数。
      * @param resourceData 包含当前视觉资源数据的Map
      */
-    public ResourceSyncPacket_S2C(Map<ResourceType, Double> resourceData) {
+    public ResourceSyncPacket_S2C(Map<AllResourceType, Double> resourceData) {
         this.resourceData = resourceData;
     }
 
@@ -48,7 +48,7 @@ public class ResourceSyncPacket_S2C extends AbstractS2CPacket {
         // 首先写入Map的大小，方便客户端解码时循环
         buf.writeInt(this.resourceData.size());
         // 遍历Map，将每个键值对写入字节流
-        for (Map.Entry<ResourceType, Double> entry : this.resourceData.entrySet()) {
+        for (Map.Entry<AllResourceType, Double> entry : this.resourceData.entrySet()) {
             buf.writeEnum(entry.getKey());      // 写入枚举类型的Key
             buf.writeDouble(entry.getValue());  // 写入双精度浮点数的Value
         }

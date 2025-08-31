@@ -1,22 +1,16 @@
 package BlockPower.Skills.MinerState.client;
 
 import BlockPower.Main.Main;
-import BlockPower.Skills.MinerState.server.PlayerResourceManager;
-import BlockPower.Skills.MinerState.server.ResourceType;
-import BlockPower.Util.Commons;
+import BlockPower.Skills.MinerState.server.AllResourceType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * 仅存在于客户端，用于缓存从服务端同步过来的资源数据。
@@ -26,7 +20,7 @@ import java.util.Objects;
 @Mod.EventBusSubscriber(modid = Main.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientResourceData {
 
-    private static final Map<ResourceType, Double> resources = new EnumMap<>(ResourceType.class);
+    private static final Map<AllResourceType, Double> resources = new EnumMap<>(AllResourceType.class);
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientResourceData.class);
 
     /**
@@ -34,7 +28,7 @@ public class ClientResourceData {
      *
      * @param newResources 新的资源数据Map
      */
-    public static void setResources(Map<ResourceType, Double> newResources) {
+    public static void setResources(Map<AllResourceType, Double> newResources) {
         // 在主渲染线程执行，确保线程安全
         if (Minecraft.getInstance().isSameThread()) {
             resources.clear();
@@ -52,7 +46,7 @@ public class ClientResourceData {
      *
      * @return 当前缓存的资源数据
      */
-    public static Map<ResourceType, Double> getResources() {
+    public static Map<AllResourceType, Double> getResources() {
         return resources;
     }
 }

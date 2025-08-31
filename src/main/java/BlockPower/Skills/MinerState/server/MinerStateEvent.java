@@ -7,7 +7,6 @@ import BlockPower.Util.TaskManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -48,23 +47,24 @@ public class MinerStateEvent {
         Level level = player.level();
 
         // 资源生成：通过带权重的随机算法决定本次获得的资源类型。
-        ResourceType resourceType = getRandomResourceType();
+        AllResourceType allResourceType = getRandomResourceType();
 
         // 数据更新：调用资源管理器，为玩家添加新获取的资源。
         var playerData = resourceManager.getPlayerData(player);
-        playerData.addResource(resourceType);
+        playerData.addResource(allResourceType);
 
         // 当服务端数据更新后，发送数据包给客户端。
         if (player instanceof ServerPlayer serverPlayer) {
-            Map<ResourceType, Double> visualData = playerData.getResourceCounts();
+            Map<AllResourceType, Double> visualData = playerData.getResourceCounts();
             ModMessages.sendToPlayer(new ResourceSyncPacket_S2C(visualData), serverPlayer);
         }
 
         // 视觉与音效表现
+        //TODO 根据不同资源类型获取不同的音效
         Vec3 position = event.getPos().getCenter().add(0, 0.4, 0);
         Vec3 velocity = new Vec3(0, 0.35, 0);
         // 根据随机到的资源类型，创建一个对应的ItemStack用于显示。
-        ItemStack displayStack = new ItemStack(resourceType.getCorrespondingItem());
+        ItemStack displayStack = new ItemStack(allResourceType.getCorrespondingItem());
         FakeItem fakeItem = new FakeItem(level, position, velocity, displayStack, 6);
         level.addFreshEntity(fakeItem);
 
@@ -78,18 +78,19 @@ public class MinerStateEvent {
      *
      * @return 随机选中的资源类型 (ResourceType)。
      */
-    private static ResourceType getRandomResourceType() {
+    //TODO 根据工具不同使用不同的权重算法
+    private static AllResourceType getRandomResourceType() {
         double chance = random.nextDouble();
         if (chance < 0.40) { // 40% 的概率落在 [0.0, 0.40)
-            return ResourceType.DIRT;
+            return AllResourceType.DIRT;
         } else if (chance < 0.70) { // 30% 的概率落在 [0.40, 0.70)
-            return ResourceType.WOOD;
+            return AllResourceType.WOOD;
         } else if (chance < 0.90) { // 20% 的概率落在 [0.70, 0.90)
-            return ResourceType.STONE;
+            return AllResourceType.STONE;
         } else if (chance < 0.98) { // 8% 的概率落在 [0.90, 0.98)
-            return ResourceType.IRON;
+            return AllResourceType.IRON;
         } else { // 剩下 2% 的概率落在 [0.98, 1.0)
-            return ResourceType.GOLD;
+            return AllResourceType.GOLD;
         }
     }
 }
