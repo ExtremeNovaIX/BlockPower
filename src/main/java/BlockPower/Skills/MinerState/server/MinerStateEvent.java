@@ -3,6 +3,8 @@ package BlockPower.Skills.MinerState.server;
 import BlockPower.ModEntities.FakeItem.FakeItem;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.ModMessages.S2CPacket.ResourceSyncPacket_S2C;
+import BlockPower.Skills.MinerState.server.strategy.ResourceGenerationStrategy;
+import BlockPower.Skills.MinerState.server.strategy.ResourceStrategyFactory;
 import BlockPower.Util.TaskManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -31,8 +33,12 @@ public class MinerStateEvent {
         Player player = event.getEntity();
         if (minerStateMap.getOrDefault(player, false)) {
             event.setCanceled(true);
-            taskManager.runOnceWithCooldown(player, "minerState", 3, () -> {
-                spawnSource(event, player);
+            // 资源生成策略
+            ResourceGenerationStrategy strategy = ResourceStrategyFactory.getStrategy(player.getMainHandItem());
+            AllResourceType result = strategy.generateResource();
+
+            taskManager.runOnceWithCooldown(player, "minerState", strategy.getDigCoolDown(), () -> {
+                spawnSource(event, player, result);
             });
         }
     }
@@ -43,15 +49,12 @@ public class MinerStateEvent {
      * @param event  事件对象，用于获取位置信息。
      * @param player 触发事件的玩家。
      */
-    private static void spawnSource(PlayerInteractEvent.LeftClickBlock event, Player player) {
+    private static void spawnSource(PlayerInteractEvent.LeftClickBlock event, Player player, AllResourceType result) {
         Level level = player.level();
-
-        // 资源生成：通过带权重的随机算法决定本次获得的资源类型。
-        AllResourceType allResourceType = getRandomResourceType();
 
         // 数据更新：调用资源管理器，为玩家添加新获取的资源。
         var playerData = resourceManager.getPlayerData(player);
-        playerData.addResource(allResourceType);
+        playerData.addResource(result);
 
         // 当服务端数据更新后，发送数据包给客户端。
         if (player instanceof ServerPlayer serverPlayer) {
@@ -60,37 +63,44 @@ public class MinerStateEvent {
         }
 
         // 视觉与音效表现
-        //TODO 根据不同资源类型获取不同的音效
         Vec3 position = event.getPos().getCenter().add(0, 0.4, 0);
         Vec3 velocity = new Vec3(0, 0.35, 0);
         // 根据随机到的资源类型，创建一个对应的ItemStack用于显示。
-        ItemStack displayStack = new ItemStack(allResourceType.getCorrespondingItem());
+        ItemStack displayStack = new ItemStack(result.getCorrespondingItem());
         FakeItem fakeItem = new FakeItem(level, position, velocity, displayStack, 6);
         level.addFreshEntity(fakeItem);
 
+        // 根据不同资源类型获取不同的音效
         if (!level.isClientSide()) {
-            level.playSound(null, position.x(), position.y(), position.z(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 3F, random.nextFloat() * 0.1F + 0.9F);
-        }
-    }
+            switch (result) {
+                case DIRT:
+                case WOOD:
+                case STONE:
+                case IRON:
+                case GOLD:
+                    level.playSound(null,
+                            position.x(), position.y(), position.z(),
+                            SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS,
+                            0.5F, random.nextFloat() * 0.1F + 0.9F);
+                    break;
 
-    /**
-     * 根据预设的权重概率，随机获取一种资源类型。
-     *
-     * @return 随机选中的资源类型 (ResourceType)。
-     */
-    //TODO 根据工具不同使用不同的权重算法
-    private static AllResourceType getRandomResourceType() {
-        double chance = random.nextDouble();
-        if (chance < 0.40) { // 40% 的概率落在 [0.0, 0.40)
-            return AllResourceType.DIRT;
-        } else if (chance < 0.70) { // 30% 的概率落在 [0.40, 0.70)
-            return AllResourceType.WOOD;
-        } else if (chance < 0.90) { // 20% 的概率落在 [0.70, 0.90)
-            return AllResourceType.STONE;
-        } else if (chance < 0.98) { // 8% 的概率落在 [0.90, 0.98)
-            return AllResourceType.IRON;
-        } else { // 剩下 2% 的概率落在 [0.98, 1.0)
-            return AllResourceType.GOLD;
+                case DIAMOND:
+                    level.playSound(null,
+                            position.x(), position.y(), position.z(),
+                            SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS,
+                            0.7F, 1F);
+                    break;
+
+                case NETHERITE:
+                    level.playSound(null,
+                            position.x(), position.y(), position.z(),
+                            SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS,
+                            1F, 1F);
+                    break;
+
+                default:
+                    break;
+            }
         }
     }
 }
