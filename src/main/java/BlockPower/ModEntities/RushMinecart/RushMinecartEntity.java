@@ -258,7 +258,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
     }
 
     private void hurtEntity(@NotNull Player player) {
-        List<Entity> entityList = applyDamage(this, player, 1.5, 15F, 3, ModSounds.MINECART_CRASH_SOUND.get());
+        List<Entity> entityList = applyDamage(this, player, 1.5, 15F, 4, ModSounds.MINECART_CRASH_SOUND.get());
         if (!entityList.isEmpty()) {
             //玩家在车上时触发屏幕震动
             if (getState() == RushMinecartState.RUSHING && this.getFirstPassenger() == player) {

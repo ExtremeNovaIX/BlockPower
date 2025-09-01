@@ -6,6 +6,7 @@ import BlockPower.ModMessages.S2CPacket.ResourceSyncPacket_S2C;
 import BlockPower.Skills.MinerState.server.strategy.ResourceGenerationStrategy;
 import BlockPower.Skills.MinerState.server.strategy.ResourceStrategyFactory;
 import BlockPower.Util.TaskManager;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -13,7 +14,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -29,15 +32,16 @@ public class MinerStateEvent {
     private static final PlayerResourceManager resourceManager = PlayerResourceManager.getInstance();
 
     @SubscribeEvent
-    public static void handleMinerState(PlayerInteractEvent.LeftClickBlock event) {
+    public static void onBreakingBlock(PlayerEvent.BreakSpeed event) {
         Player player = event.getEntity();
+        // 确认玩家处于minerState状态
         if (minerStateMap.getOrDefault(player, false)) {
-            event.setCanceled(true);
-            // 资源生成策略
+            //重置挖掘进度
+            event.setNewSpeed(0F);
             ResourceGenerationStrategy strategy = ResourceStrategyFactory.getStrategy(player.getMainHandItem());
-            AllResourceType result = strategy.generateResource();
-
             taskManager.runOnceWithCooldown(player, "minerState", strategy.getDigCoolDown(), () -> {
+                AllResourceType result = strategy.generateResource();
+                // 调用资源生成逻辑，传入方块位置
                 spawnSource(event, player, result);
             });
         }
@@ -49,7 +53,7 @@ public class MinerStateEvent {
      * @param event  事件对象，用于获取位置信息。
      * @param player 触发事件的玩家。
      */
-    private static void spawnSource(PlayerInteractEvent.LeftClickBlock event, Player player, AllResourceType result) {
+    private static void spawnSource(PlayerEvent.BreakSpeed event, Player player, AllResourceType result) {
         Level level = player.level();
         //TODO 添加高等级策略一次可以挖出双份甚至多份资源或是
         //TODO 添加对镐子耐久的消耗
@@ -66,7 +70,7 @@ public class MinerStateEvent {
         }
 
         // 视觉与音效表现
-        Vec3 position = event.getPos().getCenter().add(0, 0.4, 0);
+        Vec3 position = event.getPosition().get().getCenter().add(0, 0.4, 0);
         Vec3 velocity = new Vec3(0, 0.35, 0);
         // 根据随机到的资源类型，创建一个对应的ItemStack用于显示。
         ItemStack displayStack = new ItemStack(result.getCorrespondingItem());
