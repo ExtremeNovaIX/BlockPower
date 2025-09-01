@@ -7,6 +7,14 @@ import net.minecraftforge.client.settings.KeyConflictContext;
 public class KeyBindings {
     public static final String BLOCKPOWER_KEY = "key.blockpower";
 
+    public static final KeyMapping MINER_MODE = new KeyMapping(
+            "key.blockpower.miner_mode",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            InputConstants.KEY_TAB,//按键绑定
+            BLOCKPOWER_KEY
+    );
+
     public static final KeyMapping MINECART_RUSH = new KeyMapping(
             "key.blockpower.minecart_rush",
             KeyConflictContext.IN_GAME,

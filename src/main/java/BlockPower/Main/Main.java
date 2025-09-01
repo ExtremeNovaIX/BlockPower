@@ -14,12 +14,11 @@ import org.slf4j.LoggerFactory;
 import static BlockPower.Main.Main.MOD_ID;
 
 @Mod(MOD_ID)
-public class Main {
+public class Main {//TODO 做消耗资源的技能系统
 
     public static final String MOD_ID = "blockpower";
     private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    //TODO 完成全局的受伤管理计时器，防止反复触发效果
     public Main() {
         printWelcome();
         //不要管这个报错，它是正常的

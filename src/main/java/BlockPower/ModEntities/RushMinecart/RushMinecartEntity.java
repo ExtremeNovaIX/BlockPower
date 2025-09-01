@@ -1,8 +1,9 @@
 package BlockPower.ModEntities.RushMinecart;
 
+import BlockPower.ModEntities.IStateMachine;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
-import BlockPower.ModEntities.IStateMachine;
+import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.ServerTickListener;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -25,7 +26,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static BlockPower.Util.Commons.*;
+import static BlockPower.Util.Commons.applyDamage;
+import static BlockPower.Util.Commons.detectEntity;
 import static BlockPower.Util.EffectSender.broadcastScreenShake;
 import static BlockPower.Util.EffectSender.sendHitStop;
 
@@ -46,11 +48,15 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
         ENDING        //技能结束, 准备销毁
     }
 
+    private static final Integer MAX_SPEED = 2;
+
     private final ServerPlayer player;
 
     private Vec3 lastRailPlacementPos = Vec3.ZERO;//记录上一个生成点的位置
 
     private static final TimerManager timerManager = TimerManager.getInstance();//全局计时器管理类
+
+    private static final TaskManager taskManager = TaskManager.getInstance();
 
     private Vec3 minecartSpeed = Vec3.ZERO;
 
@@ -108,11 +114,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
                     setState(RushMinecartState.SEEKING);
                     break;
                 }
-
-                //每2tick触发一次
-                if (ServerTickListener.getTicks() % 2 == 0) {
-                    hurtEntity(player);
-                }
+                hurtEntity(player);
                 break;
 
             case HITSTOPPING:
@@ -146,9 +148,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
                 if (this.getFirstPassenger() == player) {
                     player.stopRiding();
                 }
-                if (ServerTickListener.getTicks() % 2 == 0) {
-                    hurtEntity(player);
-                }
+                hurtEntity(player);
                 if (timerManager.isTimerCyclingDue(this, "crashTimer", 20)) {
                     setState(RushMinecartState.ENDING);
                 }
@@ -238,7 +238,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
         minecart.setXRot(0.0F);
         minecart.yRotO = minecart.getYRot() + 90;
         minecart.xRotO = minecart.getXRot();
-        minecart.setMinecartSpeed(lookAngle.scale(1.8));
+        minecart.setMinecartSpeed(lookAngle.normalize().scale(MAX_SPEED));
         minecart.setDeltaMovement(minecart.getMinecartSpeed());
         //将矿车添加到世界中
         player.level().addFreshEntity(minecart);
