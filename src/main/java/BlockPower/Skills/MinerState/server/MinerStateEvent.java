@@ -51,6 +51,9 @@ public class MinerStateEvent {
      */
     private static void spawnSource(PlayerInteractEvent.LeftClickBlock event, Player player, AllResourceType result) {
         Level level = player.level();
+        //TODO 添加高等级策略一次可以挖出双份甚至多份资源或是
+        //TODO 添加对镐子耐久的消耗
+        //TODO 对附魔的支持（效率，时运，耐久）
 
         // 数据更新：调用资源管理器，为玩家添加新获取的资源。
         var playerData = resourceManager.getPlayerData(player);

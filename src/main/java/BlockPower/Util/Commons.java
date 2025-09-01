@@ -5,11 +5,13 @@ import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +31,7 @@ public class Commons {
      * 检测半径内的非技能释放者的LivingEntity
      *
      * @param mainEntity 释放技能的实体
-     * @param radius 检测半径
+     * @param radius     检测半径
      * @return 半径内的非技能释放者和非自身LivingEntity列表
      */
     public static List<Entity> detectEntity(@NotNull Entity mainEntity, double radius, Player blacklist) {
@@ -57,9 +59,9 @@ public class Commons {
     /**
      * 击退实体
      *
-     * @param mainEntity  释放技能的实体
-     * @param effectedEntity  被击退的实体
-     * @param strength 击退强度
+     * @param mainEntity     释放技能的实体
+     * @param effectedEntity 被击退的实体
+     * @param strength       击退强度
      */
     public static void knockBackEntity(@NotNull Entity mainEntity, Entity effectedEntity, double strength) {
         if (effectedEntity == null || effectedEntity.isRemoved()) return;
@@ -74,12 +76,12 @@ public class Commons {
     /**
      * 对半径内的实体造成伤害并击退
      *
-     * @param mainEntity 释放技能的实体
-     * @param skillUser 释放技能的玩家
+     * @param mainEntity        释放技能的实体
+     * @param skillUser         释放技能的玩家
      * @param knockBackStrength 击退强度
-     * @param damage 伤害值
-     * @param detectRadius 检测半径
-     * @param soundEvent 音效
+     * @param damage            伤害值
+     * @param detectRadius      检测半径
+     * @param soundEvent        音效
      * @return 半径内的实体列表
      */
     public static List<Entity> applyDamage(@NotNull Entity mainEntity, Player skillUser, double knockBackStrength, float damage, double detectRadius, SoundEvent soundEvent) {
@@ -94,7 +96,7 @@ public class Commons {
                     taskManager.runTimesWithCooldown(mainEntity, "play_sound", 3, 5, () ->
                             mainEntity.level().playSound(null,
                                     mainEntity.getX(), mainEntity.getY(), mainEntity.getZ(),
-                                    soundEvent, SoundSource.PLAYERS, 5f, r.nextFloat(0.5f) + 0.8f));
+                                    soundEvent, SoundSource.PLAYERS, 5f, r.nextFloat(0.2f) + 0.9f));
                 }
                 knockBackEntity(mainEntity, entity, knockBackStrength);
             });
@@ -134,6 +136,16 @@ public class Commons {
                 player.sendSystemMessage(broadcastMsg);
             });
         }
+    }
+
+    /**
+     * 检查服务器玩家是否为游戏模式 spectator 或 creative
+     *
+     * @param player 服务器玩家
+     */
+    public static boolean checkServerPlayerMode(ServerPlayer player) {
+        GameType gameType = player.gameMode.getGameModeForPlayer();
+        return gameType == GameType.SPECTATOR || gameType == GameType.CREATIVE;
     }
 
 }

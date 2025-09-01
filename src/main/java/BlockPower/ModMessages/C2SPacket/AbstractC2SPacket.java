@@ -10,7 +10,7 @@ import java.util.function.Supplier;
  * 一个抽象的C2S（客户端到服务端）数据包父类。
  * 它封装了所有C2S数据包共有的模板代码，例如线程处理。
  */
-abstract class AbstractC2SPacket {
+public abstract class AbstractC2SPacket {
 
     /**
      * 子类必须实现此方法，以定义如何将它们自己的数据写入字节流。
@@ -22,20 +22,20 @@ abstract class AbstractC2SPacket {
      * 这是所有数据包共有的处理器。
      * 它确保了逻辑总是在服务端的主线程上执行，避免了线程安全问题。
      * 子类不应重写此方法。
-     * @param supplier a {@link Supplier} object.
-     * @return a boolean.
      */
-    public final boolean handle(Supplier<NetworkEvent.Context> supplier) {
+    public final void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
             // 获取发送数据包的玩家
             ServerPlayer player = context.getSender();
             if (player == null) return;
 
+            // 检查数据包是否合法
+            if (!checkLegit(player)) return;
+
             // 调用一个抽象方法，让子类去实现具体的服务端逻辑
             handleServerSide(player);
         });
-        return true;
     }
 
     /**
@@ -43,5 +43,14 @@ abstract class AbstractC2SPacket {
      * @param player 发送该数据包的玩家。
      */
     protected abstract void handleServerSide(ServerPlayer player);
+
+    /**
+     * 子类可选实现此方法，以定义当服务端收到该数据包时是否合法。
+     * @param player 发送该数据包的玩家。
+     * @return 如果数据包合法则返回true，会执行handleServerSide内逻辑，否则返回false。
+     */
+    protected boolean checkLegit(ServerPlayer player){
+        return true;
+    }
 
 }

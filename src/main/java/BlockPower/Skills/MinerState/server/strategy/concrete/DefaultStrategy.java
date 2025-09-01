@@ -22,7 +22,7 @@ public class DefaultStrategy implements ResourceGenerationStrategy {
 
     @Override
     public Integer getDigCoolDown() {
-        return 10;
+        return 9;
     }
 
 }

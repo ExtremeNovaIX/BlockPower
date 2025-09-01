@@ -23,6 +23,13 @@ public class ClientResourceData {
     private static final Map<AllResourceType, Double> resources = new EnumMap<>(AllResourceType.class);
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientResourceData.class);
 
+    static {
+        // 初始化所有资源类型为0.0
+        for (AllResourceType type : AllResourceType.values()) {
+            resources.put(type, 0.0);
+        }
+    }
+
     /**
      * 用从数据包接收到的新数据更新缓存。
      *

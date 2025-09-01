@@ -35,7 +35,7 @@ public class ResourceBarHud {
             Minecraft mc = Minecraft.getInstance();
             Player player = mc.player;
 
-            if (player == null || mc.options.hideGui || !MinerStateEvent.minerStateMap.getOrDefault(player, false) || mc.gameMode.getPlayerMode() == GameType.SPECTATOR) {
+            if (mc.gameMode != null && (player == null || mc.options.hideGui || !MinerStateEvent.minerStateMap.getOrDefault(player, false) || mc.gameMode.getPlayerMode() == GameType.SPECTATOR)) {
                 return;
             }
 

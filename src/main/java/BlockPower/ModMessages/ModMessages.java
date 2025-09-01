@@ -1,12 +1,9 @@
 package BlockPower.ModMessages;
 
 import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
-import BlockPower.ModMessages.C2SPacket.SpawnDropAnvilPacket_C2S;
-import BlockPower.ModMessages.C2SPacket.SpawnRushMinecartPacket_C2S;
-import BlockPower.ModMessages.S2CPacket.HitStopPacket_S2C;
-import BlockPower.ModMessages.S2CPacket.ResourceSyncPacket_S2C;
-import BlockPower.ModMessages.S2CPacket.ShakePacket_S2C;
-import BlockPower.ModMessages.S2CPacket.SneakPacket_S2C;
+import BlockPower.ModMessages.C2SPacket.SkillPacket.SpawnDropAnvilPacket_C2S;
+import BlockPower.ModMessages.C2SPacket.SkillPacket.SpawnRushMinecartPacket_C2S;
+import BlockPower.ModMessages.S2CPacket.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -90,7 +87,14 @@ public class ModMessages {
                 .consumerMainThread(ShakePacket_S2C::handle)
                 .add();
 
+        net.messageBuilder(MinerStateSyncPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(MinerStateSyncPacket_S2C::new)
+                .encoder(MinerStateSyncPacket_S2C::toBytes)
+                .consumerMainThread(MinerStateSyncPacket_S2C::handle)
+                .add();
+
     }
+
 
     // 一个辅助方法，用于从客户端向服务端发包
     public static <MSG> void sendToServer(MSG message) {

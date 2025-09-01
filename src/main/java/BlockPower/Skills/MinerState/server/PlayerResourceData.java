@@ -1,5 +1,9 @@
 package BlockPower.Skills.MinerState.server;
 
+import BlockPower.ModMessages.ModMessages;
+import BlockPower.ModMessages.S2CPacket.ResourceSyncPacket_S2C;
+import net.minecraft.server.level.ServerPlayer;
+
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -9,7 +13,7 @@ import java.util.Map;
  */
 public class PlayerResourceData {
     // 用于存储每种资源的真实数量。
-    private final Map<AllResourceType, Double> trueResourceCounts = new EnumMap<>(AllResourceType.class);
+    public final Map<AllResourceType, Double> trueResourceCounts = new EnumMap<>(AllResourceType.class);
 
     // 每次获取资源时增加的量。
     private static final double RESOURCE_GAIN_AMOUNT = 1.0;
@@ -25,6 +29,7 @@ public class PlayerResourceData {
 
     /**
      * 为指定的资源类型增加数量，会检查该资源自身的上限。
+     *
      * @param type 要增加的资源类型。
      */
     public void addResource(AllResourceType type) {
@@ -72,5 +77,33 @@ public class PlayerResourceData {
             sb.append(type).append(":").append(count).append(",");
         });
         return sb.toString();
+    }
+
+    /**
+     * 检查指定资源类型的数量是否足够
+     *
+     * @param type   资源类型
+     * @param amount 需要检查的数量
+     * @return 是否足够
+     */
+    public boolean hasEnoughResource(AllResourceType type, double amount) {
+        Double currentAmount = trueResourceCounts.get(type);
+        return currentAmount != null && currentAmount >= amount;
+    }
+
+    /**
+     * 消耗指定数量的资源
+     *
+     * @param type   资源类型
+     * @param amount 要消耗的数量
+     * @return 是否成功消耗（如果资源不足则返回false）
+     */
+    public boolean consumeResource(AllResourceType type, double amount, ServerPlayer player) {
+        if (!hasEnoughResource(type, amount)) {
+            return false;
+        }
+        trueResourceCounts.compute(type, (k, v) -> v - amount);
+        ModMessages.sendToPlayer(new ResourceSyncPacket_S2C(trueResourceCounts), player);
+        return true;
     }
 }
