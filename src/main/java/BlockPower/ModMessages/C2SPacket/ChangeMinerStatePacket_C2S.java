@@ -1,5 +1,7 @@
 package BlockPower.ModMessages.C2SPacket;
 
+import BlockPower.ModMessages.ModMessages;
+import BlockPower.ModMessages.S2CPacket.MinerStateSyncPacket_S2C;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
@@ -26,6 +28,8 @@ public class ChangeMinerStatePacket_C2S extends AbstractC2SPacket {
     protected void handleServerSide(ServerPlayer player) {
         boolean b = !minerStateMap.getOrDefault(player, false);
         minerStateMap.put(player, b);
+        // 同步客户端状态
+        ModMessages.sendToPlayer(new MinerStateSyncPacket_S2C(b), player);
         LOGGER.info("{} changed miner state to {}", player.getGameProfile().getName(), b);
     }
 }

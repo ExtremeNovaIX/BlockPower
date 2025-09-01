@@ -19,10 +19,12 @@ public class DiamondTierStrategy implements ResourceGenerationStrategy {
             return AllResourceType.STONE;
         } else if (chance < 0.85) { // 31% 概率获取IRON
             return AllResourceType.IRON;
-        } else if (chance < 0.97) { // 12% 概率获取GOLD
+        } else if (chance < 0.96) { // 11% 概率获取GOLD
             return AllResourceType.GOLD;
+        } else if (chance < 0.99) { // 3% 概率获取DIAMOND
+            return AllResourceType.DIAMOND;
         } else {
-            return AllResourceType.DIAMOND;// 3% 概率获取DIAMOND
+            return AllResourceType.NETHERITE;// 1% 概率获取NETHERITE
         }
     }
 

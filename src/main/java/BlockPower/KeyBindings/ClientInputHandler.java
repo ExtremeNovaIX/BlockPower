@@ -4,6 +4,7 @@ import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
 import BlockPower.ModMessages.C2SPacket.SpawnDropAnvilPacket_C2S;
 import BlockPower.ModMessages.C2SPacket.SpawnRushMinecartPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
+import BlockPower.Skills.MinerState.client.ClientMinerState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -25,14 +26,19 @@ public class ClientInputHandler {
                 LOGGER.info("MINER_MODE key 触发!");
                 ModMessages.sendToServer(new ChangeMinerStatePacket_C2S());
             }
-            if (KeyBindings.MINECART_RUSH.consumeClick()) {
-                LOGGER.info("MINECART_RUSH key 触发!");
-                ModMessages.sendToServer(new SpawnRushMinecartPacket_C2S());
+
+            // 只有在挖掘模式下才能使用
+            if (ClientMinerState.isMinerMode()) {
+                if (KeyBindings.MINECART_RUSH.consumeClick()) {
+                    LOGGER.info("MINECART_RUSH key 触发!");
+                    ModMessages.sendToServer(new SpawnRushMinecartPacket_C2S());
+                }
+                if (KeyBindings.DROP_ANVIL.consumeClick()) {
+                    LOGGER.info("DROP_ANVIL key 触发!");
+                    ModMessages.sendToServer(new SpawnDropAnvilPacket_C2S());
+                }
             }
-            if (KeyBindings.DROP_ANVIL.consumeClick()) {
-                LOGGER.info("DROP_ANVIL key 触发!");
-                ModMessages.sendToServer(new SpawnDropAnvilPacket_C2S());
-            }
+
         }
     }
 }
