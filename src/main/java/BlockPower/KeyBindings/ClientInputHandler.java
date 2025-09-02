@@ -1,11 +1,16 @@
 package BlockPower.KeyBindings;
 
 import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
-import BlockPower.ModMessages.C2SPacket.SkillPacket.SpawnDropAnvilPacket_C2S;
+import BlockPower.ModMessages.C2SPacket.SkillPacket.AirJumpPacket_C2S;
+import BlockPower.ModMessages.C2SPacket.SkillPacket.DashSkillPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
-import BlockPower.Skills.SkillTrigger.DropAnvilSkill;
-import BlockPower.Skills.SkillTrigger.RushMinecartSkill;
-import BlockPower.Skills.SkillTrigger.SkillTrigger;
+import BlockPower.Skills.DashSkill;
+import BlockPower.Skills.DropAnvilSkill;
+import BlockPower.Skills.RushMinecartSkill;
+import BlockPower.Skills.SkillTrigger;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -22,17 +27,28 @@ public class ClientInputHandler {
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
-            if (KeyBindings.MINER_MODE.consumeClick()) {
-                LOGGER.info("MINER_MODE key 触发!");
-                ModMessages.sendToServer(new ChangeMinerStatePacket_C2S());
-            }
-            if (KeyBindings.MINECART_RUSH.consumeClick()) {
-                SkillTrigger.triggerSkill(new RushMinecartSkill());
-            }
-            if (KeyBindings.DROP_ANVIL.consumeClick()) {
-                SkillTrigger.triggerSkill(new DropAnvilSkill());
+        if (event.phase != TickEvent.Phase.END) return;
+        LocalPlayer localPlayer = Minecraft.getInstance().player;
+        if (localPlayer == null) return;
+
+        if (KeyBindings.MINER_MODE.consumeClick()) {
+            LOGGER.info("MINER_MODE key 触发");
+            ModMessages.sendToServer(new ChangeMinerStatePacket_C2S());
+        }
+        if (KeyBindings.MINECART_RUSH.consumeClick()) {
+            SkillTrigger.triggerSkill(new RushMinecartSkill());
+        }
+        if (KeyBindings.DROP_ANVIL.consumeClick()) {
+            SkillTrigger.triggerSkill(new DropAnvilSkill());
+        }
+        if (KeyBindings.CUSTOM_SPACE.consumeClick()) {
+            if (!localPlayer.onGround()) {
+                ModMessages.sendToServer(new AirJumpPacket_C2S());
             }
         }
+        if (KeyBindings.DASH.consumeClick()) {
+            ModMessages.sendToServer(new DashSkillPacket_C2S());
+        }
+
     }
 }

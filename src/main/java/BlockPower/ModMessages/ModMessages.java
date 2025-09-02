@@ -1,6 +1,8 @@
 package BlockPower.ModMessages;
 
 import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
+import BlockPower.ModMessages.C2SPacket.SkillPacket.AirJumpPacket_C2S;
+import BlockPower.ModMessages.C2SPacket.SkillPacket.DashSkillPacket_C2S;
 import BlockPower.ModMessages.C2SPacket.SkillPacket.SpawnDropAnvilPacket_C2S;
 import BlockPower.ModMessages.C2SPacket.SkillPacket.SpawnRushMinecartPacket_C2S;
 import BlockPower.ModMessages.S2CPacket.*;
@@ -62,6 +64,12 @@ public class ModMessages {
                 .consumerMainThread(ChangeMinerStatePacket_C2S::handle)
                 .add();
 
+        net.messageBuilder(AirJumpPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(AirJumpPacket_C2S::new)
+                .encoder(AirJumpPacket_C2S::toBytes)
+                .consumerMainThread(AirJumpPacket_C2S::handle)
+                .add();
+
         //Client
         net.messageBuilder(HitStopPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(HitStopPacket_S2C::new)
@@ -91,6 +99,12 @@ public class ModMessages {
                 .decoder(MinerStateSyncPacket_S2C::new)
                 .encoder(MinerStateSyncPacket_S2C::toBytes)
                 .consumerMainThread(MinerStateSyncPacket_S2C::handle)
+                .add();
+
+        net.messageBuilder(DashSkillPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(DashSkillPacket_C2S::new)
+                .encoder(DashSkillPacket_C2S::toBytes)
+                .consumerMainThread(DashSkillPacket_C2S::handle)
                 .add();
 
     }

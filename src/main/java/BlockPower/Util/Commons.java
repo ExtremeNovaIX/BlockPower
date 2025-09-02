@@ -143,7 +143,7 @@ public class Commons {
      *
      * @param player 服务器玩家
      */
-    public static boolean checkServerPlayerMode(ServerPlayer player) {
+    public static boolean isSpectatorOrCreativeMode(ServerPlayer player) {
         GameType gameType = player.gameMode.getGameModeForPlayer();
         return gameType == GameType.SPECTATOR || gameType == GameType.CREATIVE;
     }

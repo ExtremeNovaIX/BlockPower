@@ -3,8 +3,7 @@ package BlockPower.ModMessages.C2SPacket.SkillPacket;
 
 import BlockPower.ModEntities.RushMinecart.RushMinecartEntity;
 
-import BlockPower.ModMessages.C2SPacket.AbstractC2SPacket;
-import BlockPower.Skills.SkillTrigger.RushMinecartSkill;
+import BlockPower.Skills.RushMinecartSkill;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;

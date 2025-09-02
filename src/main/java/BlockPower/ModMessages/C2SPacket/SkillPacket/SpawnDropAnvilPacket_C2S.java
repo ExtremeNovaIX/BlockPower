@@ -1,8 +1,7 @@
 package BlockPower.ModMessages.C2SPacket.SkillPacket;
 
 import BlockPower.ModEntities.DropAnvil.DropAnvilEntity;
-import BlockPower.ModMessages.C2SPacket.AbstractC2SPacket;
-import BlockPower.Skills.SkillTrigger.DropAnvilSkill;
+import BlockPower.Skills.DropAnvilSkill;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;

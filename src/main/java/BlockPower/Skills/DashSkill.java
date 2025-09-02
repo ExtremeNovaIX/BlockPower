@@ -1,14 +1,13 @@
-package BlockPower.Skills.SkillTrigger;
+package BlockPower.Skills;
 
-import BlockPower.ModMessages.C2SPacket.SkillPacket.SpawnRushMinecartPacket_C2S;
+import BlockPower.ModMessages.C2SPacket.SkillPacket.DashSkillPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.Skills.MinerState.server.AllResourceType;
-import BlockPower.Skills.Skill;
 
-public class RushMinecartSkill implements Skill {
+public class DashSkill implements Skill {
     @Override
     public String getSkillName() {
-        return "RushMinecart";
+        return "Dash";
     }
 
     @Override
@@ -23,16 +22,16 @@ public class RushMinecartSkill implements Skill {
 
     @Override
     public void triggerSkill(int skillLevel) {
-        ModMessages.sendToServer(new SpawnRushMinecartPacket_C2S());
+        ModMessages.sendToServer(new DashSkillPacket_C2S());
     }
 
     @Override
     public AllResourceType getSkillCostType() {
-        return AllResourceType.IRON;
+        return null;
     }
 
     @Override
     public double getSkillCostAmount() {
-        return 2;
+        return 0;
     }
 }

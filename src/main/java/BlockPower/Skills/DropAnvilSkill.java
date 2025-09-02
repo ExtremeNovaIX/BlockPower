@@ -1,9 +1,8 @@
-package BlockPower.Skills.SkillTrigger;
+package BlockPower.Skills;
 
 import BlockPower.ModMessages.C2SPacket.SkillPacket.SpawnDropAnvilPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.Skills.MinerState.server.AllResourceType;
-import BlockPower.Skills.Skill;
 
 public class DropAnvilSkill implements Skill {
     @Override

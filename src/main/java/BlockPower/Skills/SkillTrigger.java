@@ -1,8 +1,6 @@
-package BlockPower.Skills.SkillTrigger;
+package BlockPower.Skills;
 
 import BlockPower.Skills.MinerState.client.ClientMinerState;
-import BlockPower.Skills.Skill;
-import BlockPower.Util.Commons;
 
 public class SkillTrigger {
 

@@ -206,12 +206,10 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
         }
     }
 
-
     private void spawnRailAt(Vec3 pos) {
         FakeRailEntity fakeRail = new FakeRailEntity(this.level(), pos.x(), pos.y(), pos.z(), this.getYRot());
         this.level().addFreshEntity(fakeRail);
     }
-
 
     public void spawnInitialRail() {
         Vec3 initialPos = this.position();
@@ -245,7 +243,6 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
         LOGGER.info("生成冲刺矿车");
 
         minecart.spawnInitialRail();
-
 
         //使玩家被矿车吸引
         if (player.onGround()) {

@@ -30,4 +30,20 @@ public class KeyBindings {
             InputConstants.KEY_F,//按键绑定
             BLOCKPOWER_KEY
     );
+
+    public static final KeyMapping CUSTOM_SPACE = new KeyMapping(
+            "key.blockpower.custom_space",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            InputConstants.KEY_SPACE,
+            BLOCKPOWER_KEY
+    );
+
+    public static final KeyMapping DASH = new KeyMapping(
+            "key.blockpower.dash",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            InputConstants.KEY_LCONTROL,
+            BLOCKPOWER_KEY
+    );
 }

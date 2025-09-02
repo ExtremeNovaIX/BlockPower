@@ -6,9 +6,7 @@ import BlockPower.Skills.MinerState.server.PlayerResourceData;
 import BlockPower.Skills.MinerState.server.PlayerResourceManager;
 import BlockPower.Skills.Skill;
 import BlockPower.Util.Commons;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.GameType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +29,8 @@ abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket {
         PlayerResourceData playerResourceData = playerResourceManager.getPlayerData(player);
         // 检查技能资源是否足够
         if (skill != null) {
-            if(Commons.checkServerPlayerMode(player)) return true;
+            if(Commons.isSpectatorOrCreativeMode(player)) return true;
+            if(skill.getSkillCostType() == null && skill.getSkillCostAmount() == 0) return true;
 
             AllResourceType costType = skill.getSkillCostType();
             double costAmount = skill.getSkillCostAmount();
@@ -43,7 +42,7 @@ abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket {
     }
 
     protected void consumeResource(ServerPlayer player, Skill skill) {
-        if(Commons.checkServerPlayerMode(player)) return;
+        if(Commons.isSpectatorOrCreativeMode(player)) return;
 
         AllResourceType type = skill.getSkillCostType();
         double amount = skill.getSkillCostAmount();
