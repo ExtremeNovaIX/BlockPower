@@ -4,10 +4,7 @@ import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
 import BlockPower.ModMessages.C2SPacket.SkillPacket.AirJumpPacket_C2S;
 import BlockPower.ModMessages.C2SPacket.SkillPacket.DashSkillPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
-import BlockPower.Skills.DashSkill;
-import BlockPower.Skills.DropAnvilSkill;
-import BlockPower.Skills.RushMinecartSkill;
-import BlockPower.Skills.SkillTrigger;
+import BlockPower.Skills.*;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -32,22 +29,31 @@ public class ClientInputHandler {
         if (localPlayer == null) return;
 
         if (KeyBindings.MINER_MODE.consumeClick()) {
-            LOGGER.info("MINER_MODE key 触发");
+            LOGGER.info("MINER_MODE key triggered");
             ModMessages.sendToServer(new ChangeMinerStatePacket_C2S());
         }
         if (KeyBindings.MINECART_RUSH.consumeClick()) {
+            LOGGER.info("MINECART_RUSH key triggered");
             SkillTrigger.triggerSkill(new RushMinecartSkill());
         }
         if (KeyBindings.DROP_ANVIL.consumeClick()) {
+            LOGGER.info("DROP_ANVIL key triggered");
             SkillTrigger.triggerSkill(new DropAnvilSkill());
         }
         if (KeyBindings.CUSTOM_SPACE.consumeClick()) {
             if (!localPlayer.onGround()) {
+                LOGGER.info("CUSTOM_SPACE key triggered");
                 ModMessages.sendToServer(new AirJumpPacket_C2S());
             }
         }
         if (KeyBindings.DASH.consumeClick()) {
+            LOGGER.info("DASH key triggered");
             ModMessages.sendToServer(new DashSkillPacket_C2S());
+        }
+
+        if (KeyBindings.PLACE_BLOCK.consumeClick()) {
+            LOGGER.info("PLACE_BLOCK key triggered");
+            SkillTrigger.triggerSkill(new PlaceBlockSkill());
         }
 
     }

@@ -1,5 +1,7 @@
 package BlockPower.Main;
 
+import BlockPower.ModBlocks.ModBlocks;
+import BlockPower.ModBlocks.ModEntityBlocks;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModItems.ModItems;
 import BlockPower.ModMessages.ModMessages;
@@ -14,8 +16,9 @@ import org.slf4j.LoggerFactory;
 import static BlockPower.Main.Main.MOD_ID;
 
 @Mod(MOD_ID)
-public class Main {//TODO 做消耗资源的技能系统
-
+public class Main {
+    //TODO combo系统，当生物/玩家被技能击中时会被挂上combo标记。接下来其他人技能更容易命中该生物（技能有第二套对带有combo标记的生物进行更大范围检测的逻辑）
+    //TODO 技能状态系统。不允许玩家同时释放多个技能，技能释放时会给玩家添加一个技能状态，技能释放完成后会移除该状态。
     public static final String MOD_ID = "blockpower";
     private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
@@ -26,6 +29,8 @@ public class Main {//TODO 做消耗资源的技能系统
         //注册事件总线
         ModSounds.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
+        ModBlocks.BLOCKS.register(modEventBus);
+        ModEntityBlocks.BLOCK_ENTITIES.register(modEventBus);
         ModEntities.ENTITY_TYPES.register(modEventBus);
         MinecraftForge.EVENT_BUS.register(this);
         ModMessages.register();

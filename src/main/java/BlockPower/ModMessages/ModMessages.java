@@ -1,10 +1,7 @@
 package BlockPower.ModMessages;
 
 import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
-import BlockPower.ModMessages.C2SPacket.SkillPacket.AirJumpPacket_C2S;
-import BlockPower.ModMessages.C2SPacket.SkillPacket.DashSkillPacket_C2S;
-import BlockPower.ModMessages.C2SPacket.SkillPacket.SpawnDropAnvilPacket_C2S;
-import BlockPower.ModMessages.C2SPacket.SkillPacket.SpawnRushMinecartPacket_C2S;
+import BlockPower.ModMessages.C2SPacket.SkillPacket.*;
 import BlockPower.ModMessages.S2CPacket.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -68,6 +65,12 @@ public class ModMessages {
                 .decoder(AirJumpPacket_C2S::new)
                 .encoder(AirJumpPacket_C2S::toBytes)
                 .consumerMainThread(AirJumpPacket_C2S::handle)
+                .add();
+
+        net.messageBuilder(PlaceBlockSkillPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(PlaceBlockSkillPacket_C2S::new)
+                .encoder(PlaceBlockSkillPacket_C2S::toBytes)
+                .consumerMainThread(PlaceBlockSkillPacket_C2S::handle)
                 .add();
 
         //Client

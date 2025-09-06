@@ -3,6 +3,7 @@ package BlockPower.KeyBindings;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.client.settings.KeyConflictContext;
+import net.minecraftforge.client.settings.KeyModifier;
 
 public class KeyBindings {
     public static final String BLOCKPOWER_KEY = "key.blockpower";
@@ -46,4 +47,15 @@ public class KeyBindings {
             InputConstants.KEY_LCONTROL,
             BLOCKPOWER_KEY
     );
+
+    public static final KeyMapping PLACE_BLOCK = new KeyMapping(
+            "key.blockpower.place_block",
+            KeyConflictContext.IN_GAME,
+            KeyModifier.SHIFT,
+            InputConstants.Type.MOUSE,
+            InputConstants.MOUSE_BUTTON_RIGHT,
+            BLOCKPOWER_KEY
+    );
+
+
 }
