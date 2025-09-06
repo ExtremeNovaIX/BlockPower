@@ -4,6 +4,7 @@ import BlockPower.ModEffects.FakeItemInHandEffect;
 import BlockPower.ModEntities.IStateMachine;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
+import BlockPower.Util.Commons;
 import BlockPower.Util.EffectSender;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
@@ -169,7 +170,8 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
 
 
     private void hurtEntity() {
-        List<Entity> entityList = applyDamage(this, player, 1.5, 10F, 9, ModSounds.ANVIL_SOUND.get());
+        List<Entity> entityList = applyDamage(this, player, 10F, 9, ModSounds.ANVIL_SOUND.get());
+        Commons.knockBackEntity(this, entityList, 1.5);
         if (!entityList.isEmpty()) {
             broadcastScreenShake(this, 6, 3f, 15, 7);
             //触发一次卡帧动画以后不再出现卡帧动画效果

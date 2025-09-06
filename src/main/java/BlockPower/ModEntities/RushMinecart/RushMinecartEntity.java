@@ -3,6 +3,7 @@ package BlockPower.ModEntities.RushMinecart;
 import BlockPower.ModEntities.IStateMachine;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
+import BlockPower.Util.Commons;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.ServerTickListener;
 import BlockPower.Util.Timer.TimerManager;
@@ -255,7 +256,8 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
     }
 
     private void hurtEntity(@NotNull Player player) {
-        List<Entity> entityList = applyDamage(this, player, 1.5, 15F, 5, ModSounds.MINECART_CRASH_SOUND.get());
+        List<Entity> entityList = applyDamage(this, player, 15F, 5, ModSounds.MINECART_CRASH_SOUND.get());
+        Commons.knockBackEntity(this, entityList, 1.5);
         if (!entityList.isEmpty()) {
             //玩家在车上时触发屏幕震动
             if (getState() == RushMinecartState.RUSHING && this.getFirstPassenger() == player) {
