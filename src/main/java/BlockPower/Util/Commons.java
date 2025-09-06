@@ -63,28 +63,49 @@ public class Commons {
      * @param effectedEntity 被击退的实体
      * @param strength       击退强度
      */
-    public static void knockBackEntity(@NotNull Entity mainEntity, Entity effectedEntity, double strength) {
-        if (effectedEntity == null || effectedEntity.isRemoved()) return;
-        Vec3 knockbackVector = effectedEntity.position().subtract(mainEntity.position()).normalize();
-        effectedEntity.setDeltaMovement(mainEntity.getDeltaMovement().add(
-                knockbackVector.x * strength,
-                1 * strength,
-                knockbackVector.z * strength
-        ));
+    public static void knockBackEntity(@NotNull Entity mainEntity, List<Entity> effectedEntity, double strength) {
+        if (effectedEntity == null || effectedEntity.isEmpty()) return;
+        for (Entity entity : effectedEntity) {
+            if (entity.isRemoved()) continue;
+            Vec3 knockbackVector = entity.position().subtract(mainEntity.position()).normalize();
+            entity.setDeltaMovement(mainEntity.getDeltaMovement().add(
+                    knockbackVector.x * strength,
+                    1 * strength,
+                    knockbackVector.z * strength
+            ));
+        }
+    }
+
+    /**
+     * 向上击退实体
+     *
+     * @param mainEntity     释放技能的实体
+     * @param effectedEntity 被击退的实体
+     * @param strength       击退强度
+     */
+    public static void knockBackEntityUp(@NotNull Entity mainEntity, List<Entity> effectedEntity, double strength) {
+        if (effectedEntity.isEmpty()) return;
+        for (Entity entity : effectedEntity) {
+            if (entity.isRemoved()) continue;
+            entity.setDeltaMovement(mainEntity.getDeltaMovement().add(
+                    r.nextFloat() * 0.02,
+                    1 * strength,
+                    r.nextFloat() * 0.02
+            ));
+        }
     }
 
     /**
      * 对半径内的实体造成伤害并击退
      *
-     * @param mainEntity        释放技能的实体
-     * @param skillUser         释放技能的玩家
-     * @param knockBackStrength 击退强度
-     * @param damage            伤害值
-     * @param detectRadius      检测半径
-     * @param soundEvent        音效
+     * @param mainEntity   释放技能的实体
+     * @param skillUser    释放技能的玩家
+     * @param damage       伤害值
+     * @param detectRadius 检测半径
+     * @param soundEvent   音效
      * @return 半径内的实体列表
      */
-    public static List<Entity> applyDamage(@NotNull Entity mainEntity, Player skillUser, double knockBackStrength, float damage, double detectRadius, SoundEvent soundEvent) {
+    public static List<Entity> applyDamage(@NotNull Entity mainEntity, Player skillUser, float damage, double detectRadius, SoundEvent soundEvent) {
         List<Entity> entities = detectEntity(mainEntity, detectRadius, skillUser);
         if (!entities.isEmpty()) {
             entities.forEach(entity -> {
@@ -98,7 +119,6 @@ public class Commons {
                                     mainEntity.getX(), mainEntity.getY(), mainEntity.getZ(),
                                     soundEvent, SoundSource.PLAYERS, 5f, r.nextFloat(0.2f) + 0.9f));
                 }
-                knockBackEntity(mainEntity, entity, knockBackStrength);
             });
         }
         return entities;
