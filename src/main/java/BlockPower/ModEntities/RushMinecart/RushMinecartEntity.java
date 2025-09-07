@@ -54,9 +54,9 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
 
     private Vec3 lastRailPlacementPos = Vec3.ZERO;//记录上一个生成点的位置
 
-    private static final TimerManager timerManager = TimerManager.getInstance();//全局计时器管理类
+    private static final TimerManager timerManager = TimerManager.getInstance(false);//全局计时器管理类
 
-    private static final TaskManager taskManager = TaskManager.getInstance();
+    private static final TaskManager taskManager = TaskManager.getInstance(false);
 
     private Vec3 minecartSpeed = Vec3.ZERO;
 

@@ -24,8 +24,8 @@ import static BlockPower.ModEffects.GlobalEffectHandler.cloudParticleTimers;
 public class Commons {
     private static final Random r = new Random();
 
-    private static final TimerManager timerManager = TimerManager.getInstance();
-    private static final TaskManager taskManager = TaskManager.getInstance();
+    private static final TimerManager timerManager = TimerManager.getInstance(false);
+    private static final TaskManager taskManager = TaskManager.getInstance(false);
 
     /**
      * 检测半径内的非技能释放者的LivingEntity
@@ -108,7 +108,7 @@ public class Commons {
             entities.forEach(entity -> {
                 entity.hurt(mainEntity.level().damageSources().mobAttack(skillUser), damage);
                 //为每个被击中的实体启动粒子计时器
-                cloudParticleTimers.put(entity, new TickTimer(40));
+                cloudParticleTimers.put(entity, new TickTimer(40,false));
                 if (!mainEntity.level().isClientSide) {
                     //限制5tick内最多播放3次声音
                     taskManager.runTimesWithCooldown(mainEntity, "play_sound", 3, 5, () ->

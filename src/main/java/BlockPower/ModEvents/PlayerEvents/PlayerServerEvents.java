@@ -19,9 +19,9 @@ import java.util.WeakHashMap;
 
 @Mod.EventBusSubscriber(modid = Main.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class PlayerServerEvents {
-    private static final TaskManager taskManager = TaskManager.getInstance();
+    private static final TaskManager taskManager = TaskManager.getInstance(false);
 
-    private static final TimerManager timerManager = TimerManager.getInstance();
+    private static final TimerManager timerManager = TimerManager.getInstance(false);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.MOD_ID);
 

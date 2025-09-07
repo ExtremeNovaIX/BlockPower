@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 public class DashSkillPacket_C2S extends AbstractSkillPacket_C2S {
     private static final Logger LOGGER = LoggerFactory.getLogger(DashSkillPacket_C2S.class);
-    private static final TaskManager taskManager = TaskManager.getInstance();
+    private static final TaskManager taskManager = TaskManager.getInstance(false);
 
     public DashSkillPacket_C2S() {
         super(new DashSkill());

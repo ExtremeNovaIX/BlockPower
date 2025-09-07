@@ -46,9 +46,9 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
 
     private final Logger LOGGER = LoggerFactory.getLogger(DropAnvilEntity.class);
 
-    private static final TimerManager timerManager = TimerManager.getInstance();
+    private static final TimerManager timerManager = TimerManager.getInstance(false);
 
-    private static final TaskManager taskManager = TaskManager.getInstance();
+    private static final TaskManager taskManager = TaskManager.getInstance(false);
 
     private static final EntityDataAccessor<Integer> DATA_STATE = SynchedEntityData.defineId(DropAnvilEntity.class, EntityDataSerializers.INT);
 

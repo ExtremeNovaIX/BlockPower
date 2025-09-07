@@ -13,9 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AirJumpPacket_C2S extends AbstractSkillPacket_C2S {
-    private static final TaskManager taskManager = TaskManager.getInstance();
+    private static final TaskManager taskManager = TaskManager.getInstance(false);
 
-    private static final TimerManager timerManager = TimerManager.getInstance();
+    private static final TimerManager timerManager = TimerManager.getInstance(false);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AirJumpPacket_C2S.class);
 

@@ -26,7 +26,7 @@ import java.util.WeakHashMap;
 
 @Mod.EventBusSubscriber
 public class MinerStateEvent {
-    private static final TaskManager taskManager = TaskManager.getInstance();
+    private static final TaskManager taskManager = TaskManager.getInstance(false);
     public static final Map<Player, Boolean> minerStateMap = new WeakHashMap<>();
     private static final Random random = new Random();
     private static final PlayerResourceManager resourceManager = PlayerResourceManager.getInstance();
