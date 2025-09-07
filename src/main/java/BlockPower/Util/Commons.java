@@ -87,11 +87,8 @@ public class Commons {
         if (effectedEntity.isEmpty()) return;
         for (Entity entity : effectedEntity) {
             if (entity.isRemoved()) continue;
-            entity.setDeltaMovement(mainEntity.getDeltaMovement().add(
-                    r.nextFloat() * 0.02,
-                    1 * strength,
-                    r.nextFloat() * 0.02
-            ));
+            Vec3 mainEntityLookAngle = mainEntity.getLookAngle().normalize().scale(0.05);
+            entity.setDeltaMovement(mainEntityLookAngle.x, 1 * strength, mainEntityLookAngle.z);
         }
     }
 

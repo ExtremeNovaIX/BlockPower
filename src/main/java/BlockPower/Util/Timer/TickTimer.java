@@ -8,7 +8,7 @@ public class TickTimer {
     private int tickDuration;
 
     public TickTimer(int tickDuration) {
-        this.startTick = ServerTickListener.getTicks();
+        this.startTick = TickListener.getServerTicks();
         this.tickDuration = tickDuration;
     }
 
@@ -18,7 +18,7 @@ public class TickTimer {
      *         false: 等待时间未到
      */
     public boolean isFinished() {
-        this.setNowTick(ServerTickListener.getTicks() - this.getStartTick());
+        this.setNowTick(TickListener.getServerTicks() - this.getStartTick());
         return this.getNowTick()  >= tickDuration;
     }
 

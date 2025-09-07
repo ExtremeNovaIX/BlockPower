@@ -5,7 +5,6 @@ import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Util.Commons;
 import BlockPower.Util.TaskManager;
-import BlockPower.Util.Timer.ServerTickListener;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
