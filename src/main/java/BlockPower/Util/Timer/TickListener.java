@@ -1,5 +1,6 @@
 package BlockPower.Util.Timer;
 
+import BlockPower.Util.TaskManager;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -13,6 +14,7 @@ public class TickListener {
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             serverTicks++;
+            TaskManager.getInstance(false).updateTick();
         }
     }
 
@@ -20,6 +22,7 @@ public class TickListener {
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             clientTicks++;
+            TaskManager.getInstance(true).updateTick();
         }
     }
 

@@ -16,21 +16,26 @@ import java.util.WeakHashMap;
  */
 public final class TimerManager {
 
-    private static final TimerManager INSTANCE = new TimerManager();
+    private static final TimerManager SERVER_INSTANCE = new TimerManager(false);
+    private static final TimerManager CLIENT_INSTANCE = new TimerManager(true);
 
-    public static final Map<String, TickTimer> globalTimers = new HashMap<>();
-    public static final Map<Entity, Map<String, TickTimer>> entityToStringTimers = new WeakHashMap<>();
-    public static final Map<Entity, Map<Entity, TickTimer>> entityToEntityTimers = new WeakHashMap<>();
+    public final Map<String, TickTimer> globalTimers = new HashMap<>();
+    public final Map<Entity, Map<String, TickTimer>> entityToStringTimers = new WeakHashMap<>();
+    public final Map<Entity, Map<Entity, TickTimer>> entityToEntityTimers = new WeakHashMap<>();
 
-    private TimerManager() {
+    private final boolean isClient;
+
+    private TimerManager(boolean isClient) {
+        this.isClient = isClient;
     }
 
     /**
-     * 获取 TimerManager 的全局唯一实例。
-     * @return TimerManager 的单例对象。
+     * 获取 TimerManager 的实例
+     * @param isClient 代码是否运行在客户端？
+     * @return 对应端的 TimerManager 实例
      */
-    public static TimerManager getInstance() {
-        return INSTANCE;
+    public static TimerManager getInstance(boolean isClient) {
+        return isClient ? CLIENT_INSTANCE : SERVER_INSTANCE;
     }
 
     /**
@@ -82,7 +87,7 @@ public final class TimerManager {
      * @param tickDuration 计时器需要持续的 tick 数量。
      */
     public void setTimer(@NotNull String timerName, int tickDuration) {
-        globalTimers.put(timerName, new TickTimer(tickDuration));
+        globalTimers.put(timerName, new TickTimer(tickDuration, this.isClient));
     }
 
     /**
@@ -94,7 +99,7 @@ public final class TimerManager {
      */
     public void setTimer(@NotNull Entity entity, @NotNull String timerName, int tickDuration) {
         Map<String, TickTimer> innerMap = entityToStringTimers.computeIfAbsent(entity, k -> new HashMap<>());
-        innerMap.put(timerName, new TickTimer(tickDuration));
+        innerMap.put(timerName, new TickTimer(tickDuration, this.isClient));
     }
 
     /**
@@ -106,7 +111,7 @@ public final class TimerManager {
      */
     public void setTimer(@NotNull Entity entity, @NotNull Entity effectedEntity, int tickDuration) {
         Map<Entity, TickTimer> innerMap = entityToEntityTimers.computeIfAbsent(entity, k -> new HashMap<>());
-        innerMap.put(effectedEntity, new TickTimer(tickDuration));
+        innerMap.put(effectedEntity, new TickTimer(tickDuration, this.isClient));
     }
 
     /**
@@ -117,7 +122,7 @@ public final class TimerManager {
      * @param tickDuration 计时器需要持续的 tick 数量。
      */
     private void createTimerIfAbsent(@NotNull String timerName, int tickDuration) {
-        globalTimers.putIfAbsent(timerName, new TickTimer(tickDuration));
+        globalTimers.putIfAbsent(timerName, new TickTimer(tickDuration, this.isClient));
     }
 
     /**
@@ -130,7 +135,7 @@ public final class TimerManager {
      */
     private void createTimerIfAbsent(@NotNull Entity entity, @NotNull String timerName, int tickDuration) {
         Map<String, TickTimer> innerMap = entityToStringTimers.computeIfAbsent(entity, k -> new HashMap<>());
-        innerMap.putIfAbsent(timerName, new TickTimer(tickDuration));
+        innerMap.putIfAbsent(timerName, new TickTimer(tickDuration, this.isClient));
     }
 
     /**
@@ -143,7 +148,7 @@ public final class TimerManager {
      */
     private void createTimerIfAbsent(@NotNull Entity entity, @NotNull Entity timerName, int tickDuration) {
         Map<Entity, TickTimer> innerMap = entityToEntityTimers.computeIfAbsent(entity, k -> new HashMap<>());
-        innerMap.putIfAbsent(timerName, new TickTimer(tickDuration));
+        innerMap.putIfAbsent(timerName, new TickTimer(tickDuration, this.isClient));
     }
 
     /**
