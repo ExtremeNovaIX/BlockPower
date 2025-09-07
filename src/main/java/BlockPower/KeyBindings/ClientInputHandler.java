@@ -1,10 +1,12 @@
 package BlockPower.KeyBindings;
 
+import BlockPower.ModItems.ModItems;
 import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
 import BlockPower.ModMessages.C2SPacket.SkillPacket.AirJumpPacket_C2S;
 import BlockPower.ModMessages.C2SPacket.SkillPacket.DashSkillPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.Skills.*;
+import BlockPower.Util.TaskManager;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -22,6 +24,8 @@ public class ClientInputHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
+    private static final TaskManager taskManager = TaskManager.getInstance(true);
+
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
@@ -32,28 +36,42 @@ public class ClientInputHandler {
             LOGGER.info("MINER_MODE key triggered");
             ModMessages.sendToServer(new ChangeMinerStatePacket_C2S());
         }
+
         if (KeyBindings.MINECART_RUSH.consumeClick()) {
             LOGGER.info("MINECART_RUSH key triggered");
             SkillTrigger.triggerSkill(new RushMinecartSkill());
         }
+
         if (KeyBindings.DROP_ANVIL.consumeClick()) {
             LOGGER.info("DROP_ANVIL key triggered");
             SkillTrigger.triggerSkill(new DropAnvilSkill());
         }
+
         if (KeyBindings.CUSTOM_SPACE.consumeClick()) {
             if (!localPlayer.onGround()) {
                 LOGGER.info("CUSTOM_SPACE key triggered");
                 ModMessages.sendToServer(new AirJumpPacket_C2S());
             }
         }
+
         if (KeyBindings.DASH.consumeClick()) {
             LOGGER.info("DASH key triggered");
             ModMessages.sendToServer(new DashSkillPacket_C2S());
         }
 
         if (KeyBindings.PLACE_BLOCK.consumeClick()) {
+            if (localPlayer.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) return;
             LOGGER.info("PLACE_BLOCK key triggered");
             SkillTrigger.triggerSkill(new PlaceBlockSkill());
+        }
+
+        if (KeyBindings.LAUNCHER_SWING.consumeClick()) {
+            if (localPlayer.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) return;
+            if (localPlayer.getXRot() >= -35.0F) return;//玩家抬头角度大于35度时才会触发LauncherSwing
+            taskManager.runOnceWithCooldown(localPlayer, "LAUNCHER_SWING", 7, () -> {
+                LOGGER.info("LAUNCHER_SWING key triggered");
+                SkillTrigger.triggerSkill(new LauncherSwingSkill());
+            });
         }
 
     }

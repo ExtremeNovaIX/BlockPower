@@ -51,9 +51,16 @@ public class KeyBindings {
     public static final KeyMapping PLACE_BLOCK = new KeyMapping(
             "key.blockpower.place_block",
             KeyConflictContext.IN_GAME,
-            KeyModifier.SHIFT,
             InputConstants.Type.MOUSE,
             InputConstants.MOUSE_BUTTON_RIGHT,
+            BLOCKPOWER_KEY
+    );
+
+    public static final KeyMapping LAUNCHER_SWING = new KeyMapping(
+            "key.blockpower.launcher_swing",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.MOUSE,
+            InputConstants.MOUSE_BUTTON_LEFT,
             BLOCKPOWER_KEY
     );
 

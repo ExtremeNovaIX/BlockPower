@@ -85,10 +85,28 @@ public class Commons {
      */
     public static void knockBackEntityUp(@NotNull Entity mainEntity, List<Entity> effectedEntity, double strength) {
         if (effectedEntity.isEmpty()) return;
+
+        // 垂直向上的力度
+        double horizontalRepelStrength = 0.45; // 水平推开的力度
+
+        // 获取玩家的水平朝向向量（忽略Y轴的抬头或低头）
+        Vec3 lookVec = mainEntity.getLookAngle();
+        Vec3 horizontalLook = new Vec3(lookVec.x, 0.0, lookVec.z).normalize();
+
+        // 创建一个“推后”向量，即玩家朝向的相反方向
+        Vec3 pushBackVec = horizontalLook.scale(horizontalRepelStrength);
+
         for (Entity entity : effectedEntity) {
             if (entity.isRemoved()) continue;
-            Vec3 mainEntityLookAngle = mainEntity.getLookAngle().normalize().scale(0.05);
-            entity.setDeltaMovement(mainEntityLookAngle.x, 1 * strength, mainEntityLookAngle.z);
+
+            // 将实体当前的速度与新向量组合
+            Vec3 existingMotion = entity.getDeltaMovement();
+
+            entity.setDeltaMovement(
+                    existingMotion.x + pushBackVec.x,
+                    strength,
+                    existingMotion.z + pushBackVec.z
+            );
         }
     }
 
@@ -108,7 +126,7 @@ public class Commons {
             entities.forEach(entity -> {
                 entity.hurt(mainEntity.level().damageSources().mobAttack(skillUser), damage);
                 //为每个被击中的实体启动粒子计时器
-                cloudParticleTimers.put(entity, new TickTimer(40,false));
+                cloudParticleTimers.put(entity, new TickTimer(40, false));
                 if (!mainEntity.level().isClientSide) {
                     //限制5tick内最多播放3次声音
                     taskManager.runTimesWithCooldown(mainEntity, "play_sound", 3, 5, () ->

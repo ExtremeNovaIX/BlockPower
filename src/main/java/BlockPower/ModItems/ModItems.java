@@ -13,4 +13,7 @@ public class ModItems {
     public static final RegistryObject<Item> DEBUG_ITEM = ITEMS.register("debug_item",
             () -> new DebugItem(new Item.Properties()));
 
+    public static final RegistryObject<Item> PIXEL_CORE = ITEMS.register("pixel_core",
+            () -> new PixelCoreItem(new Item.Properties()));
+
 }

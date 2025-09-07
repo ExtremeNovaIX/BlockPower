@@ -1,0 +1,44 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "blockpower:item/pixel_core"
+  },
+  "overrides": [
+
+    {
+      "predicate": { "blockpower:skill_state": 1.0 },
+      "model": "minecraft:item/anvil"
+    },
+
+    {
+      "predicate": { "blockpower:skill_state": 2.0 },
+      "model": "minecraft:item/powered_rail"
+    },
+
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 1.0, "blockpower:pixel_core_level": 1.0 }, "model": "minecraft:item/wooden_axe" },
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 1.0, "blockpower:pixel_core_level": 2.0 }, "model": "minecraft:item/stone_axe" },
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 1.0, "blockpower:pixel_core_level": 3.0 }, "model": "minecraft:item/iron_axe" },
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 1.0, "blockpower:pixel_core_level": 4.0 }, "model": "minecraft:item/golden_axe" },
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 1.0, "blockpower:pixel_core_level": 5.0 }, "model": "minecraft:item/diamond_axe" },
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 1.0, "blockpower:pixel_core_level": 6.0 }, "model": "minecraft:item/netherite_axe" },
+
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 2.0, "blockpower:pixel_core_level": 1.0 }, "model": "minecraft:item/wooden_pickaxe" },
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 2.0, "blockpower:pixel_core_level": 2.0 }, "model": "minecraft:item/stone_pickaxe" },
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 2.0, "blockpower:pixel_core_level": 3.0 }, "model": "minecraft:item/iron_pickaxe" },
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 2.0, "blockpower:pixel_core_level": 4.0 }, "model": "minecraft:item/golden_pickaxe" },
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 2.0, "blockpower:pixel_core_level": 5.0 }, "model": "minecraft:item/diamond_pickaxe" },
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 2.0, "blockpower:pixel_core_level": 6.0 }, "model": "minecraft:item/netherite_pickaxe" },
+
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 3.0, "blockpower:pixel_core_level": 1.0 }, "model": "minecraft:item/wooden_sword" },
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 3.0, "blockpower:pixel_core_level": 2.0 }, "model": "minecraft:item/stone_sword" },
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 3.0, "blockpower:pixel_core_level": 3.0 }, "model": "minecraft:item/iron_sword" },
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 3.0, "blockpower:pixel_core_level": 4.0 }, "model": "minecraft:item/golden_sword" },
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 3.0, "blockpower:pixel_core_level": 5.0 }, "model": "minecraft:item/diamond_sword" },
+    { "predicate": { "blockpower:skill_state": 3.0, "blockpower:tool_type": 3.0, "blockpower:pixel_core_level": 6.0 }, "model": "minecraft:item/netherite_sword" },
+
+    {
+      "predicate": { "blockpower:skill_state": 3.0 },
+      "model": "blockpower:item/pixel_core_tool_default"
+    }
+  ]
+}

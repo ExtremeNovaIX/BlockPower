@@ -73,11 +73,23 @@ public class ModMessages {
                 .consumerMainThread(PlaceBlockSkillPacket_C2S::handle)
                 .add();
 
+        net.messageBuilder(LauncherSwingSkillPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(LauncherSwingSkillPacket_C2S::new)
+                .encoder(LauncherSwingSkillPacket_C2S::toBytes)
+                .consumerMainThread(LauncherSwingSkillPacket_C2S::handle)
+                .add();
+
         //Client
         net.messageBuilder(HitStopPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(HitStopPacket_S2C::new)
                 .encoder(HitStopPacket_S2C::toBytes)
                 .consumerMainThread(HitStopPacket_S2C::handle)
+                .add();
+
+        net.messageBuilder(CameraLockPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(CameraLockPacket_S2C::new)
+                .encoder(CameraLockPacket_S2C::toBytes)
+                .consumerMainThread(CameraLockPacket_S2C::handle)
                 .add();
 
         net.messageBuilder(ResourceSyncPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)

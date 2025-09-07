@@ -6,9 +6,13 @@ import BlockPower.Skills.Skill;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class PlaceBlockSkillPacket_C2S extends AbstractSkillPacket_C2S {
     public PlaceBlockSkillPacket_C2S() {
@@ -31,6 +35,10 @@ public class PlaceBlockSkillPacket_C2S extends AbstractSkillPacket_C2S {
         Block block = level.getBlockState(blockBelowPos).getBlock();
         if (block == Blocks.AIR) {
             level.setBlockAndUpdate(blockBelowPos, ModBlocks.DECAYING_DIRT.get().defaultBlockState());
+            BlockState newState = level.getBlockState(blockBelowPos);
+            SoundType soundType = newState.getSoundType();
+            SoundEvent placeSound = soundType.getPlaceSound();
+            player.level().playSound(null, player, placeSound, SoundSource.BLOCKS, 1.0F, 1.0F);
             consumeResource(player, skill);
         }
     }
