@@ -37,7 +37,7 @@ public class LauncherSwingSkillPacket_C2S extends AbstractSkillPacket_C2S {
     // 弹簧的“死区”范围（格）。在最佳距离±此范围内，不施加力，以防止抖动。
     private static final double DEAD_ZONE = 0.5;
     // 连击状态的持续时间 (Ticks)
-    private static final int COMBO_DURATION_TICKS = 20;
+    private static final int COMBO_DURATION_TICKS = 15;
 
 
     public LauncherSwingSkillPacket_C2S() {
@@ -55,7 +55,7 @@ public class LauncherSwingSkillPacket_C2S extends AbstractSkillPacket_C2S {
 
     @Override
     protected void handleServerSide(ServerPlayer player) {
-        if (player.getXRot() >= -35.0F) return;
+        if (player.getXRot() >= -25.0F) return;
 
         ItemStack mainHandItem = player.getMainHandItem();
         if (mainHandItem.getItem() != ModItems.PIXEL_CORE.get()) return;
@@ -71,7 +71,7 @@ public class LauncherSwingSkillPacket_C2S extends AbstractSkillPacket_C2S {
     }
 
     private void launcherSwing(ServerPlayer player) {
-        List<Entity> entities = Commons.applyDamage(player, player, 0F, 6, ModSounds.HIT_SOUND.get());
+        List<Entity> entities = Commons.applyDamage(player, player, 3F, 6, ModSounds.HIT_SOUND.get());
         Commons.knockBackEntityUp(player, entities, 1); // 施加初始的上挑击飞
 
         if (entities.isEmpty()) {
@@ -79,13 +79,6 @@ public class LauncherSwingSkillPacket_C2S extends AbstractSkillPacket_C2S {
         }
 
         final Entity targetEntity = entities.get(0); // 锁定第一个目标
-
-        // 为双方施加缓降效果
-        if (targetEntity instanceof LivingEntity livingTarget) {
-            livingTarget.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, COMBO_DURATION_TICKS + 10, 0));
-        }
-        player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, COMBO_DURATION_TICKS + 10, 0));
-
         Runnable physicsTask = () -> {
             // 安全检查: 任何一方失效、死亡或不在同一维度，则停止
             if (!player.isAlive() || !targetEntity.isAlive() || player.level() != targetEntity.level()) {
@@ -112,8 +105,8 @@ public class LauncherSwingSkillPacket_C2S extends AbstractSkillPacket_C2S {
             Vec3 forceVector = directionVec.scale(distanceError * SPRING_CONSTANT);
 
             // 应用力：太远则拉近(吸引力)，太近则推开(排斥力)
-            player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), player.getDeltaMovement().add(forceVector.scale(0.6))));
-            targetEntity.addDeltaMovement(forceVector.scale(-0.1));
+            player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), player.getDeltaMovement().add(forceVector.scale(0.9))));
+            targetEntity.addDeltaMovement(forceVector.scale(-0.15));
         };
 
         String taskID = "combo_attract_" + player.getUUID();

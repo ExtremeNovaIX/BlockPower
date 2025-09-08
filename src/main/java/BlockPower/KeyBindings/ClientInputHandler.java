@@ -67,7 +67,7 @@ public class ClientInputHandler {
 
         if (KeyBindings.LAUNCHER_SWING.consumeClick()) {
             if (localPlayer.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) return;
-            if (localPlayer.getXRot() >= -35.0F) return;//玩家抬头角度大于35度时才会触发LauncherSwing
+            if (localPlayer.getXRot() >= -25.0F) return;//玩家抬头角度大于25度时才会触发LauncherSwing
             taskManager.runOnceWithCooldown(localPlayer, "LAUNCHER_SWING", 7, () -> {
                 LOGGER.info("LAUNCHER_SWING key triggered");
                 SkillTrigger.triggerSkill(new LauncherSwingSkill());

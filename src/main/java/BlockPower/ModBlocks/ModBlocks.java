@@ -15,9 +15,9 @@ public class ModBlocks {
             DeferredRegister.create(ForgeRegistries.BLOCKS, Main.MOD_ID);
 
     public static final RegistryObject<Block> DECAYING_STONE = BLOCKS.register("decaying_stone",
-            () -> new DestroyingBlock(BlockBehaviour.Properties.copy(Blocks.STONE),100));
+            () -> new DestroyingBlock(BlockBehaviour.Properties.copy(Blocks.STONE),200));
 
     public static final RegistryObject<Block> DECAYING_DIRT = BLOCKS.register("decaying_dirt",
-            () -> new DestroyingBlock(BlockBehaviour.Properties.copy(Blocks.DIRT),50));
+            () -> new DestroyingBlock(BlockBehaviour.Properties.copy(Blocks.DIRT),100));
 
 }
