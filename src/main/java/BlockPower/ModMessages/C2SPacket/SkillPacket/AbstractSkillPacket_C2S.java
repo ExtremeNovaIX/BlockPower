@@ -6,6 +6,7 @@ import BlockPower.Skills.MinerState.server.PlayerResourceData;
 import BlockPower.Skills.MinerState.server.PlayerResourceManager;
 import BlockPower.Skills.Skill;
 import BlockPower.Util.Commons;
+import BlockPower.Util.SkillLock.SkillLockManager;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +24,12 @@ abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket {
     }
 
     protected static final PlayerResourceManager playerResourceManager = PlayerResourceManager.getInstance();
+    protected static final SkillLockManager skillLockManager = SkillLockManager.getInstance();
 
     @Override
     protected boolean checkLegit(ServerPlayer player) {
+        if (skillLockManager.isLocked(player)) return false;//如果玩家被技能锁锁定，直接返回false
+
         PlayerResourceData playerResourceData = playerResourceManager.getPlayerData(player);
         // 检查技能资源是否足够
         if (skill != null) {
@@ -42,8 +46,8 @@ abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket {
     }
 
     protected void consumeResource(ServerPlayer player, Skill skill) {
-        if(Commons.isSpectatorOrCreativeMode(player)) return;
-
+        if (Commons.isSpectatorOrCreativeMode(player)) return;
+        if (skill.getSkillCostType() == null && skill.getSkillCostAmount() == 0) return;
         AllResourceType type = skill.getSkillCostType();
         double amount = skill.getSkillCostAmount();
         PlayerResourceData playerResourceData = playerResourceManager.getPlayerData(player);

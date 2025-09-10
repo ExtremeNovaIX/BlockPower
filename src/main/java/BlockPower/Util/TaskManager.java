@@ -16,9 +16,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class TaskManager {
     private static final TaskManager SERVER_INSTANCE = new TaskManager(false);
     private static final TaskManager CLIENT_INSTANCE = new TaskManager(true);
-    public final List<Map.Entry<Runnable, Integer>> scheduledTasks = new CopyOnWriteArrayList<>();
+    private final List<Map.Entry<Runnable, Integer>> scheduledTasks = new CopyOnWriteArrayList<>();
     private final Map<String, RepeatingTaskState> repeatingTaskMap = new ConcurrentHashMap<>();
-    public final Map<Entity, Map<String, Integer>> taskExecutionCounter = new WeakHashMap<>();// 挂载在实体下的任务执行次数Map
+    private final Map<Entity, Map<String, Integer>> taskExecutionCounter = new WeakHashMap<>();// 挂载在实体下的任务执行次数Map
     private final Map<Entity, Set<String>> coolingDownTasks = new WeakHashMap<>();// 挂载在实体下的冷却中任务Map
     private final TimerManager timerManager;
     private final Logger LOGGER = LoggerFactory.getLogger(TaskManager.class);
