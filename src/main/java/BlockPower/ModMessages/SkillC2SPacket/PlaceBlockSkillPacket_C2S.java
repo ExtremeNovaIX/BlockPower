@@ -45,6 +45,5 @@ public class PlaceBlockSkillPacket_C2S extends AbstractSkillPacket_C2S {
 
     @Override
     protected void afterHandleServerSide(ServerPlayer player) {
-        super.consumeResource(player, skill);
     }
 }
