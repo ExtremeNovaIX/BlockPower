@@ -1,4 +1,4 @@
-package BlockPower.ModMessages.C2SPacket.SkillPacket;
+package BlockPower.ModMessages.SkillC2SPacket;
 
 import BlockPower.ModEntities.DropAnvil.DropAnvilEntity;
 import BlockPower.Skills.DropAnvilSkill;
@@ -27,6 +27,6 @@ public class SpawnDropAnvilPacket_C2S extends AbstractSkillPacket_C2S {
     protected void handleServerSide(ServerPlayer player) {
         LOGGER.info("createDropAnvil by {}", player.getGameProfile().getName());
         DropAnvilEntity.createDropAnvil(player);
-        consumeResource(player, skill);
+        super.consumeResource(player, skill);
     }
 }

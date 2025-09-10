@@ -1,6 +1,6 @@
 package BlockPower.Skills;
 
-import BlockPower.ModMessages.C2SPacket.SkillPacket.LauncherSwingSkillPacket_C2S;
+import BlockPower.ModMessages.SkillC2SPacket.LauncherSwingSkillPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 

@@ -1,8 +1,8 @@
-package BlockPower.ModMessages.C2SPacket.SkillPacket;
+package BlockPower.ModMessages.SkillC2SPacket;
 
 import BlockPower.ModEvents.PlayerEvents.PlayerServerEvents;
 import BlockPower.Skills.AirJumpSkill;
-import BlockPower.Util.Commons;
+import BlockPower.Util.SkillLock.SkillLock;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.network.FriendlyByteBuf;
@@ -56,6 +56,10 @@ public class AirJumpPacket_C2S extends AbstractSkillPacket_C2S {
                 timerManager.setTimer(player, "noFallDamage", 100);
             });
         }
+    }
+
+    @Override
+    protected void afterHandleServerSide(ServerPlayer player) {
     }
 
 

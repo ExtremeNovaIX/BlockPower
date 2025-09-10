@@ -1,6 +1,6 @@
 package BlockPower.Skills;
 
-import BlockPower.ModMessages.C2SPacket.SkillPacket.AirJumpPacket_C2S;
+import BlockPower.ModMessages.SkillC2SPacket.AirJumpPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 

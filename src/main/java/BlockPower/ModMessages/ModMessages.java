@@ -1,8 +1,8 @@
 package BlockPower.ModMessages;
 
 import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
-import BlockPower.ModMessages.C2SPacket.SkillPacket.*;
 import BlockPower.ModMessages.S2CPacket.*;
+import BlockPower.ModMessages.SkillC2SPacket.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;

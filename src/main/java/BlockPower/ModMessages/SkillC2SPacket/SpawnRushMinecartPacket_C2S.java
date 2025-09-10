@@ -1,4 +1,4 @@
-package BlockPower.ModMessages.C2SPacket.SkillPacket;
+package BlockPower.ModMessages.SkillC2SPacket;
 
 
 import BlockPower.ModEntities.RushMinecart.RushMinecartEntity;
@@ -29,6 +29,6 @@ public class SpawnRushMinecartPacket_C2S extends AbstractSkillPacket_C2S {
     protected void handleServerSide(ServerPlayer player) {
         LOGGER.info("createRushMinecart by player: {}", player.getGameProfile().getName());
         RushMinecartEntity.createRushMinecart(player);
-        consumeResource(player, skill);
+        super.consumeResource(player, skill);
     }
 }

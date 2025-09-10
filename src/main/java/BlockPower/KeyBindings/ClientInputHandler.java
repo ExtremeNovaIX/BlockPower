@@ -2,13 +2,11 @@ package BlockPower.KeyBindings;
 
 import BlockPower.ModItems.ModItems;
 import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
-import BlockPower.ModMessages.C2SPacket.SkillPacket.AirJumpPacket_C2S;
-import BlockPower.ModMessages.C2SPacket.SkillPacket.DashSkillPacket_C2S;
+import BlockPower.ModMessages.SkillC2SPacket.AirJumpPacket_C2S;
+import BlockPower.ModMessages.SkillC2SPacket.DashSkillPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.Skills.*;
 import BlockPower.Util.TaskManager;
-import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
@@ -20,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static BlockPower.Main.Main.MOD_ID;
-import static com.mojang.blaze3d.platform.InputConstants.*;
 
 @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientInputHandler {

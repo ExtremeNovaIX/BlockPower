@@ -6,6 +6,7 @@ import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Util.Commons;
 import BlockPower.Util.EffectSender;
+import BlockPower.Util.SkillLock.SkillLockManager;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.nbt.CompoundTag;
@@ -49,6 +50,8 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
     private static final TimerManager timerManager = TimerManager.getInstance(false);
 
     private static final TaskManager taskManager = TaskManager.getInstance(false);
+
+    private static final SkillLockManager skillLockManager = SkillLockManager.getInstance();
 
     private static final EntityDataAccessor<Integer> DATA_STATE = SynchedEntityData.defineId(DropAnvilEntity.class, EntityDataSerializers.INT);
 
@@ -127,6 +130,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
             player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), desiredVelocity));
         } else {
             taskManager.runOnce(this, "reset_player", () -> {
+                skillLockManager.unlock(player);
                 player.noPhysics = false;
                 player.setNoGravity(false);
             });

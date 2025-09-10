@@ -1,4 +1,4 @@
-package BlockPower.ModMessages.C2SPacket.SkillPacket;
+package BlockPower.ModMessages.SkillC2SPacket;
 
 import BlockPower.ModItems.ModItems;
 import BlockPower.ModMessages.ModMessages;
@@ -13,10 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.LogManager;
@@ -118,4 +115,7 @@ public class LauncherSwingSkillPacket_C2S extends AbstractSkillPacket_C2S {
         ModMessages.sendToPlayer(new ShakePacket_S2C(4, 2F), player);
     }
 
+    @Override
+    protected void afterHandleServerSide(ServerPlayer player) {
+    }
 }

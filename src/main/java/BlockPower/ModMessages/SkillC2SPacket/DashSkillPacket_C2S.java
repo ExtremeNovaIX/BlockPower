@@ -1,4 +1,4 @@
-package BlockPower.ModMessages.C2SPacket.SkillPacket;
+package BlockPower.ModMessages.SkillC2SPacket;
 
 import BlockPower.Skills.DashSkill;
 import BlockPower.Util.Commons;
@@ -52,5 +52,9 @@ public class DashSkillPacket_C2S extends AbstractSkillPacket_C2S {
             player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), finalVec));
             player.setSprinting(true);
         });
+    }
+
+    @Override
+    protected void afterHandleServerSide(ServerPlayer player) {
     }
 }

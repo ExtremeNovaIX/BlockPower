@@ -4,6 +4,7 @@ import BlockPower.ModEntities.IStateMachine;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Util.Commons;
+import BlockPower.Util.SkillLock.SkillLockManager;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -56,7 +57,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
 
     private static final TimerManager timerManager = TimerManager.getInstance(false);//全局计时器管理类
 
-    private static final TaskManager taskManager = TaskManager.getInstance(false);
+    private static final SkillLockManager skillLockManager = SkillLockManager.getInstance();
 
     private Vec3 minecartSpeed = Vec3.ZERO;
 
@@ -111,6 +112,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
 
             case RUSHING:
                 if (this.getFirstPassenger() != player) {
+                    skillLockManager.unlock(player);
                     setState(RushMinecartState.SEEKING);
                     break;
                 }
@@ -145,6 +147,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
 
             case CRASHED:
                 //TODO 修改为按速度大小决定伤害检测范围
+                skillLockManager.unlock(player);
                 if (this.getFirstPassenger() == player) {
                     player.stopRiding();
                 }

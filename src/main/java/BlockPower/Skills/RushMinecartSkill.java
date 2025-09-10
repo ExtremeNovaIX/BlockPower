@@ -1,6 +1,6 @@
 package BlockPower.Skills;
 
-import BlockPower.ModMessages.C2SPacket.SkillPacket.SpawnRushMinecartPacket_C2S;
+import BlockPower.ModMessages.SkillC2SPacket.SpawnRushMinecartPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 

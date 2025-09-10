@@ -1,4 +1,4 @@
-package BlockPower.ModMessages.C2SPacket.SkillPacket;
+package BlockPower.ModMessages.SkillC2SPacket;
 
 import BlockPower.ModMessages.C2SPacket.AbstractC2SPacket;
 import BlockPower.Skills.MinerState.server.AllResourceType;
@@ -6,6 +6,7 @@ import BlockPower.Skills.MinerState.server.PlayerResourceData;
 import BlockPower.Skills.MinerState.server.PlayerResourceManager;
 import BlockPower.Skills.Skill;
 import BlockPower.Util.Commons;
+import BlockPower.Util.SkillLock.SkillLock;
 import BlockPower.Util.SkillLock.SkillLockManager;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
@@ -43,6 +44,12 @@ abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket {
             LOGGER.info("技能对象为null，数据包类型：{}", this.getClass().getSimpleName());
             return false;
         }
+    }
+
+    @Override
+    protected void afterHandleServerSide(ServerPlayer player) {
+        consumeResource(player, skill);
+        skillLockManager.lock(player,new SkillLock(true));
     }
 
     protected void consumeResource(ServerPlayer player, Skill skill) {

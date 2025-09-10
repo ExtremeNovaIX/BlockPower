@@ -33,8 +33,9 @@ public abstract class AbstractC2SPacket {
             // 检查数据包是否合法
             if (!checkLegit(player)) return;
 
-            // 调用一个抽象方法，让子类去实现具体的服务端逻辑
+            // 调用抽象方法，让子类去实现具体的服务端逻辑
             handleServerSide(player);
+            afterHandleServerSide(player);
         });
     }
 
@@ -51,6 +52,13 @@ public abstract class AbstractC2SPacket {
      */
     protected boolean checkLegit(ServerPlayer player){
         return true;
+    }
+
+    /**
+     * 子类可选实现此方法，会在handleServerSide之后执行
+     * @param player 发送该数据包的玩家。
+     */
+    protected void afterHandleServerSide(ServerPlayer player){
     }
 
 }
