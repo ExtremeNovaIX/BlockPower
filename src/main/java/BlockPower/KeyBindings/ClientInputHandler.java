@@ -51,9 +51,15 @@ public class ClientInputHandler {
         }
 
         if (KeyBindings.CUSTOM_SPACE.consumeClick()) {
+            String result = "";
             if (!localPlayer.onGround()) {
-                LOGGER.info("CUSTOM_SPACE key triggered");
-                ModMessages.sendToServer(new AirJumpPacket_C2S());
+                if (localPlayer.input.up) {
+                    result = "w";
+                    ModMessages.sendToServer(new AirJumpPacket_C2S("w"));
+                } else {
+                    ModMessages.sendToServer(new AirJumpPacket_C2S(""));
+                }
+                LOGGER.info("CUSTOM_SPACE key triggered:{}", result);
             }
         }
 

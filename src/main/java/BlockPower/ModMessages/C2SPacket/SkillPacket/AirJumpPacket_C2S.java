@@ -19,17 +19,26 @@ public class AirJumpPacket_C2S extends AbstractSkillPacket_C2S {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AirJumpPacket_C2S.class);
 
+    private final String keyResult;
+
     public AirJumpPacket_C2S() {
         super(new AirJumpSkill());
+        keyResult = null;
     }
 
     public AirJumpPacket_C2S(FriendlyByteBuf buf) {
         super(new AirJumpSkill());
+        keyResult = buf.readUtf();
+    }
+
+    public AirJumpPacket_C2S(String keyResult) {
+        super(new AirJumpSkill());
+        this.keyResult = keyResult;
     }
 
     @Override
     public void toBytes(FriendlyByteBuf buf) {
-
+        buf.writeUtf(keyResult);
     }
 
     @Override
@@ -37,7 +46,12 @@ public class AirJumpPacket_C2S extends AbstractSkillPacket_C2S {
         if (!player.onGround() && PlayerServerEvents.getPlayerAirTicks(player) >= 3) {
             taskManager.runOnce(player, "airJump", () -> {
                 LOGGER.info(" {} airJump", player.getGameProfile().getName());
-                Vec3 motion = new Vec3(player.getDeltaMovement().x * 6, 0.8, player.getDeltaMovement().z * 6);
+                Vec3 motion;
+                if (keyResult.equals("w")) {
+                    motion = new Vec3(player.getDeltaMovement().x * 6, 0.8, player.getDeltaMovement().z * 6);
+                } else {
+                    motion = new Vec3(0, 0.9, 0);
+                }
                 player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), motion));
                 timerManager.setTimer(player, "noFallDamage", 100);
             });
