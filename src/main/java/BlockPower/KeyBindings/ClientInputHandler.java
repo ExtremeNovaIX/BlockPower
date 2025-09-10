@@ -7,8 +7,10 @@ import BlockPower.ModMessages.C2SPacket.SkillPacket.DashSkillPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.Skills.*;
 import BlockPower.Util.TaskManager;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
@@ -18,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static BlockPower.Main.Main.MOD_ID;
+import static com.mojang.blaze3d.platform.InputConstants.*;
 
 @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientInputHandler {
@@ -55,8 +58,21 @@ public class ClientInputHandler {
         }
 
         if (KeyBindings.DASH.consumeClick()) {
-            LOGGER.info("DASH key triggered");
-            ModMessages.sendToServer(new DashSkillPacket_C2S());
+            Input playerInput = localPlayer.input;
+            String result = "w";
+            if (playerInput.left) {
+                result = "a";
+                ModMessages.sendToServer(new DashSkillPacket_C2S("a"));
+            } else if (playerInput.right) {
+                result = "d";
+                ModMessages.sendToServer(new DashSkillPacket_C2S("d"));
+            } else if (playerInput.down) {
+                result = "s";
+                ModMessages.sendToServer(new DashSkillPacket_C2S("s"));
+            } else {
+                ModMessages.sendToServer(new DashSkillPacket_C2S("w"));
+            }
+            LOGGER.info("Client DASH key triggered:{}", result);
         }
 
         if (KeyBindings.PLACE_BLOCK.consumeClick()) {
