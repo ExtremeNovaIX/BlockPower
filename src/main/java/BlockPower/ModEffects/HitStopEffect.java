@@ -1,22 +1,22 @@
-package BlockPower.ModEffects.HitStop;
+package BlockPower.ModEffects;
 
+import BlockPower.Util.Timer.TickTimer;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Timer;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * 一个只存在于客户端的处理器，专门用于实现“打击停顿”（Hit Stop）效果。
  * 它通过在极短时间内冻结客户端的渲染更新，来营造强烈的打击感。
  */
-@Mod.EventBusSubscriber(Dist.CLIENT)
-public class HitStopHandler {
+public class HitStopEffect {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -34,6 +34,12 @@ public class HitStopHandler {
      * 静态变量，用于记录卡帧效果的结束系统时间。
      */
     private static long hitStopEndTime = 0;
+
+    /**
+     * 全局卡帧效果计时器
+     */
+    public static final Map<Entity, Map.Entry<Vec3, TickTimer>> hitStopTimers = new WeakHashMap<>();
+
 
     static {
         Field tempTimerField = null;
@@ -69,27 +75,43 @@ public class HitStopHandler {
         hitStopEndTime = Math.max(hitStopEndTime, newEndTime);
     }
 
-    //监听客户端的渲染Tick事件。
-    @SubscribeEvent
-    public static void onRenderTick(TickEvent.RenderTickEvent event) {
-        if (event.phase == TickEvent.Phase.START) {
+    public static void handleHitStop() {
+        // 检查是否正处于卡帧状态
+        if (System.currentTimeMillis() < hitStopEndTime) {
+            // 确保成功获取到了所有反射字段
+            if (timerField != null && partialTickField != null) {
+                try {
+                    // 通过反射从 Minecraft 实例中获取到 Timer 对象
+                    Timer timer = (Timer) timerField.get(Minecraft.getInstance());
 
-            // 检查是否正处于卡帧状态
-            if (System.currentTimeMillis() < hitStopEndTime) {
-                // 确保成功获取到了所有反射字段
-                if (timerField != null && partialTickField != null) {
-                    try {
-                        // 通过反射从 Minecraft 实例中获取到 Timer 对象
-                        Timer timer = (Timer) timerField.get(Minecraft.getInstance());
+                    // 通过反射，强行将该 Timer 对象的 partialTick 设置为 0。
+                    partialTickField.setFloat(timer, 0.0f);
 
-                        // 通过反射，强行将该 Timer 对象的 partialTick 设置为 0。
-                        partialTickField.setFloat(timer, 0.0f);
-
-                    } catch (IllegalAccessException e) {
-                        LOGGER.error("Could not access required fields for HitStop effect.", e);
-                    }
+                } catch (IllegalAccessException e) {
+                    LOGGER.error("Could not access required fields for HitStop effect.", e);
                 }
             }
         }
+    }
+
+    public static void handleHitStopTimer() {
+        hitStopTimers.entrySet().removeIf(
+                entry -> {
+                    Entity entity = entry.getKey();
+                    Map.Entry<Vec3, TickTimer> onlyEntry = entry.getValue();
+                    Vec3 speed = onlyEntry.getKey();
+                    TickTimer timer = onlyEntry.getValue();
+
+                    if (entity.isRemoved()) {
+                        return true;
+                    }
+
+                    if (timer.isFinished()) {
+                        entity.setDeltaMovement(speed);
+                        return true;
+                    }
+                    return false;
+                }
+        );
     }
 }

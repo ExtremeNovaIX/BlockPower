@@ -3,7 +3,6 @@ package BlockPower.KeyBindings;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.client.settings.KeyConflictContext;
-import net.minecraftforge.client.settings.KeyModifier;
 
 public class KeyBindings {
     public static final String BLOCKPOWER_KEY = "key.blockpower";

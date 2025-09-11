@@ -1,6 +1,5 @@
 package BlockPower.ModEntities.DropAnvil;
 
-import BlockPower.ModEffects.FakeItemInHandEffect;
 import BlockPower.ModEntities.IStateMachine;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
@@ -21,8 +20,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -228,7 +225,6 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
         DropAnvilEntity dropAnvil = new DropAnvilEntity(player);
         Vec3 spawnPos = player.position();
         if (!player.onGround()) {
-            FakeItemInHandEffect.playItemAnimation(player, new ItemStack(Items.ANVIL), 5);
             player.swing(InteractionHand.MAIN_HAND, true);
             dropAnvil.setPlacedBelow(true);
             taskManager.runTaskAfterTicks(5, () -> {

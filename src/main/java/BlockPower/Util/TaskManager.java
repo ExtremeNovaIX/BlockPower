@@ -2,9 +2,6 @@ package BlockPower.Util;
 
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

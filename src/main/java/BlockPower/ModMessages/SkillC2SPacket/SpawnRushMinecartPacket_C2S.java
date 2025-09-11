@@ -2,7 +2,6 @@ package BlockPower.ModMessages.SkillC2SPacket;
 
 
 import BlockPower.ModEntities.RushMinecart.RushMinecartEntity;
-
 import BlockPower.Skills.RushMinecartSkill;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;

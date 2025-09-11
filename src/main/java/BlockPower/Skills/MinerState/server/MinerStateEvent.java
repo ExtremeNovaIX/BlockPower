@@ -6,7 +6,6 @@ import BlockPower.ModMessages.S2CPacket.ResourceSyncPacket_S2C;
 import BlockPower.Skills.MinerState.server.strategy.ResourceGenerationStrategy;
 import BlockPower.Skills.MinerState.server.strategy.ResourceStrategyFactory;
 import BlockPower.Util.TaskManager;
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -15,8 +14,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 

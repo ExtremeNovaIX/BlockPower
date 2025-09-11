@@ -1,6 +1,6 @@
 package BlockPower.Util;
 
-import BlockPower.ModEffects.GlobalEffectHandler;
+import BlockPower.ModEffects.HitStopEffect;
 import BlockPower.ModMessages.S2CPacket.HitStopPacket_S2C;
 import BlockPower.ModMessages.S2CPacket.ShakePacket_S2C;
 import BlockPower.ModMessages.S2CPacket.SneakPacket_S2C;
@@ -78,7 +78,7 @@ public class EffectSender {
     public static void sendHitStop(int duration, ServerPlayer serverPlayer, @Nullable Entity skillEntity) {
         if (skillEntity != null) {
             Map.Entry<Vec3, TickTimer> entry = new AbstractMap.SimpleEntry<>(skillEntity.getDeltaMovement(), new TickTimer(duration,false));
-            GlobalEffectHandler.hitStopTimers.put(skillEntity, entry);
+            HitStopEffect.hitStopTimers.put(skillEntity, entry);
             skillEntity.setDeltaMovement(Vec3.ZERO);
         }
         sendToPlayer(new HitStopPacket_S2C(duration), serverPlayer);

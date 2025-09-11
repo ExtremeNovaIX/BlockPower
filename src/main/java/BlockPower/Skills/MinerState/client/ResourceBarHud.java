@@ -2,7 +2,6 @@ package BlockPower.Skills.MinerState.client;
 
 import BlockPower.Main.Main;
 import BlockPower.Skills.MinerState.server.AllResourceType;
-import BlockPower.Skills.MinerState.server.MinerStateEvent;
 import BlockPower.Skills.MinerState.server.PlayerResourceData;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;

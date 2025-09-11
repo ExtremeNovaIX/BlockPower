@@ -43,7 +43,7 @@ public class AirJumpPacket_C2S extends AbstractSkillPacket_C2S {
 
     @Override
     protected void handleServerSide(ServerPlayer player) {
-        if (!player.onGround() && PlayerServerEvents.getPlayerAirTicks(player) >= 3) {
+        if (!player.onGround() && AirJumpSkill.getPlayerAirTicks(player) >= 3) {
             taskManager.runOnce(player, "airJump", () -> {
                 LOGGER.info(" {} airJump", player.getGameProfile().getName());
                 Vec3 motion;

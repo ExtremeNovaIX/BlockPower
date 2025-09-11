@@ -2,11 +2,9 @@ package BlockPower.ModEvents;
 
 import BlockPower.Main.Main;
 import BlockPower.ModItems.ModItems;
-import BlockPower.Util.ClientComboManager;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;

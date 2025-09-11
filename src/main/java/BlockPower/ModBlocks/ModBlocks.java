@@ -2,7 +2,6 @@ package BlockPower.ModBlocks;
 
 import BlockPower.Main.Main;
 import BlockPower.ModBlocks.DestroyingBlocks.DestroyingBlock;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
