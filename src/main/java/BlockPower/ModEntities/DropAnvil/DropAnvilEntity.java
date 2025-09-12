@@ -1,10 +1,11 @@
 package BlockPower.ModEntities.DropAnvil;
 
-import BlockPower.ModEffects.FakeItemInHandEffect;
 import BlockPower.ModEntities.IStateMachine;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
-import BlockPower.Util.EffectSender;
+import BlockPower.Util.Commons;
+import BlockPower.Util.ModEffect.EffectSender;
+import BlockPower.Util.SkillLock.SkillLockManager;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.nbt.CompoundTag;
@@ -19,8 +20,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +31,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import static BlockPower.Util.Commons.applyDamage;
-import static BlockPower.Util.EffectSender.broadcastScreenShake;
+import static BlockPower.Util.ModEffect.EffectSender.broadcastScreenShake;
 
 public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEntity.AnvilState> {
     private int onGroundLifeTime = 100;
@@ -45,9 +44,11 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
 
     private final Logger LOGGER = LoggerFactory.getLogger(DropAnvilEntity.class);
 
-    private static final TimerManager timerManager = TimerManager.getInstance();
+    private static final TimerManager timerManager = TimerManager.getInstance(false);
 
-    private static final TaskManager taskManager = TaskManager.getInstance();
+    private static final TaskManager taskManager = TaskManager.getInstance(false);
+
+    private static final SkillLockManager skillLockManager = SkillLockManager.getInstance();
 
     private static final EntityDataAccessor<Integer> DATA_STATE = SynchedEntityData.defineId(DropAnvilEntity.class, EntityDataSerializers.INT);
 
@@ -126,6 +127,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
             player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), desiredVelocity));
         } else {
             taskManager.runOnce(this, "reset_player", () -> {
+                skillLockManager.unlock(player);
                 player.noPhysics = false;
                 player.setNoGravity(false);
             });
@@ -169,7 +171,8 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
 
 
     private void hurtEntity() {
-        List<Entity> entityList = applyDamage(this, player, 1.5, 10F, 9, ModSounds.ANVIL_SOUND.get());
+        List<Entity> entityList = applyDamage(this, player, 10F, 9, ModSounds.ANVIL_SOUND.get());
+        Commons.knockBackEntity(this, entityList, 1.5);
         if (!entityList.isEmpty()) {
             broadcastScreenShake(this, 6, 3f, 15, 7);
             //触发一次卡帧动画以后不再出现卡帧动画效果
@@ -222,7 +225,6 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
         DropAnvilEntity dropAnvil = new DropAnvilEntity(player);
         Vec3 spawnPos = player.position();
         if (!player.onGround()) {
-            FakeItemInHandEffect.playItemAnimation(player, new ItemStack(Items.ANVIL), 5);
             player.swing(InteractionHand.MAIN_HAND, true);
             dropAnvil.setPlacedBelow(true);
             taskManager.runTaskAfterTicks(5, () -> {

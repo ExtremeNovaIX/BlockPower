@@ -1,9 +1,8 @@
 package BlockPower.ModMessages;
 
 import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
-import BlockPower.ModMessages.C2SPacket.SkillPacket.SpawnDropAnvilPacket_C2S;
-import BlockPower.ModMessages.C2SPacket.SkillPacket.SpawnRushMinecartPacket_C2S;
 import BlockPower.ModMessages.S2CPacket.*;
+import BlockPower.ModMessages.SkillC2SPacket.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -62,11 +61,35 @@ public class ModMessages {
                 .consumerMainThread(ChangeMinerStatePacket_C2S::handle)
                 .add();
 
+        net.messageBuilder(AirJumpPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(AirJumpPacket_C2S::new)
+                .encoder(AirJumpPacket_C2S::toBytes)
+                .consumerMainThread(AirJumpPacket_C2S::handle)
+                .add();
+
+        net.messageBuilder(PlaceBlockSkillPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(PlaceBlockSkillPacket_C2S::new)
+                .encoder(PlaceBlockSkillPacket_C2S::toBytes)
+                .consumerMainThread(PlaceBlockSkillPacket_C2S::handle)
+                .add();
+
+        net.messageBuilder(LauncherSwingSkillPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(LauncherSwingSkillPacket_C2S::new)
+                .encoder(LauncherSwingSkillPacket_C2S::toBytes)
+                .consumerMainThread(LauncherSwingSkillPacket_C2S::handle)
+                .add();
+
         //Client
         net.messageBuilder(HitStopPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(HitStopPacket_S2C::new)
                 .encoder(HitStopPacket_S2C::toBytes)
                 .consumerMainThread(HitStopPacket_S2C::handle)
+                .add();
+
+        net.messageBuilder(CameraLockPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(CameraLockPacket_S2C::new)
+                .encoder(CameraLockPacket_S2C::toBytes)
+                .consumerMainThread(CameraLockPacket_S2C::handle)
                 .add();
 
         net.messageBuilder(ResourceSyncPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
@@ -91,6 +114,12 @@ public class ModMessages {
                 .decoder(MinerStateSyncPacket_S2C::new)
                 .encoder(MinerStateSyncPacket_S2C::toBytes)
                 .consumerMainThread(MinerStateSyncPacket_S2C::handle)
+                .add();
+
+        net.messageBuilder(DashSkillPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(DashSkillPacket_C2S::new)
+                .encoder(DashSkillPacket_C2S::toBytes)
+                .consumerMainThread(DashSkillPacket_C2S::handle)
                 .add();
 
     }

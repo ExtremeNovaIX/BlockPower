@@ -1,25 +1,23 @@
 package BlockPower.Util.Timer;
 
 public class TickTimer {
-    private long startTick;
+    private final long startTick;
+    private final int tickDuration;
+    private final boolean isClientSide;
 
-    private long nowTick;
-
-    private int tickDuration;
-
-    public TickTimer(int tickDuration) {
-        this.startTick = ServerTickListener.getTicks();
+    public TickTimer(int tickDuration, boolean isClientSide) {
+        this.startTick = isClientSide ? TickListener.getClientTicks() : TickListener.getServerTicks();
         this.tickDuration = tickDuration;
+        this.isClientSide = isClientSide;
     }
 
     /**
-     * 等待一段时间，具体用法请查看testTimer
-     * @return true: 等待时间已到
-     *         false: 等待时间未到
+     * @return true: 等待时间已到;false: 等待时间未到
      */
     public boolean isFinished() {
-        this.setNowTick(ServerTickListener.getTicks() - this.getStartTick());
-        return this.getNowTick()  >= tickDuration;
+        // 根据这个计时器的归属，获取当前时间
+        long currentTicks = this.isClientSide ? TickListener.getClientTicks() : TickListener.getServerTicks();
+        return (currentTicks - this.getStartTick()) >= tickDuration;
     }
 
     public long getStartTick() {
@@ -30,15 +28,4 @@ public class TickTimer {
         return tickDuration;
     }
 
-    public void setTickDuration(int tickDuration) {
-        this.tickDuration = tickDuration;
-    }
-
-    public long getNowTick() {
-        return nowTick;
-    }
-
-    public void setNowTick(long nowTick) {
-        this.nowTick = nowTick;
-    }
 }

@@ -1,6 +1,8 @@
 package BlockPower.ModMessages.S2CPacket;
 
-import BlockPower.ModEffects.ScreenShake.ScreenShakeHandler;
+import BlockPower.ModEffects.ScreenShakeEffect;
+import BlockPower.Util.ModEffect.ModEffectManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +32,6 @@ public class ShakePacket_S2C extends AbstractS2CPacket {
     @Override
     protected void handleClientSide() {
         LOGGER.info("ShakePacket_S2C received, duration: {}, strength: {}", duration, strength);
-        ScreenShakeHandler.shakeTrigger(duration, strength);
+        ModEffectManager.addEffect(Minecraft.getInstance().player, new ScreenShakeEffect(duration, strength));
     }
 }

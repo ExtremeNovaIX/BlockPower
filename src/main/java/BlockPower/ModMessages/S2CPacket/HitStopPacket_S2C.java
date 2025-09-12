@@ -1,6 +1,8 @@
 package BlockPower.ModMessages.S2CPacket;
 
-import BlockPower.ModEffects.HitStop.HitStopHandler;
+import BlockPower.ModEffects.HitStopEffect;
+import BlockPower.Util.ModEffect.ModEffectManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,6 @@ public class HitStopPacket_S2C extends AbstractS2CPacket {
     @Override
     protected void handleClientSide() {
         LOGGER.info("HitStopPacket_S2C received, duration: {}", duration);
-        HitStopHandler.start(duration);
+        ModEffectManager.addEffect(Minecraft.getInstance().player, new HitStopEffect(duration));
     }
 }

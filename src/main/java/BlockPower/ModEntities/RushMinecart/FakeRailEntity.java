@@ -25,7 +25,7 @@ public class FakeRailEntity extends Entity {
 
     private static final Random r = new Random();
 
-    private static final TaskManager taskManager = TaskManager.getInstance();
+    private static final TaskManager taskManager = TaskManager.getInstance(false);
 
     private static final EntityDataAccessor<Float> DATA_YAW = SynchedEntityData.defineId(FakeRailEntity.class, EntityDataSerializers.FLOAT);
 

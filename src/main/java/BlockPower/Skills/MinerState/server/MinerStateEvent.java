@@ -6,7 +6,6 @@ import BlockPower.ModMessages.S2CPacket.ResourceSyncPacket_S2C;
 import BlockPower.Skills.MinerState.server.strategy.ResourceGenerationStrategy;
 import BlockPower.Skills.MinerState.server.strategy.ResourceStrategyFactory;
 import BlockPower.Util.TaskManager;
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -15,8 +14,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -26,7 +23,7 @@ import java.util.WeakHashMap;
 
 @Mod.EventBusSubscriber
 public class MinerStateEvent {
-    private static final TaskManager taskManager = TaskManager.getInstance();
+    private static final TaskManager taskManager = TaskManager.getInstance(false);
     public static final Map<Player, Boolean> minerStateMap = new WeakHashMap<>();
     private static final Random random = new Random();
     private static final PlayerResourceManager resourceManager = PlayerResourceManager.getInstance();
@@ -36,14 +33,16 @@ public class MinerStateEvent {
         Player player = event.getEntity();
         // 确认玩家处于minerState状态
         if (minerStateMap.getOrDefault(player, false)) {
-            //重置挖掘进度
-            event.setNewSpeed(0F);
-            ResourceGenerationStrategy strategy = ResourceStrategyFactory.getStrategy(player.getMainHandItem());
-            taskManager.runOnceWithCooldown(player, "minerState", strategy.getDigCoolDown(), () -> {
-                AllResourceType result = strategy.generateResource();
-                // 调用资源生成逻辑，传入方块位置
-                spawnSource(event, player, result);
-            });
+            if (player.level().isClientSide()) {
+                event.setNewSpeed(0F);
+            } else {
+                event.setNewSpeed(0F);
+                ResourceGenerationStrategy strategy = ResourceStrategyFactory.getStrategy(player.getMainHandItem());
+                taskManager.runOnceWithCooldown(player, "minerState", strategy.getDigCoolDown(), () -> {
+                    AllResourceType result = strategy.generateResource();
+                    spawnSource(event, player, result);
+                });
+            }
         }
     }
 
@@ -55,7 +54,7 @@ public class MinerStateEvent {
      */
     private static void spawnSource(PlayerEvent.BreakSpeed event, Player player, AllResourceType result) {
         Level level = player.level();
-        //TODO 添加高等级策略一次可以挖出双份甚至多份资源或是
+        //TODO 添加高等级策略一次可以挖出双份甚至多份资源
         //TODO 添加对镐子耐久的消耗
         //TODO 对附魔的支持（效率，时运，耐久）
 
@@ -78,36 +77,34 @@ public class MinerStateEvent {
         level.addFreshEntity(fakeItem);
 
         // 根据不同资源类型获取不同的音效
-        if (!level.isClientSide()) {
-            switch (result) {
-                case DIRT:
-                case WOOD:
-                case STONE:
-                case IRON:
-                case GOLD:
-                    level.playSound(null,
-                            position.x(), position.y(), position.z(),
-                            SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS,
-                            0.5F, random.nextFloat() * 0.1F + 0.9F);
-                    break;
+        switch (result) {
+            case DIRT:
+            case WOOD:
+            case STONE:
+            case IRON:
+            case GOLD:
+                level.playSound(null,
+                        position.x(), position.y(), position.z(),
+                        SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS,
+                        0.5F, random.nextFloat() * 0.1F + 0.9F);
+                break;
 
-                case DIAMOND:
-                    level.playSound(null,
-                            position.x(), position.y(), position.z(),
-                            SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS,
-                            0.7F, 1F);
-                    break;
+            case DIAMOND:
+                level.playSound(null,
+                        position.x(), position.y(), position.z(),
+                        SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS,
+                        0.7F, 1F);
+                break;
 
-                case NETHERITE:
-                    level.playSound(null,
-                            position.x(), position.y(), position.z(),
-                            SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS,
-                            1F, 1F);
-                    break;
+            case NETHERITE:
+                level.playSound(null,
+                        position.x(), position.y(), position.z(),
+                        SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS,
+                        1F, 1F);
+                break;
 
-                default:
-                    break;
-            }
+            default:
+                break;
         }
     }
 }

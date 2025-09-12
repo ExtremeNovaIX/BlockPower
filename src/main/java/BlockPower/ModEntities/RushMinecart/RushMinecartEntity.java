@@ -3,8 +3,8 @@ package BlockPower.ModEntities.RushMinecart;
 import BlockPower.ModEntities.IStateMachine;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
-import BlockPower.Util.TaskManager;
-import BlockPower.Util.Timer.ServerTickListener;
+import BlockPower.Util.Commons;
+import BlockPower.Util.SkillLock.SkillLockManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -28,8 +28,8 @@ import java.util.List;
 
 import static BlockPower.Util.Commons.applyDamage;
 import static BlockPower.Util.Commons.detectEntity;
-import static BlockPower.Util.EffectSender.broadcastScreenShake;
-import static BlockPower.Util.EffectSender.sendHitStop;
+import static BlockPower.Util.ModEffect.EffectSender.broadcastScreenShake;
+import static BlockPower.Util.ModEffect.EffectSender.sendHitStop;
 
 public class RushMinecartEntity extends AbstractMinecart implements IStateMachine<RushMinecartEntity.RushMinecartState> {
 
@@ -54,9 +54,9 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
 
     private Vec3 lastRailPlacementPos = Vec3.ZERO;//记录上一个生成点的位置
 
-    private static final TimerManager timerManager = TimerManager.getInstance();//全局计时器管理类
+    private static final TimerManager timerManager = TimerManager.getInstance(false);//全局计时器管理类
 
-    private static final TaskManager taskManager = TaskManager.getInstance();
+    private static final SkillLockManager skillLockManager = SkillLockManager.getInstance();
 
     private Vec3 minecartSpeed = Vec3.ZERO;
 
@@ -111,6 +111,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
 
             case RUSHING:
                 if (this.getFirstPassenger() != player) {
+                    skillLockManager.unlock(player);
                     setState(RushMinecartState.SEEKING);
                     break;
                 }
@@ -145,6 +146,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
 
             case CRASHED:
                 //TODO 修改为按速度大小决定伤害检测范围
+                skillLockManager.unlock(player);
                 if (this.getFirstPassenger() == player) {
                     player.stopRiding();
                 }
@@ -206,12 +208,10 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
         }
     }
 
-
     private void spawnRailAt(Vec3 pos) {
         FakeRailEntity fakeRail = new FakeRailEntity(this.level(), pos.x(), pos.y(), pos.z(), this.getYRot());
         this.level().addFreshEntity(fakeRail);
     }
-
 
     public void spawnInitialRail() {
         Vec3 initialPos = this.position();
@@ -246,7 +246,6 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
 
         minecart.spawnInitialRail();
 
-
         //使玩家被矿车吸引
         if (player.onGround()) {
             player.setDeltaMovement(player.getDeltaMovement().add(0, 0.5, 0));
@@ -258,7 +257,8 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
     }
 
     private void hurtEntity(@NotNull Player player) {
-        List<Entity> entityList = applyDamage(this, player, 1.5, 15F, 4, ModSounds.MINECART_CRASH_SOUND.get());
+        List<Entity> entityList = applyDamage(this, player, 15F, 5, ModSounds.MINECART_CRASH_SOUND.get());
+        Commons.knockBackEntity(this, entityList, 1.5);
         if (!entityList.isEmpty()) {
             //玩家在车上时触发屏幕震动
             if (getState() == RushMinecartState.RUSHING && this.getFirstPassenger() == player) {

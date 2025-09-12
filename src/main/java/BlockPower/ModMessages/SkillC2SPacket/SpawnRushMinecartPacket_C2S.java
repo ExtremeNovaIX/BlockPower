@@ -1,10 +1,16 @@
+<<<<<<<< HEAD:src/main/java/BlockPower/ModMessages/C2SPacket/SkillPacket/SpawnRushMinecartPacket_C2S.java
 package BlockPower.ModMessages.C2SPacket.SkillPacket;
 
 
 import BlockPower.ModEntities.RushMinecart.RushMinecartEntity;
 
-import BlockPower.ModMessages.C2SPacket.AbstractC2SPacket;
-import BlockPower.Skills.SkillTrigger.RushMinecartSkill;
+========
+package BlockPower.ModMessages.SkillC2SPacket;
+
+
+import BlockPower.ModEntities.RushMinecart.RushMinecartEntity;
+>>>>>>>> ExNova:src/main/java/BlockPower/ModMessages/SkillC2SPacket/SpawnRushMinecartPacket_C2S.java
+import BlockPower.Skills.RushMinecartSkill;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
@@ -30,6 +36,10 @@ public class SpawnRushMinecartPacket_C2S extends AbstractSkillPacket_C2S {
     protected void handleServerSide(ServerPlayer player) {
         LOGGER.info("createRushMinecart by player: {}", player.getGameProfile().getName());
         RushMinecartEntity.createRushMinecart(player);
+<<<<<<<< HEAD:src/main/java/BlockPower/ModMessages/C2SPacket/SkillPacket/SpawnRushMinecartPacket_C2S.java
         consumeResource(player, skill);
+========
+        super.consumeResource(player, skill);
+>>>>>>>> ExNova:src/main/java/BlockPower/ModMessages/SkillC2SPacket/SpawnRushMinecartPacket_C2S.java
     }
 }

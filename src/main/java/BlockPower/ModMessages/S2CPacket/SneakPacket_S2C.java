@@ -1,6 +1,7 @@
 package BlockPower.ModMessages.S2CPacket;
 
 import BlockPower.ModEffects.PlayerSneakEffect;
+import BlockPower.Util.ModEffect.ModEffectManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
@@ -31,9 +32,9 @@ public class SneakPacket_S2C extends AbstractS2CPacket {
             return;
         }
         if (this.state) {
-            PlayerSneakEffect.start(player);
+            ModEffectManager.addEffect(player, new PlayerSneakEffect());
         } else {
-            PlayerSneakEffect.end(player);
+            ModEffectManager.removeEffect(player, PlayerSneakEffect.class);
         }
         LOGGER.info("SneakPacket_S2C: {} {}", this.state, player);
     }

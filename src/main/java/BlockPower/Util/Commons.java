@@ -1,6 +1,7 @@
 package BlockPower.Util;
 
-import BlockPower.Util.Timer.TickTimer;
+import BlockPower.ModEffects.CloudTrailEffect;
+import BlockPower.Util.ModEffect.ModEffectManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -19,13 +20,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Random;
 
-import static BlockPower.ModEffects.GlobalEffectHandler.cloudParticleTimers;
-
 public class Commons {
     private static final Random r = new Random();
 
-    private static final TimerManager timerManager = TimerManager.getInstance();
-    private static final TaskManager taskManager = TaskManager.getInstance();
+    private static final TimerManager timerManager = TimerManager.getInstance(false);
+    private static final TaskManager taskManager = TaskManager.getInstance(false);
 
     /**
      * 检测半径内的非技能释放者的LivingEntity
@@ -63,42 +62,77 @@ public class Commons {
      * @param effectedEntity 被击退的实体
      * @param strength       击退强度
      */
-    public static void knockBackEntity(@NotNull Entity mainEntity, Entity effectedEntity, double strength) {
-        if (effectedEntity == null || effectedEntity.isRemoved()) return;
-        Vec3 knockbackVector = effectedEntity.position().subtract(mainEntity.position()).normalize();
-        effectedEntity.setDeltaMovement(mainEntity.getDeltaMovement().add(
-                knockbackVector.x * strength,
-                1 * strength,
-                knockbackVector.z * strength
-        ));
+    public static void knockBackEntity(@NotNull Entity mainEntity, List<Entity> effectedEntity, double strength) {
+        if (effectedEntity == null || effectedEntity.isEmpty()) return;
+        for (Entity entity : effectedEntity) {
+            if (entity.isRemoved()) continue;
+            Vec3 knockbackVector = entity.position().subtract(mainEntity.position()).normalize();
+            entity.setDeltaMovement(mainEntity.getDeltaMovement().add(
+                    knockbackVector.x * strength,
+                    1 * strength,
+                    knockbackVector.z * strength
+            ));
+        }
+    }
+
+    /**
+     * 向上击退实体
+     *
+     * @param mainEntity     释放技能的实体
+     * @param effectedEntity 被击退的实体
+     * @param strength       击退强度
+     */
+    public static void knockBackEntityUp(@NotNull Entity mainEntity, List<Entity> effectedEntity, double strength) {
+        if (effectedEntity.isEmpty()) return;
+
+        // 垂直向上的力度
+        double horizontalRepelStrength = 0.45; // 水平推开的力度
+
+        // 获取玩家的水平朝向向量（忽略Y轴的抬头或低头）
+        Vec3 lookVec = mainEntity.getLookAngle();
+        Vec3 horizontalLook = new Vec3(lookVec.x, 0.0, lookVec.z).normalize();
+
+        // 创建一个“推后”向量，即玩家朝向的相反方向
+        Vec3 pushBackVec = horizontalLook.scale(horizontalRepelStrength);
+
+        for (Entity entity : effectedEntity) {
+            if (entity.isRemoved()) continue;
+
+            // 将实体当前的速度与新向量组合
+            Vec3 existingMotion = entity.getDeltaMovement();
+
+            entity.setDeltaMovement(
+                    existingMotion.x + pushBackVec.x,
+                    strength,
+                    existingMotion.z + pushBackVec.z
+            );
+        }
     }
 
     /**
      * 对半径内的实体造成伤害并击退
      *
-     * @param mainEntity        释放技能的实体
-     * @param skillUser         释放技能的玩家
-     * @param knockBackStrength 击退强度
-     * @param damage            伤害值
-     * @param detectRadius      检测半径
-     * @param soundEvent        音效
+     * @param mainEntity   释放技能的实体
+     * @param skillUser    释放技能的玩家
+     * @param damage       伤害值
+     * @param detectRadius 检测半径
+     * @param soundEvent   音效
      * @return 半径内的实体列表
      */
-    public static List<Entity> applyDamage(@NotNull Entity mainEntity, Player skillUser, double knockBackStrength, float damage, double detectRadius, SoundEvent soundEvent) {
+    public static List<Entity> applyDamage(@NotNull Entity mainEntity, Player skillUser, float damage, double detectRadius, SoundEvent soundEvent) {
         List<Entity> entities = detectEntity(mainEntity, detectRadius, skillUser);
         if (!entities.isEmpty()) {
             entities.forEach(entity -> {
                 entity.hurt(mainEntity.level().damageSources().mobAttack(skillUser), damage);
                 //为每个被击中的实体启动粒子计时器
-                cloudParticleTimers.put(entity, new TickTimer(40));
+                ModEffectManager.addEffect(entity, new CloudTrailEffect(entity, 40));
                 if (!mainEntity.level().isClientSide) {
                     //限制5tick内最多播放3次声音
-                    taskManager.runTimesWithCooldown(mainEntity, "play_sound", 3, 5, () ->
+                    taskManager.runTimesWithCooldown(mainEntity, "play_sound", 2, 5, () ->
                             mainEntity.level().playSound(null,
                                     mainEntity.getX(), mainEntity.getY(), mainEntity.getZ(),
                                     soundEvent, SoundSource.PLAYERS, 5f, r.nextFloat(0.2f) + 0.9f));
                 }
-                knockBackEntity(mainEntity, entity, knockBackStrength);
             });
         }
         return entities;
@@ -143,7 +177,7 @@ public class Commons {
      *
      * @param player 服务器玩家
      */
-    public static boolean checkServerPlayerMode(ServerPlayer player) {
+    public static boolean isSpectatorOrCreativeMode(ServerPlayer player) {
         GameType gameType = player.gameMode.getGameModeForPlayer();
         return gameType == GameType.SPECTATOR || gameType == GameType.CREATIVE;
     }
