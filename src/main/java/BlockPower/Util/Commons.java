@@ -1,7 +1,7 @@
 package BlockPower.Util;
 
 import BlockPower.ModEffects.CloudTrailEffect;
-import BlockPower.Util.Timer.TickTimer;
+import BlockPower.Util.ModEffect.ModEffectManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -125,10 +125,10 @@ public class Commons {
             entities.forEach(entity -> {
                 entity.hurt(mainEntity.level().damageSources().mobAttack(skillUser), damage);
                 //为每个被击中的实体启动粒子计时器
-               CloudTrailEffect.cloudParticleTimers.put(entity, new TickTimer(40, false));
+                ModEffectManager.addEffect(entity, new CloudTrailEffect(entity, 40));
                 if (!mainEntity.level().isClientSide) {
                     //限制5tick内最多播放3次声音
-                    taskManager.runTimesWithCooldown(mainEntity, "play_sound", 3, 5, () ->
+                    taskManager.runTimesWithCooldown(mainEntity, "play_sound", 2, 5, () ->
                             mainEntity.level().playSound(null,
                                     mainEntity.getX(), mainEntity.getY(), mainEntity.getZ(),
                                     soundEvent, SoundSource.PLAYERS, 5f, r.nextFloat(0.2f) + 0.9f));

@@ -4,7 +4,7 @@ import BlockPower.ModEntities.IStateMachine;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Util.Commons;
-import BlockPower.Util.EffectSender;
+import BlockPower.Util.ModEffect.EffectSender;
 import BlockPower.Util.SkillLock.SkillLockManager;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
@@ -31,7 +31,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import static BlockPower.Util.Commons.applyDamage;
-import static BlockPower.Util.EffectSender.broadcastScreenShake;
+import static BlockPower.Util.ModEffect.EffectSender.broadcastScreenShake;
 
 public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEntity.AnvilState> {
     private int onGroundLifeTime = 100;

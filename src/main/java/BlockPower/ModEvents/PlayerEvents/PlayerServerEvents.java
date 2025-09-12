@@ -39,7 +39,7 @@ public class PlayerServerEvents {
     public static void onLivingFall(LivingFallEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             // 检查玩家是否有免疫摔落伤害的任务
-            if (timerManager.isTimerActive(player,"noFallDamage") && !timerManager.isFinished(player, "noFallDamage")) {
+            if (timerManager.isTimerActive(player,"noFallDamage") && !timerManager.isFinished(player, "noFallDamage",true)) {
                 event.setCanceled(true);
             }
         }

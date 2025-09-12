@@ -1,22 +1,20 @@
-package BlockPower.Util;
+package BlockPower.Util.ModEffect;
 
-import BlockPower.ModEffects.HitStopEffect;
 import BlockPower.ModMessages.S2CPacket.HitStopPacket_S2C;
 import BlockPower.ModMessages.S2CPacket.ShakePacket_S2C;
 import BlockPower.ModMessages.S2CPacket.SneakPacket_S2C;
-import BlockPower.Util.Timer.TickTimer;
+import BlockPower.Util.Commons;
+import BlockPower.Util.TaskManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.AbstractMap;
-import java.util.Map;
-
 import static BlockPower.ModMessages.ModMessages.sendToPlayer;
 
 public class EffectSender {
+    private static final TaskManager taskManager = TaskManager.getInstance(false);
 
     /**
      * 触发玩家屏幕震动
@@ -37,7 +35,7 @@ public class EffectSender {
      * @param duration    震动持续时间 (tick)。
      * @param maxStrength 在震源中心处的最大震动强度。
      * @param maxRadius   震动能够影响的最大半径（格）。
-     * @param minRadius 震动不衰减的距离。
+     * @param minRadius   震动不衰减的距离。
      */
     public static void broadcastScreenShake(Entity mainEntity, int duration, float maxStrength, double maxRadius, double minRadius) {
         if (!(mainEntity.level() instanceof ServerLevel) || minRadius > maxRadius) {
@@ -76,12 +74,14 @@ public class EffectSender {
      * @param skillEntity  触发卡帧的技能实体
      */
     public static void sendHitStop(int duration, ServerPlayer serverPlayer, @Nullable Entity skillEntity) {
-        if (skillEntity != null) {
-            Map.Entry<Vec3, TickTimer> entry = new AbstractMap.SimpleEntry<>(skillEntity.getDeltaMovement(), new TickTimer(duration,false));
-            HitStopEffect.hitStopTimers.put(skillEntity, entry);
-            skillEntity.setDeltaMovement(Vec3.ZERO);
-        }
         sendToPlayer(new HitStopPacket_S2C(duration), serverPlayer);
+        if (skillEntity != null) {
+            Vec3 deltaMovement = skillEntity.getDeltaMovement();
+            skillEntity.setDeltaMovement(Vec3.ZERO);
+            taskManager.runTaskAfterTicks(duration, () -> {
+                skillEntity.setDeltaMovement(deltaMovement);
+            });
+        }
     }
 
     /**

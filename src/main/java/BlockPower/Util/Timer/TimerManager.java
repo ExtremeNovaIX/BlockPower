@@ -185,6 +185,7 @@ public final class TimerManager {
         return innerMap != null && innerMap.containsKey(effectedEntity);
     }
 
+    //TODO 添加不会移除计时器的方法，并把isFinished改为private
     /**
      * 检查一个全局计时器是否已完成。
      * 此方法具有副作用：如果计时器已完成，它将被从管理器中移除。

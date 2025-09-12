@@ -13,6 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class TaskManager {
     private static final TaskManager SERVER_INSTANCE = new TaskManager(false);
     private static final TaskManager CLIENT_INSTANCE = new TaskManager(true);
+    //TODO 把复合Map改为存储对象，符合面向对象的设计
     private final List<Map.Entry<Runnable, Integer>> scheduledTasks = new CopyOnWriteArrayList<>();
     private final Map<String, RepeatingTaskState> repeatingTaskMap = new ConcurrentHashMap<>();
     private final Map<Entity, Map<String, Integer>> taskExecutionCounter = new WeakHashMap<>();// 挂载在实体下的任务执行次数Map

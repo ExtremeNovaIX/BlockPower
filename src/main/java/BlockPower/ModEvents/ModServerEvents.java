@@ -1,9 +1,8 @@
 package BlockPower.ModEvents;
 
 import BlockPower.Main.Main;
-import BlockPower.ModEffects.CloudTrailEffect;
-import BlockPower.ModEffects.HitStopEffect;
 import BlockPower.Skills.MinerState.server.PlayerResourceManager;
+import BlockPower.Util.ModEffect.ModEffectManager;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -18,8 +17,7 @@ public class ModServerEvents {
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
-            CloudTrailEffect.handleCloudParticleTimer();
-            HitStopEffect.handleHitStopTimer();
+            ModEffectManager.tickAll(false);
         }
     }
 

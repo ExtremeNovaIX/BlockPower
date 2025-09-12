@@ -5,7 +5,6 @@ import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Util.Commons;
 import BlockPower.Util.SkillLock.SkillLockManager;
-import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -29,8 +28,8 @@ import java.util.List;
 
 import static BlockPower.Util.Commons.applyDamage;
 import static BlockPower.Util.Commons.detectEntity;
-import static BlockPower.Util.EffectSender.broadcastScreenShake;
-import static BlockPower.Util.EffectSender.sendHitStop;
+import static BlockPower.Util.ModEffect.EffectSender.broadcastScreenShake;
+import static BlockPower.Util.ModEffect.EffectSender.sendHitStop;
 
 public class RushMinecartEntity extends AbstractMinecart implements IStateMachine<RushMinecartEntity.RushMinecartState> {
 
