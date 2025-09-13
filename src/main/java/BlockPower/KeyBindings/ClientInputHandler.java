@@ -2,7 +2,7 @@ package BlockPower.KeyBindings;
 
 import BlockPower.ModItems.ModItems;
 import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
-import BlockPower.ModMessages.SkillC2SPacket.AirJumpPacket_C2S;
+import BlockPower.ModMessages.SkillC2SPacket.AirJumpSkillPacket_C2S;
 import BlockPower.ModMessages.SkillC2SPacket.DashSkillPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.Skills.*;
@@ -52,9 +52,9 @@ public class ClientInputHandler {
             if (!localPlayer.onGround()) {
                 if (localPlayer.input.up) {
                     result = "w";
-                    ModMessages.sendToServer(new AirJumpPacket_C2S("w"));
+                    ModMessages.sendToServer(new AirJumpSkillPacket_C2S("w"));
                 } else {
-                    ModMessages.sendToServer(new AirJumpPacket_C2S(""));
+                    ModMessages.sendToServer(new AirJumpSkillPacket_C2S(""));
                 }
                 LOGGER.info("CUSTOM_SPACE key triggered:{}", result);
             }

@@ -61,10 +61,10 @@ public class ModMessages {
                 .consumerMainThread(ChangeMinerStatePacket_C2S::handle)
                 .add();
 
-        net.messageBuilder(AirJumpPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(AirJumpPacket_C2S::new)
-                .encoder(AirJumpPacket_C2S::toBytes)
-                .consumerMainThread(AirJumpPacket_C2S::handle)
+        net.messageBuilder(AirJumpSkillPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(AirJumpSkillPacket_C2S::new)
+                .encoder(AirJumpSkillPacket_C2S::toBytes)
+                .consumerMainThread(AirJumpSkillPacket_C2S::handle)
                 .add();
 
         net.messageBuilder(PlaceBlockSkillPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)

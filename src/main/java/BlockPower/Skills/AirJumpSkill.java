@@ -1,6 +1,6 @@
 package BlockPower.Skills;
 
-import BlockPower.ModMessages.SkillC2SPacket.AirJumpPacket_C2S;
+import BlockPower.ModMessages.SkillC2SPacket.AirJumpSkillPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Util.TaskManager;
@@ -32,7 +32,7 @@ public class AirJumpSkill implements Skill {
 
     @Override
     public void triggerSkill(int skillLevel) {
-        ModMessages.sendToServer(new AirJumpPacket_C2S());
+        ModMessages.sendToServer(new AirJumpSkillPacket_C2S());
     }
 
     @Override

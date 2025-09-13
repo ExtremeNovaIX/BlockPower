@@ -1,9 +1,11 @@
 package BlockPower.Util;
 
 import BlockPower.ModEffects.CloudTrailEffect;
+import BlockPower.ModItems.ModItems;
 import BlockPower.Util.ModEffect.ModEffectManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,12 +14,15 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 public class Commons {
@@ -180,6 +185,17 @@ public class Commons {
     public static boolean isSpectatorOrCreativeMode(ServerPlayer player) {
         GameType gameType = player.gameMode.getGameModeForPlayer();
         return gameType == GameType.SPECTATOR || gameType == GameType.CREATIVE;
+    }
+
+    public static void changePixelCoreNBT(Player player, @Nullable Integer skillState, @Nullable Integer toolType, @Nullable Integer pixelCoreLevel) {
+        if (player.level().isClientSide) return;
+        ItemStack mainHandItem = player.getMainHandItem();
+        if (mainHandItem.getItem() != ModItems.PIXEL_CORE.get()) return;
+        CompoundTag NBT = mainHandItem.getOrCreateTag();
+        NBT.putInt("skill_state", Objects.requireNonNullElse(skillState, 0));
+        NBT.putInt("tool_type", Objects.requireNonNullElse(toolType, -1));
+        NBT.putInt("pixel_core_level", Objects.requireNonNullElse(pixelCoreLevel, -1));
+        mainHandItem.setTag(NBT);
     }
 
 }

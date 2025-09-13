@@ -18,7 +18,7 @@ import static BlockPower.Main.Main.MOD_ID;
 @Mod(MOD_ID)
 public class Main {
     //TODO combo系统，当生物/玩家被技能击中时会被挂上combo标记。接下来其他人技能更容易命中该生物（技能有第二套对带有combo标记的生物进行更大范围检测的逻辑）
-    //TODO 为ModEffect分离为Tick-Based Effects和Event-Driven Effects。Tick-Based Effects需要抽象出接口和父类
+    //TODO 把ModEntity逻辑系统抽离至Skill，在ModEntity只负责调用，满足单一职责原则
     public static final String MOD_ID = "blockpower";
     private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 

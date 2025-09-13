@@ -19,8 +19,8 @@ public final class TimerManager {
     private static final TimerManager SERVER_INSTANCE = new TimerManager(false);
     private static final TimerManager CLIENT_INSTANCE = new TimerManager(true);
 
-    public final Map<String, TickTimer> globalTimers = new HashMap<>();
-    public final Map<Entity, Map<String, TickTimer>> entityToStringTimers = new WeakHashMap<>();
+    private final Map<String, TickTimer> globalTimers = new HashMap<>();
+    private final Map<Entity, Map<String, TickTimer>> entityToStringTimers = new WeakHashMap<>();
 
     private final boolean isClient;
 
