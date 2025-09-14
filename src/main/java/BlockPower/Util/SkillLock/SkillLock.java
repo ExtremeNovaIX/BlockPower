@@ -7,7 +7,9 @@ package BlockPower.Util.SkillLock;
 public class SkillLock {
     private boolean locked;
     private int lockTime;
-    public static final int MAX_LOCK_TICK = 300;//最大锁定时间15s
+    private boolean overrideableLocked;
+    private int overrideableLockTime;
+    public static final int MAX_LOCK_TICK = 400;//最大锁定时间20s
 
     /**
      * @param locked  是否锁定
@@ -18,18 +20,21 @@ public class SkillLock {
         this.lockTime = lockTime;
     }
 
+    /**
+     * 添加一个可被覆盖锁定的技能锁，不可覆盖lock方法设定的lock
+     * @param overrideableLockTime 锁定时间，单位为tick
+     * @param overrideableLocked 是否可被覆盖锁定
+     */
+    public SkillLock(int overrideableLockTime, boolean overrideableLocked) {
+        this.overrideableLockTime = overrideableLockTime;
+        this.overrideableLocked = overrideableLocked;
+    }
+
     public SkillLock() {
         this.locked = false;
         this.lockTime = 0;
-    }
-
-    /**
-     * @param locked  是否锁定
-     * 不指定锁定时间，需要手动解锁或等到最大锁定时间以后自然解锁
-     */
-    public SkillLock(boolean locked) {
-        this.locked = locked;
-        this.lockTime = 0;
+        this.overrideableLocked = false;
+        this.overrideableLockTime = 0;
     }
 
     public boolean isLocked() {
@@ -48,4 +53,19 @@ public class SkillLock {
         this.lockTime = lockTime;
     }
 
+    public boolean isOverrideableLocked() {
+        return overrideableLocked;
+    }
+
+    public void setOverrideableLocked(boolean overrideableLocked) {
+        this.overrideableLocked = overrideableLocked;
+    }
+
+    public int getOverrideableLockTime() {
+        return overrideableLockTime;
+    }
+
+    public void setOverrideableLockTime(int overrideableLockTime) {
+        this.overrideableLockTime = overrideableLockTime;
+    }
 }

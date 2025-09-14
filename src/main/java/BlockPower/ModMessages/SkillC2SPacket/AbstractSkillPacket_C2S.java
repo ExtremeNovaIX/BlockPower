@@ -49,7 +49,7 @@ abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket {
     @Override
     protected void afterHandleServerSide(ServerPlayer player) {
         consumeResource(player, skill);
-        skillLockManager.lock(player,new SkillLock(true));
+        skillLockManager.lock(player);
     }
 
     protected void consumeResource(ServerPlayer player, Skill skill) {
