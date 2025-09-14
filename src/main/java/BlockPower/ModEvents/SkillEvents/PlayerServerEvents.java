@@ -1,10 +1,9 @@
-package BlockPower.ModEvents.PlayerEvents;
+package BlockPower.ModEvents.SkillEvents;
 
 
 import BlockPower.Main.Main;
 import BlockPower.Skills.AirJumpSkill;
 import BlockPower.Util.Commons;
-import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -18,8 +17,6 @@ import org.slf4j.LoggerFactory;
 
 @Mod.EventBusSubscriber(modid = Main.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class PlayerServerEvents {
-    private static final TaskManager taskManager = TaskManager.getInstance(false);
-
     private static final TimerManager timerManager = TimerManager.getInstance(false);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.MOD_ID);

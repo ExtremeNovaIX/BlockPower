@@ -1,4 +1,4 @@
-package BlockPower.ModEvents;
+package BlockPower.ModEvents.SkillEvents;
 
 import BlockPower.Main.Main;
 import BlockPower.ModItems.ModItems;
@@ -18,8 +18,6 @@ public class ModClientEvents {
             registerItemProperties();
         });
     }
-
-    // ModClientEvents.java
 
     private static void registerItemProperties() {
         // PIXEL_CORE相关
