@@ -11,8 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Mod.EventBusSubscriber(modid = Main.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class ModServerEvents {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ModServerEvents.class);
+public class ForgeServerEvents {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ForgeServerEvents.class);
 
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {

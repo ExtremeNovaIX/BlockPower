@@ -13,8 +13,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class TaskManager {
     private static final TaskManager SERVER_INSTANCE = new TaskManager(false);
     private static final TaskManager CLIENT_INSTANCE = new TaskManager(true);
-    //TODO 把复合Map改为存储对象，符合面向对象的设计
-    private final List<Map.Entry<Runnable, Integer>> scheduledTasks = new CopyOnWriteArrayList<>();
+
+    private final Set<scheduledTaskState> scheduledTasks = new HashSet<>();
     private final Map<String, RepeatingTaskState> repeatingTaskMap = new ConcurrentHashMap<>();
     private final Map<Entity, Map<String, Integer>> taskExecutionCounter = new WeakHashMap<>();// 挂载在实体下的任务执行次数Map
     private final Map<Entity, Set<String>> coolingDownTasks = new WeakHashMap<>();// 挂载在实体下的冷却中任务Map
@@ -43,8 +43,24 @@ public class TaskManager {
      * @param tickDuration 在多少tick后执行。
      * @param runnable     执行的方法或者语句。
      */
-    public void runTaskAfterTicks(@NotNull Integer tickDuration, @NotNull Runnable runnable) {
-        scheduledTasks.add(new AbstractMap.SimpleEntry<>(runnable, tickDuration));
+    public synchronized void runTaskAfterTicks(@NotNull Integer tickDuration, @NotNull Runnable runnable) {
+        scheduledTasks.add(new scheduledTaskState(runnable, tickDuration));
+    }
+
+    /**
+     * 添加任务到自更新timer池内，在tickDuration后执行
+     * 如果任务ID已存在且任务未执行，会覆盖旧任务
+     * 此方法是线程安全的
+     *
+     * @param tickDuration 在多少tick后执行。
+     * @param runnable     执行的方法或者语句。
+     */
+    public synchronized void runOverrideTaskAfterTicks(@NotNull Integer tickDuration, @NotNull Runnable runnable, @NotNull String taskID) {
+        //移除相同taskID的现有任务
+        scheduledTasks.removeIf(entry -> entry.taskID.equals(taskID));
+
+        //添加新任务
+        scheduledTasks.add(new scheduledTaskState(runnable, tickDuration, taskID));
     }
 
     /**
@@ -240,9 +256,9 @@ public class TaskManager {
      */
     private void updateScheduledTasksList() {
         scheduledTasks.removeIf(entry -> {
-            entry.setValue(entry.getValue() - 1);
-            if (entry.getValue() <= 0) {
-                entry.getKey().run();
+            entry.runAfterTicks--;
+            if (entry.runAfterTicks <= 0) {
+                entry.task.run();
                 return true;
             }
             return false;
@@ -291,6 +307,30 @@ public class TaskManager {
 
         public boolean isFinished() {
             return remainingTicks <= 0;
+        }
+    }
+
+    private static class scheduledTaskState {
+        final Runnable task;
+        int runAfterTicks;
+        final String taskID;
+
+        public scheduledTaskState(Runnable task, int runAfterTicks, String taskID) {
+            this.task = task;
+            this.runAfterTicks = runAfterTicks;
+            this.taskID = taskID;
+        }
+
+        public scheduledTaskState(Runnable task, int runAfterTicks) {
+            this.task = task;
+            this.runAfterTicks = runAfterTicks;
+            this.taskID = String.valueOf(this.hashCode());
+        }
+
+        @Override
+        public int hashCode() {
+            if (taskID == null) return super.hashCode();
+            return taskID.hashCode();
         }
     }
 }

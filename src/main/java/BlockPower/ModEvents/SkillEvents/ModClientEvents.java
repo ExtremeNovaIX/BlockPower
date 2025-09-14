@@ -1,4 +1,4 @@
-package BlockPower.ModEvents;
+package BlockPower.ModEvents.SkillEvents;
 
 import BlockPower.Main.Main;
 import BlockPower.ModItems.ModItems;
@@ -20,37 +20,32 @@ public class ModClientEvents {
     }
 
     private static void registerItemProperties() {
-        //PIXEL_CORE相关
-        //注册skill_state属性
+        // PIXEL_CORE相关
+        // 注册skill_state属性
         ItemProperties.register(ModItems.PIXEL_CORE.get(),
                 new ResourceLocation(Main.MOD_ID, "skill_state"),
                 (stack, level, entity, seed) -> {
-                    // 读取NBT中的skill_id
-                    return stack.getOrCreateTag().getInt("skill_id");
+                    return stack.getOrCreateTag().getInt("skill_state");
                 });
 
-        //注册tool_type属性
+        // 注册tool_type属性
         ItemProperties.register(ModItems.PIXEL_CORE.get(),
                 new ResourceLocation(Main.MOD_ID, "tool_type"),
                 (stack, level, entity, seed) -> {
-                    // 只有在skill_id == 3时才检查这个属性
-                    if (stack.getOrCreateTag().getInt("skill_id") == 3) {
-                        // (例如: 1=斧, 2=镐, 3=剑)
+                    if (stack.getOrCreateTag().getInt("skill_state") == 3) {
                         return stack.getOrCreateTag().getInt("tool_type");
                     }
-                    return 0f; // 其他模式时返回0
+                    return 0f;
                 });
 
-        // 3. 注册 "pixel_core_level" 属性 (新)
+        // 注册 "pixel_core_level" 属性
         ItemProperties.register(ModItems.PIXEL_CORE.get(),
                 new ResourceLocation(Main.MOD_ID, "pixel_core_level"),
                 (stack, level, entity, seed) -> {
-                    // 只有在skill_id == 3时才检查这个属性
-                    if (stack.getOrCreateTag().getInt("skill_id") == 3) {
-                        // 1=木, 2=石, 3=铁, 4=金, 5=钻, 6=下界合金
+                    if (stack.getOrCreateTag().getInt("skill_state") == 3) {
                         return stack.getOrCreateTag().getInt("pixel_core_level");
                     }
-                    return 0f; // 其他模式时返回0
+                    return 0f;
                 });
     }
 }

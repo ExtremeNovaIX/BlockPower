@@ -1,8 +1,6 @@
 package BlockPower.ModMessages.SkillC2SPacket;
 
-import BlockPower.ModEvents.PlayerEvents.PlayerServerEvents;
 import BlockPower.Skills.AirJumpSkill;
-import BlockPower.Util.SkillLock.SkillLock;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.network.FriendlyByteBuf;
@@ -12,26 +10,26 @@ import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AirJumpPacket_C2S extends AbstractSkillPacket_C2S {
+public class AirJumpSkillPacket_C2S extends AbstractSkillPacket_C2S {
     private static final TaskManager taskManager = TaskManager.getInstance(false);
 
     private static final TimerManager timerManager = TimerManager.getInstance(false);
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AirJumpPacket_C2S.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AirJumpSkillPacket_C2S.class);
 
     private final String keyResult;
 
-    public AirJumpPacket_C2S() {
+    public AirJumpSkillPacket_C2S() {
         super(new AirJumpSkill());
         keyResult = null;
     }
 
-    public AirJumpPacket_C2S(FriendlyByteBuf buf) {
+    public AirJumpSkillPacket_C2S(FriendlyByteBuf buf) {
         super(new AirJumpSkill());
         keyResult = buf.readUtf();
     }
 
-    public AirJumpPacket_C2S(String keyResult) {
+    public AirJumpSkillPacket_C2S(String keyResult) {
         super(new AirJumpSkill());
         this.keyResult = keyResult;
     }

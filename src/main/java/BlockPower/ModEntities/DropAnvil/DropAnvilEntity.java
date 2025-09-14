@@ -157,6 +157,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
             case INITIALIZING:
                 if (!timerManager.isTimerCyclingDue(this, "initializing", 5)) {
                     isPlayerStandingOnAnvil = true;
+                    Commons.changePixelCoreNBT(player,1,null,null);
                 } else {
                     setState(AnvilState.DROPPING);
                 }

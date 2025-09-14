@@ -56,14 +56,7 @@ public class LauncherSwingSkillPacket_C2S extends AbstractSkillPacket_C2S {
 
         ItemStack mainHandItem = player.getMainHandItem();
         if (mainHandItem.getItem() != ModItems.PIXEL_CORE.get()) return;
-
-        // 设置NBT状态以触发客户端渲染更新 (斧头形态)
-        CompoundTag NBT = mainHandItem.getOrCreateTag();
-        NBT.putInt("skill_state", 3);
-        NBT.putInt("tool_type", 1);
-        NBT.putInt("pixel_core_level", 1);
-        mainHandItem.setTag(NBT);
-
+        Commons.changePixelCoreNBT(player,3,1,1);
         launcherSwing(player);
     }
 

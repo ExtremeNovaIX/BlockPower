@@ -2,7 +2,7 @@ package BlockPower.KeyBindings;
 
 import BlockPower.ModItems.ModItems;
 import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
-import BlockPower.ModMessages.SkillC2SPacket.AirJumpPacket_C2S;
+import BlockPower.ModMessages.SkillC2SPacket.AirJumpSkillPacket_C2S;
 import BlockPower.ModMessages.SkillC2SPacket.DashSkillPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.Skills.*;
@@ -52,9 +52,9 @@ public class ClientInputHandler {
             if (!localPlayer.onGround()) {
                 if (localPlayer.input.up) {
                     result = "w";
-                    ModMessages.sendToServer(new AirJumpPacket_C2S("w"));
+                    ModMessages.sendToServer(new AirJumpSkillPacket_C2S("w"));
                 } else {
-                    ModMessages.sendToServer(new AirJumpPacket_C2S(""));
+                    ModMessages.sendToServer(new AirJumpSkillPacket_C2S(""));
                 }
                 LOGGER.info("CUSTOM_SPACE key triggered:{}", result);
             }
@@ -87,7 +87,7 @@ public class ClientInputHandler {
         if (KeyBindings.LAUNCHER_SWING.consumeClick()) {
             if (localPlayer.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) return;
             if (localPlayer.getXRot() >= -25.0F) return;//玩家抬头角度大于25度时才会触发LauncherSwing
-            taskManager.runOnceWithCooldown(localPlayer, "LAUNCHER_SWING", 7, () -> {
+            taskManager.runOnceWithCooldown(localPlayer, "LAUNCHER_SWING", 9, () -> {
                 LOGGER.info("LAUNCHER_SWING key triggered");
                 SkillTrigger.triggerSkill(new LauncherSwingSkill());
             });
