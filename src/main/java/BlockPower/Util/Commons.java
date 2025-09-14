@@ -1,6 +1,7 @@
 package BlockPower.Util;
 
 import BlockPower.ModEffects.CloudTrailEffect;
+import BlockPower.ModEffects.UnBalanceEffect;
 import BlockPower.ModItems.ModItems;
 import BlockPower.Util.ModEffect.ModEffectManager;
 import BlockPower.Util.Timer.TimerManager;
@@ -129,6 +130,7 @@ public class Commons {
         if (!entities.isEmpty()) {
             entities.forEach(entity -> {
                 entity.hurt(mainEntity.level().damageSources().mobAttack(skillUser), damage);
+                ModEffectManager.addEffect(entity, new UnBalanceEffect(entity, 9));
                 //为每个被击中的实体启动粒子计时器
                 ModEffectManager.addEffect(entity, new CloudTrailEffect(entity, 40));
                 if (!mainEntity.level().isClientSide) {
