@@ -115,7 +115,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
                     setState(RushMinecartState.SEEKING);
                     break;
                 }
-                Commons.changePixelCoreNBT(player,2,null,null);
+                Commons.changePixelCoreNBT(player, 2.0F, null, null);
                 hurtEntity(player);
                 break;
 
