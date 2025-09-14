@@ -56,7 +56,7 @@ public class LauncherSwingSkillPacket_C2S extends AbstractSkillPacket_C2S {
 
         ItemStack mainHandItem = player.getMainHandItem();
         if (mainHandItem.getItem() != ModItems.PIXEL_CORE.get()) return;
-        Commons.changePixelCoreNBT(player,3,1,1);
+        Commons.changePixelCoreNBT(player,3F,1F,1F);
         launcherSwing(player);
     }
 

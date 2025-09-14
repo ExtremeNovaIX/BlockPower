@@ -1,4 +1,4 @@
-package BlockPower.ModEvents.SkillEvents;
+package BlockPower.ModEvents;
 
 import BlockPower.Main.Main;
 import BlockPower.ModItems.ModItems;
@@ -26,26 +26,23 @@ public class ModClientEvents {
                 new ResourceLocation(Main.MOD_ID, "skill_state"),
                 (stack, level, entity, seed) -> {
                     return stack.getOrCreateTag().getInt("skill_state");
-                });
+                }
+        );
 
         // 注册tool_type属性
         ItemProperties.register(ModItems.PIXEL_CORE.get(),
                 new ResourceLocation(Main.MOD_ID, "tool_type"),
                 (stack, level, entity, seed) -> {
-                    if (stack.getOrCreateTag().getInt("skill_state") == 3) {
-                        return stack.getOrCreateTag().getInt("tool_type");
-                    }
-                    return 0f;
-                });
+                    return stack.getOrCreateTag().getInt("tool_type");
+                }
+        );
 
         // 注册 "pixel_core_level" 属性
         ItemProperties.register(ModItems.PIXEL_CORE.get(),
                 new ResourceLocation(Main.MOD_ID, "pixel_core_level"),
                 (stack, level, entity, seed) -> {
-                    if (stack.getOrCreateTag().getInt("skill_state") == 3) {
-                        return stack.getOrCreateTag().getInt("pixel_core_level");
-                    }
-                    return 0f;
-                });
+                    return stack.getOrCreateTag().getInt("pixel_core_level");
+                }
+        );
     }
 }

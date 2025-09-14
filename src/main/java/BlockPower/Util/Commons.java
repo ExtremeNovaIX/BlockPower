@@ -189,14 +189,14 @@ public class Commons {
         return gameType == GameType.SPECTATOR || gameType == GameType.CREATIVE;
     }
 
-    public static void changePixelCoreNBT(Player player, @Nullable Integer skillState, @Nullable Integer toolType, @Nullable Integer pixelCoreLevel) {
+    public static void changePixelCoreNBT(Player player, @Nullable Float skillState, @Nullable Float toolType, @Nullable Float pixelCoreLevel) {
         if (player.level().isClientSide) return;
         ItemStack mainHandItem = player.getMainHandItem();
         if (mainHandItem.getItem() != ModItems.PIXEL_CORE.get()) return;
         CompoundTag NBT = mainHandItem.getOrCreateTag();
-        NBT.putInt("skill_state", Objects.requireNonNullElse(skillState, 0));
-        NBT.putInt("tool_type", Objects.requireNonNullElse(toolType, -1));
-        NBT.putInt("pixel_core_level", Objects.requireNonNullElse(pixelCoreLevel, -1));
+        NBT.putFloat("skill_state", Objects.requireNonNullElse(skillState, 0.0F));
+        NBT.putFloat("tool_type", Objects.requireNonNullElse(toolType, -1.0F));
+        NBT.putFloat("pixel_core_level", Objects.requireNonNullElse(pixelCoreLevel, -1.0F));
         mainHandItem.setTag(NBT);
     }
 

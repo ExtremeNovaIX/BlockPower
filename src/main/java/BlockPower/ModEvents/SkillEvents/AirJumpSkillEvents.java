@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 
 @Mod.EventBusSubscriber(modid = Main.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class PlayerServerEvents {
+public class AirJumpSkillEvents {
     private static final TimerManager timerManager = TimerManager.getInstance(false);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.MOD_ID);

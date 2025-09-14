@@ -2,6 +2,7 @@ package BlockPower.ModMessages.SkillC2SPacket;
 
 import BlockPower.ModBlocks.ModBlocks;
 import BlockPower.Skills.PlaceBlockSkill;
+import BlockPower.Util.Commons;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,6 +36,7 @@ public class PlaceBlockSkillPacket_C2S extends AbstractSkillPacket_C2S {
         Block block = level.getBlockState(blockBelowPos).getBlock();
         if (block == Blocks.AIR || block instanceof LiquidBlock) {
             level.setBlockAndUpdate(blockBelowPos, ModBlocks.DECAYING_DIRT.get().defaultBlockState());
+            Commons.changePixelCoreNBT(player, 4.0F, 1.0F, -1.0F);
             BlockState newState = level.getBlockState(blockBelowPos);
             SoundType soundType = newState.getSoundType();
             SoundEvent placeSound = soundType.getPlaceSound();
