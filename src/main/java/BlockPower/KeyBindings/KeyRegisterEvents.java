@@ -17,7 +17,7 @@ import static BlockPower.Main.Main.MOD_ID;
 @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class KeyRegisterEvents {
 
-    private static final Logger LOGGER = LogManager.getLogger("ClientEvents");
+    private static final Logger LOGGER = LogManager.getLogger("KeyRegisterEvents");
 
     @SubscribeEvent
     public static void onKeyRegister(RegisterKeyMappingsEvent event) {

@@ -122,6 +122,8 @@ public class ModEffectManager {
                 if (effect.isFinished()) {
                     //如果效果已结束，安排一个删除该效果的操作
                     modifications.add(() -> effectMap.remove(effect.getClass()));
+                    //调用效果的结束方法
+                    effect.onEnd();
                 } else {
                     //否则，执行效果的 tick 逻辑
                     effect.tick();
