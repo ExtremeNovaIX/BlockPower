@@ -1,5 +1,6 @@
 package BlockPower.Util;
 
+import BlockPower.Main.Main;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +20,7 @@ public class TaskManager {
     private final Map<Entity, Map<String, Integer>> taskExecutionCounter = new WeakHashMap<>();// 挂载在实体下的任务执行次数Map
     private final Map<Entity, Set<String>> coolingDownTasks = new WeakHashMap<>();// 挂载在实体下的冷却中任务Map
     private final TimerManager timerManager;
-    private final Logger LOGGER = LoggerFactory.getLogger(TaskManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.MOD_ID);
 
     private TaskManager(boolean isClient) {
         this.timerManager = TimerManager.getInstance(isClient);

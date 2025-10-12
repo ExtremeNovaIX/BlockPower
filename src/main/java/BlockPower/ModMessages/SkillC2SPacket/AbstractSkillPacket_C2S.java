@@ -1,5 +1,6 @@
 package BlockPower.ModMessages.SkillC2SPacket;
 
+import BlockPower.Main.Main;
 import BlockPower.ModMessages.C2SPacket.AbstractC2SPacket;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.MinerState.server.PlayerResourceData;
@@ -8,12 +9,14 @@ import BlockPower.Skills.Skill;
 import BlockPower.Util.Commons;
 import BlockPower.Util.SkillLock.SkillLock;
 import BlockPower.Util.SkillLock.SkillLockManager;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.slf4j.LoggerFactory;
 
 abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSkillPacket_C2S.class);
+    private static final Logger LOGGER = LogManager.getLogger();
     protected Skill skill;
 
     public AbstractSkillPacket_C2S(Skill skill) {

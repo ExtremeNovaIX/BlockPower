@@ -6,7 +6,9 @@ import BlockPower.ModMessages.S2CPacket.CameraLockPacket_S2C;
 import BlockPower.ModMessages.S2CPacket.HitStopPacket_S2C;
 import BlockPower.ModMessages.S2CPacket.ShakePacket_S2C;
 import BlockPower.ModSounds.ModSounds;
+import BlockPower.Skills.ComboSkills.ComboSkillType;
 import BlockPower.Skills.LauncherSwingSkill;
+import BlockPower.Util.ComboManager.PlayerComboManager;
 import BlockPower.Util.Commons;
 import BlockPower.Util.TaskManager;
 import net.minecraft.nbt.CompoundTag;
@@ -106,6 +108,9 @@ public class LauncherSwingSkillPacket_C2S extends AbstractSkillPacket_C2S {
         ModMessages.sendToPlayer(new CameraLockPacket_S2C(targetEntity.getId()), player);
         ModMessages.sendToPlayer(new HitStopPacket_S2C(2), player);
         ModMessages.sendToPlayer(new ShakePacket_S2C(4, 2F), player);
+
+        // 记录连击
+        PlayerComboManager.recordCombo(player, ComboSkillType.CHASE);
     }
 
     @Override

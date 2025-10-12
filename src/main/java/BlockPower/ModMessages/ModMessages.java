@@ -1,6 +1,9 @@
 package BlockPower.ModMessages;
 
 import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
+import BlockPower.ModMessages.ComboSkillPacket.ComboSkillC2SPacket;
+import BlockPower.ModMessages.ComboSkillPacket.ComboStandbyS2CPacket;
+import BlockPower.ModMessages.ComboSkillPacket.ComboTriggeredC2SPacket;
 import BlockPower.ModMessages.S2CPacket.*;
 import BlockPower.ModMessages.SkillC2SPacket.*;
 import net.minecraft.resources.ResourceLocation;
@@ -78,12 +81,27 @@ public class ModMessages {
                 .encoder(LauncherSwingSkillPacket_C2S::toBytes)
                 .consumerMainThread(LauncherSwingSkillPacket_C2S::handle)
                 .add();
+        net.messageBuilder(ComboSkillC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(ComboSkillC2SPacket::new)
+                .encoder(ComboSkillC2SPacket::toBytes)
+                .consumerMainThread(ComboSkillC2SPacket::handle)
+                .add();
+        net.messageBuilder(ComboTriggeredC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(ComboTriggeredC2SPacket::new)
+                .encoder(ComboTriggeredC2SPacket::toBytes)
+                .consumerMainThread(ComboTriggeredC2SPacket::handle)
+                .add();
 
         //Client
         net.messageBuilder(HitStopPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(HitStopPacket_S2C::new)
                 .encoder(HitStopPacket_S2C::toBytes)
                 .consumerMainThread(HitStopPacket_S2C::handle)
+                .add();
+        net.messageBuilder(ComboStandbyS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(ComboStandbyS2CPacket::new)
+                .encoder(ComboStandbyS2CPacket::toBytes)
+                .consumerMainThread(ComboStandbyS2CPacket::handle)
                 .add();
 
         net.messageBuilder(CameraLockPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)

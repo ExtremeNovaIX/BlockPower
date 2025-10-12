@@ -1,12 +1,14 @@
 package BlockPower.KeyBindings;
 
+import BlockPower.Main.Main;
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -17,7 +19,7 @@ import static BlockPower.Main.Main.MOD_ID;
 @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class KeyRegisterEvents {
 
-    private static final Logger LOGGER = LogManager.getLogger("KeyRegisterEvents");
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.MOD_ID);
 
     @SubscribeEvent
     public static void onKeyRegister(RegisterKeyMappingsEvent event) {

@@ -19,7 +19,7 @@ public class KeyBindings {
             "key.blockpower.minecart_rush",
             KeyConflictContext.IN_GAME,
             InputConstants.Type.KEYSYM,
-            InputConstants.KEY_R,//按键绑定
+            InputConstants.KEY_G,//按键绑定
             BLOCKPOWER_KEY
     );
 
@@ -60,6 +60,14 @@ public class KeyBindings {
             KeyConflictContext.IN_GAME,
             InputConstants.Type.MOUSE,
             InputConstants.MOUSE_BUTTON_LEFT,
+            BLOCKPOWER_KEY
+    );
+
+     public static final KeyMapping COMBO_SKILL = new KeyMapping(
+            "key.blockpower.combo_skill",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            InputConstants.KEY_R,
             BLOCKPOWER_KEY
     );
 

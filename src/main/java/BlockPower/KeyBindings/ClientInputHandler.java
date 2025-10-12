@@ -2,10 +2,14 @@ package BlockPower.KeyBindings;
 
 import BlockPower.ModItems.ModItems;
 import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
+import BlockPower.ModMessages.ComboSkillPacket.ComboTriggeredC2SPacket;
 import BlockPower.ModMessages.SkillC2SPacket.AirJumpSkillPacket_C2S;
 import BlockPower.ModMessages.SkillC2SPacket.DashSkillPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.Skills.*;
+import BlockPower.Skills.ComboSkills.Client.ClientComboData;
+import BlockPower.Skills.ComboSkills.ComboSkill;
+import BlockPower.Skills.ComboSkills.ComboSkillType;
 import BlockPower.Util.TaskManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.Input;
@@ -33,17 +37,14 @@ public class ClientInputHandler {
         if (localPlayer == null) return;
 
         if (KeyBindings.MINER_MODE.consumeClick()) {
-            LOGGER.info("MINER_MODE key triggered");
             ModMessages.sendToServer(new ChangeMinerStatePacket_C2S());
         }
 
         if (KeyBindings.MINECART_RUSH.consumeClick()) {
-            LOGGER.info("MINECART_RUSH key triggered");
             SkillTrigger.triggerSkill(new RushMinecartSkill());
         }
 
         if (KeyBindings.DROP_ANVIL.consumeClick()) {
-            LOGGER.info("DROP_ANVIL key triggered");
             SkillTrigger.triggerSkill(new DropAnvilSkill());
         }
 
@@ -56,7 +57,6 @@ public class ClientInputHandler {
                 } else {
                     ModMessages.sendToServer(new AirJumpSkillPacket_C2S(""));
                 }
-                LOGGER.info("CUSTOM_SPACE key triggered:{}", result);
             }
         }
 
@@ -75,12 +75,10 @@ public class ClientInputHandler {
             } else {
                 ModMessages.sendToServer(new DashSkillPacket_C2S("w"));
             }
-            LOGGER.info("Client DASH key triggered:{}", result);
         }
 
         if (KeyBindings.PLACE_BLOCK.consumeClick()) {
             if (localPlayer.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) return;
-            LOGGER.info("PLACE_BLOCK key triggered");
             SkillTrigger.triggerSkill(new PlaceBlockSkill());
         }
 
@@ -88,9 +86,18 @@ public class ClientInputHandler {
             if (localPlayer.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) return;
             if (localPlayer.getXRot() >= -25.0F) return;//玩家抬头角度大于25度时才会触发LauncherSwing
             taskManager.runOnceWithCooldown(localPlayer, "LAUNCHER_SWING", 9, () -> {
-                LOGGER.info("LAUNCHER_SWING key triggered");
                 SkillTrigger.triggerSkill(new LauncherSwingSkill());
             });
+        }
+
+        if (KeyBindings.COMBO_SKILL.consumeClick()) {
+            LOGGER.info("COMBO_SKILL key triggered");
+            if (ClientComboData.getFirstActiveComboSkill() == null) return;
+            // 总是触发第一个可释放的连携技
+            ComboSkillType comboSkillType = ClientComboData.getFirstActiveComboSkill();
+            ModMessages.sendToServer(new ComboTriggeredC2SPacket(comboSkillType));
+            // 移除已触发的连携技
+            ClientComboData.removeActiveChainSkill(comboSkillType);
         }
 
     }

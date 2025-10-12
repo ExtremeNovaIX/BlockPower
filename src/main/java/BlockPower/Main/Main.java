@@ -20,6 +20,7 @@ public class Main {
     //TODO combo系统，当生物/玩家被技能击中时会被挂上combo标记。接下来其他人技能更容易命中该生物（技能有第二套对带有combo标记的生物进行更大范围检测的逻辑）
     //TODO 把ModEntity以及数据包逻辑系统抽离至Skill，在ModEntity只负责调用，满足单一职责原则，数据包可接受runnable
     //TODO 修复铁砧技能放出失败（如在地上放置铁砧导致铁砧无法放出）导致技能锁死锁问题
+    //TODO 规范化日志
     public static final String MOD_ID = "blockpower";
     private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
