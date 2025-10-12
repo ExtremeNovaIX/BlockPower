@@ -1,6 +1,6 @@
 package BlockPower.ModMessages.S2CPacket;
 
-import BlockPower.Util.ClientComboManager;
+import BlockPower.Util.ClientCameraTrackingManager;
 import net.minecraft.network.FriendlyByteBuf;
 
 public class CameraLockPacket_S2C extends AbstractS2CPacket {
@@ -21,6 +21,6 @@ public class CameraLockPacket_S2C extends AbstractS2CPacket {
 
     @Override
     protected void handleClientSide() {
-        ClientComboManager.setCameraTarget(this.entityId);
+        ClientCameraTrackingManager.setCameraTarget(this.entityId);
     }
 }
