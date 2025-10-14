@@ -3,9 +3,12 @@ package BlockPower.Skills;
 import BlockPower.ModMessages.SkillC2SPacket.AirJumpSkillPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.Skills.MinerState.server.AllResourceType;
+import BlockPower.Util.PlayerData.PlayerSkillData.PlayerSkillsData;
 import BlockPower.Util.TaskManager;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -21,18 +24,18 @@ public class AirJumpSkill implements Skill {
     }
 
     @Override
-    public String getSkillDescription() {
+    public String getSkillDescription(int skillLevel) {
         return "";
     }
 
     @Override
     public int getSkillLevel() {
-        return 0;
+        return PlayerSkillsData.getSkillLevel();
     }
 
     @Override
-    public void triggerSkill(int skillLevel) {
-        ModMessages.sendToServer(new AirJumpSkillPacket_C2S());
+    public boolean canUse(Player player, @Nullable Entity target) {
+        return false;
     }
 
     @Override
@@ -44,6 +47,12 @@ public class AirJumpSkill implements Skill {
     public double getSkillCostAmount() {
         return 0;
     }
+
+    @Override
+    public void triggerSkill(int skillLevel) {
+        ModMessages.sendToServer(new AirJumpSkillPacket_C2S());
+    }
+
 
 
     public static void handleAirJump(ServerPlayer player) {

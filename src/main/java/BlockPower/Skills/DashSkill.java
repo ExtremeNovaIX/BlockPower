@@ -3,6 +3,10 @@ package BlockPower.Skills;
 import BlockPower.ModMessages.SkillC2SPacket.DashSkillPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.Skills.MinerState.server.AllResourceType;
+import BlockPower.Util.PlayerData.PlayerSkillData.PlayerSkillsData;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class DashSkill implements Skill {
     @Override
@@ -11,13 +15,17 @@ public class DashSkill implements Skill {
     }
 
     @Override
-    public String getSkillDescription() {
+    public String getSkillDescription(int skillLevel) {
         return "";
+    }
+    @Override
+    public int getSkillLevel() {
+        return PlayerSkillsData.getSkillLevel();
     }
 
     @Override
-    public int getSkillLevel() {
-        return 0;
+    public boolean canUse(Player player, @Nullable Entity target) {
+        return false;
     }
 
     @Override
