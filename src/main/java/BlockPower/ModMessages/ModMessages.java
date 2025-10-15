@@ -1,7 +1,6 @@
 package BlockPower.ModMessages;
 
 import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
-import BlockPower.ModMessages.ComboSkillPacket.ComboSkillPacket_C2S;
 import BlockPower.ModMessages.ComboSkillPacket.ComboStandbyPacket_S2C;
 import BlockPower.ModMessages.ComboSkillPacket.ComboTriggeredPacket_C2S;
 import BlockPower.ModMessages.NormalSkillC2SPacket.*;
@@ -58,11 +57,6 @@ public class ModMessages {
                 .consumerMainThread(ChangeMinerStatePacket_C2S::handle)
                 .add();
 
-        net.messageBuilder(ComboSkillPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(ComboSkillPacket_C2S::new)
-                .encoder(ComboSkillPacket_C2S::toBytes)
-                .consumerMainThread(ComboSkillPacket_C2S::handle)
-                .add();
         net.messageBuilder(ComboTriggeredPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(ComboTriggeredPacket_C2S::new)
                 .encoder(ComboTriggeredPacket_C2S::toBytes)

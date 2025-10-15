@@ -1,7 +1,7 @@
 package BlockPower.Skills.ComboSkills;
 
 public enum ComboSkillType {
-    CHASE(new ChaseComboSkill());
+    PICKAXE_HIT(new PickaxeHitComboSkill());
 
     private final ComboSkill skillInstance;
 
