@@ -21,6 +21,6 @@ public class CameraLockPacket_S2C extends AbstractS2CPacket {
 
     @Override
     protected void handleClientSide() {
-        ClientCameraTrackingManager.setCameraTarget(this.entityId);
+        ClientCameraTrackingManager.setCameraTarget(this.entityId, 10);
     }
 }

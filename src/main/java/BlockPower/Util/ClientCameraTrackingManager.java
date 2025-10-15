@@ -10,14 +10,15 @@ public class ClientCameraTrackingManager {
 
     public static int trackedEntityId = -1; // -1 表示没有目标
     private static final float SMOOTHING_FACTOR = 0.2f; // 平滑系数 (值越小，转动越慢越平滑；值越大，转动越快)
-    private static final int trackingTime = 10;
+    private static int trackingTime = 10;
     private static long nowTick;
     private static final float ANGLE_DEADZONE = 0.5f;//角度死区，角度差小于这个值时，不计算角度差
     private static final double POLE_DEADZONE_THRESHOLD = 0.05;//极轴死区，角度差小于这个值时，不计算角度差
 
-    public static void setCameraTarget(int targetId) {
+    public static void setCameraTarget(int targetId,int trackingTick) {
         trackedEntityId = targetId;
         nowTick = TickListener.getClientTicks();
+        trackingTime = trackingTick;
     }
 
     public static void stopTracking() {

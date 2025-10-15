@@ -1,5 +1,6 @@
 package BlockPower.Skills.NormalSkills;
 
+import BlockPower.ModEffects.SpringAttractionEffect;
 import BlockPower.ModItems.ModItems;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.ModMessages.S2CPacket.CameraLockPacket_S2C;
@@ -10,6 +11,7 @@ import BlockPower.Skills.ComboSkills.ComboSkillType;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Util.ComboManager.PlayerComboManager;
 import BlockPower.Util.Commons;
+import BlockPower.Util.ModEffect.ModEffectManager;
 import BlockPower.Util.TaskManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -23,17 +25,6 @@ import java.util.List;
 //TODO 修改成一段时间内combo上限6次，并且后几次击退明显增大，防止无限连
 public class LauncherSwingSkill implements IPacketSerializableSkill {
     private static final TaskManager taskManager = TaskManager.getInstance(false);
-
-    // 理想的作战距离（格），弹簧会试图维持这个距离
-    private static final double OPTIMAL_DISTANCE = 1;
-    // 弹簧的力度系数 (劲度)。值越大，拉/推的力越强。
-    private static final double SPRING_CONSTANT = 0.25;
-    // 弹簧引力的最大有效范围（的平方）
-    private static final double MAX_COMBO_RANGE_SQR = Math.pow(5, 2);
-    // 弹簧的“死区”范围（格）。在最佳距离±此范围内，不施加力，以防止抖动。
-    private static final double DEAD_ZONE = 0.5;
-    // 连击状态的持续时间 (Ticks)
-    private static final int COMBO_DURATION_TICKS = 15;
 
     @Override
     public String getSkillName() {
@@ -69,46 +60,13 @@ public class LauncherSwingSkill implements IPacketSerializableSkill {
         }
 
         final Entity targetEntity = entities.get(0); // 锁定第一个目标
-        Runnable physicsTask = () -> {
-            // 安全检查: 任何一方失效、死亡或不在同一维度，则停止
-            if (!player.isAlive() || !targetEntity.isAlive() || player.level() != targetEntity.level()) {
-                return;
-            }
-
-            double distSqr = player.distanceToSqr(targetEntity);
-
-            // 范围检查: 如果目标超出最大连击范围，则停止
-            if (distSqr > MAX_COMBO_RANGE_SQR) {
-                return;
-            }
-
-            double currentDistance = Math.sqrt(distSqr);
-            double distanceError = currentDistance - OPTIMAL_DISTANCE;
-
-            // 应用“死区”，防止在最佳距离附近时发生抖动
-            if (Math.abs(distanceError) < DEAD_ZONE) {
-                return;
-            }
-
-            // 计算方向和力的大小 (力 = 误差 * 劲度系数)
-            Vec3 directionVec = targetEntity.getPosition(0).subtract(player.getPosition(0)).normalize();
-            Vec3 forceVector = directionVec.scale(distanceError * SPRING_CONSTANT);
-
-            // 应用力：太远则拉近(吸引力)，太近则推开(排斥力)
-            player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), player.getDeltaMovement().add(forceVector.scale(0.9))));
-            targetEntity.addDeltaMovement(forceVector.scale(-0.15));
-        };
-
-        String taskID = "combo_attract_" + player.getUUID();
-
-        taskManager.scheduleRepeatingTaskPerTick(taskID, COMBO_DURATION_TICKS, physicsTask, true);
-
+        ModEffectManager.addEffect(player,new SpringAttractionEffect(player, targetEntity));
         ModMessages.sendToPlayer(new CameraLockPacket_S2C(targetEntity.getId()), player);
         ModMessages.sendToPlayer(new HitStopPacket_S2C(2), player);
         ModMessages.sendToPlayer(new ShakePacket_S2C(4, 2F), player);
 
         // 记录连击
-        PlayerComboManager.recordCombo(player, ComboSkillType.CHASE);
+        PlayerComboManager.recordCombo(player, ComboSkillType.PICKAXE_HIT);
     }
 
 

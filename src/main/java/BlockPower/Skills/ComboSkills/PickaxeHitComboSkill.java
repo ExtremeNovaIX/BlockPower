@@ -45,7 +45,7 @@ public class PickaxeHitComboSkill implements ComboSkill {
         // 检测7格内的实体作为目标
         Entity target = Commons.detectEntity(player, 7, null).get(0);
         // 应用镐击效果
-        ModEffectManager.addEffect(player, new PickaxeHitEffect(target, player));
+        ModEffectManager.addEffect(player, new PickaxeHitEffect(target, (ServerPlayer) player));
     }
 
     @Override

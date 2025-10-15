@@ -200,4 +200,11 @@ public class Commons {
         mainHandItem.setTag(NBT);
     }
 
+    public static void playSoundWithRandomPitch(ServerPlayer player, SoundEvent soundEvent) {
+        if (player.level().isClientSide) return;
+        player.level().playSound(null,
+                player.getX(), player.getY(), player.getZ(),
+                soundEvent, SoundSource.PLAYERS, 1f, r.nextFloat(0.2f) + 0.9f);
+    }
+
 }
