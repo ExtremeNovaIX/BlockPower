@@ -119,7 +119,6 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
                 player.noPhysics = true;
                 player.setNoGravity(true);
             });
-            //TODO 解决玩家和铁砧距离越来越远问题
             Vec3 targetPosition = new Vec3(this.getX(), this.getY() + 3, this.getZ());
             // 计算从玩家当前位置指向目标位置的矢量
             Vec3 desiredVelocity = targetPosition.subtract(player.position());
@@ -175,7 +174,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
         List<Entity> entityList = applyDamage(this, player, 10F, 9, ModSounds.ANVIL_SOUND.get());
         Commons.knockBackEntity(this, entityList, 1.5);
         if (!entityList.isEmpty()) {
-            broadcastScreenShake(this, 6, 3f, 15, 7);
+            broadcastScreenShake(this, 6, 2f, 15, 7);
             //触发一次卡帧动画以后不再出现卡帧动画效果
 //            taskManager.runOnce(this, "hitStop", () -> {
 //                sendHitStop(5, player, this);
@@ -208,7 +207,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
 
     private void handleAnvilMovement() {
         if (!this.isNoGravity()) {
-            this.setDeltaMovement(this.getDeltaMovement().add(0.0, -0.08, 0.0));
+            this.setDeltaMovement(this.getDeltaMovement().add(0.0, -0.16, 0.0));
         }
         this.move(MoverType.SELF, this.getDeltaMovement());
         this.setDeltaMovement(this.getDeltaMovement().scale(0.98));
