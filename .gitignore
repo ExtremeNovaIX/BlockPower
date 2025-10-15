@@ -23,3 +23,7 @@ run
 
 # Files from Forge MDK
 forge*changelog.txt
+logs/2025-10-15-1.log.gz
+logs/debug-1.log.gz
+logs/debug.log
+logs/latest.log

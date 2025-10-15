@@ -1,25 +1,23 @@
-package BlockPower.ModMessages.SkillC2SPacket;
+package BlockPower.ModMessages.NormalSkillC2SPacket;
 
-import BlockPower.Main.Main;
 import BlockPower.ModMessages.C2SPacket.AbstractC2SPacket;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.MinerState.server.PlayerResourceData;
 import BlockPower.Skills.MinerState.server.PlayerResourceManager;
-import BlockPower.Skills.Skill;
+import BlockPower.Skills.NormalSkills.ISkill;
 import BlockPower.Util.Commons;
-import BlockPower.Util.SkillLock.SkillLock;
 import BlockPower.Util.SkillLock.SkillLockManager;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket {
-    private static final Logger LOGGER = LogManager.getLogger();
-    protected Skill skill;
+abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket{
+    private static final Logger log = LoggerFactory.getLogger(AbstractSkillPacket_C2S.class);
+    protected ISkill skill;
+    protected static final PlayerResourceManager playerResourceManager = PlayerResourceManager.getInstance();
+    protected static final SkillLockManager skillLockManager = SkillLockManager.getInstance();
 
-    public AbstractSkillPacket_C2S(Skill skill) {
+    public AbstractSkillPacket_C2S(ISkill skill) {
         this.skill = skill;
     }
 
@@ -27,24 +25,21 @@ abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket {
 
     }
 
-    protected static final PlayerResourceManager playerResourceManager = PlayerResourceManager.getInstance();
-    protected static final SkillLockManager skillLockManager = SkillLockManager.getInstance();
-
     @Override
     protected boolean checkLegit(ServerPlayer player) {
+        if (Commons.isSpectatorOrCreativeMode(player)) return true;
         if (skillLockManager.isLocked(player)) return false;//如果玩家被技能锁锁定，直接返回false
 
         PlayerResourceData playerResourceData = playerResourceManager.getPlayerData(player);
         // 检查技能资源是否足够
         if (skill != null) {
-            if(Commons.isSpectatorOrCreativeMode(player)) return true;
-            if(skill.getSkillCostType() == null && skill.getSkillCostAmount() == 0) return true;
+            if (skill.getSkillCostType() == null || skill.getSkillCostAmount() == 0) return true;
 
             AllResourceType costType = skill.getSkillCostType();
             double costAmount = skill.getSkillCostAmount();
             return playerResourceData.hasEnoughResource(costType, costAmount);
         } else {
-            LOGGER.info("技能对象为null，数据包类型：{}", this.getClass().getSimpleName());
+            log.info("技能对象为null，数据包类型：{}", this.getClass().getSimpleName());
             return false;
         }
     }
@@ -52,15 +47,27 @@ abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket {
     @Override
     protected void afterHandleServerSide(ServerPlayer player) {
         consumeResource(player, skill);
-        skillLockManager.lock(player);
+
+        if (this.isSkillAutoLocked()) {
+            skillLockManager.lock(player);
+        }
     }
 
-    protected void consumeResource(ServerPlayer player, Skill skill) {
+    protected void consumeResource(ServerPlayer player, ISkill skill) {
+        if (!this.isSkillConsumeResource()) return;
         if (Commons.isSpectatorOrCreativeMode(player)) return;
         if (skill.getSkillCostType() == null && skill.getSkillCostAmount() == 0) return;
         AllResourceType type = skill.getSkillCostType();
         double amount = skill.getSkillCostAmount();
         PlayerResourceData playerResourceData = playerResourceManager.getPlayerData(player);
         playerResourceData.consumeResource(type, amount, player);
+    }
+
+    protected boolean isSkillConsumeResource() {
+        return skill.isSkillConsumeResource();
+    }
+
+    protected boolean isSkillAutoLocked() {
+        return skill.isSkillAutoLocked();
     }
 }

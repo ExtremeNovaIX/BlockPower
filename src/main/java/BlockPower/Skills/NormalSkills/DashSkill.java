@@ -1,43 +1,42 @@
-package BlockPower.ModMessages.SkillC2SPacket;
+package BlockPower.Skills.NormalSkills;
 
-import BlockPower.Skills.DashSkill;
+import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Util.Commons;
 import BlockPower.Util.TaskManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class DashSkillPacket_C2S extends AbstractSkillPacket_C2S {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DashSkillPacket_C2S.class);
+public class DashSkill implements IPacketSerializableSkill {
     private static final TaskManager taskManager = TaskManager.getInstance(false);
-    private final String keyResult;//玩家在冲刺时按下的键
 
-    public DashSkillPacket_C2S() {
-        super(new DashSkill());
-        keyResult = null;
+    private String keyResult;
+
+    public DashSkill() {
     }
 
-    public DashSkillPacket_C2S(FriendlyByteBuf buf) {
-        super(new DashSkill());
-        keyResult = buf.readUtf();
-    }
-
-    public DashSkillPacket_C2S(String keyResult) {
-        super(new DashSkill());
+    public DashSkill(String keyResult) {
         this.keyResult = keyResult;
     }
 
-
     @Override
-    public void toBytes(FriendlyByteBuf buf) {
-        buf.writeUtf(keyResult);
+    public String getSkillName() {
+        return "Dash";
     }
 
     @Override
-    protected void handleServerSide(ServerPlayer player) {
+    public String getSkillDescription() {
+        return "";
+    }
+
+    @Override
+    public int getSkillLevel() {
+        return 0;
+    }
+
+    @Override
+    public void triggerSkill(ServerPlayer player) {
         if (Commons.isSpectatorOrCreativeMode(player)) return;
         taskManager.runOnceWithCooldown(player, "dashingCoolDown", 10, () -> {
             Vec3 lookAngle = player.getLookAngle().normalize();
@@ -54,7 +53,37 @@ public class DashSkillPacket_C2S extends AbstractSkillPacket_C2S {
         });
     }
 
+    public String getKeyResult() {
+        return keyResult;
+    }
+
     @Override
-    protected void afterHandleServerSide(ServerPlayer player) {
+    public void writeParams(FriendlyByteBuf buf) {
+        buf.writeUtf(this.keyResult);
+    }
+
+    @Override
+    public void readParams(FriendlyByteBuf buf) {
+        this.keyResult = buf.readUtf();
+    }
+
+    @Override
+    public AllResourceType getSkillCostType() {
+        return null;
+    }
+
+    @Override
+    public double getSkillCostAmount() {
+        return 0;
+    }
+
+    @Override
+    public boolean isSkillConsumeResource() {
+        return false;
+    }
+
+    @Override
+    public boolean isSkillAutoLocked() {
+        return false;
     }
 }

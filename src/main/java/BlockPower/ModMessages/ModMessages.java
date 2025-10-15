@@ -1,11 +1,11 @@
 package BlockPower.ModMessages;
 
 import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
-import BlockPower.ModMessages.ComboSkillPacket.ComboSkillC2SPacket;
-import BlockPower.ModMessages.ComboSkillPacket.ComboStandbyS2CPacket;
-import BlockPower.ModMessages.ComboSkillPacket.ComboTriggeredC2SPacket;
+import BlockPower.ModMessages.ComboSkillPacket.ComboSkillPacket_C2S;
+import BlockPower.ModMessages.ComboSkillPacket.ComboStandbyPacket_S2C;
+import BlockPower.ModMessages.ComboSkillPacket.ComboTriggeredPacket_C2S;
+import BlockPower.ModMessages.NormalSkillC2SPacket.*;
 import BlockPower.ModMessages.S2CPacket.*;
-import BlockPower.ModMessages.SkillC2SPacket.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -46,16 +46,10 @@ public class ModMessages {
         INSTANCE = net;
 
         //Server
-        net.messageBuilder(SpawnDropAnvilPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(SpawnDropAnvilPacket_C2S::new)
-                .encoder(SpawnDropAnvilPacket_C2S::toBytes)
-                .consumerMainThread(SpawnDropAnvilPacket_C2S::handle)
-                .add();
-
-        net.messageBuilder(SpawnRushMinecartPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(SpawnRushMinecartPacket_C2S::new)
-                .encoder(SpawnRushMinecartPacket_C2S::toBytes)
-                .consumerMainThread(SpawnRushMinecartPacket_C2S::handle)
+        net.messageBuilder(NormalSkillPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(NormalSkillPacket_C2S::new)
+                .encoder(NormalSkillPacket_C2S::toBytes)
+                .consumerMainThread(NormalSkillPacket_C2S::handle)
                 .add();
 
         net.messageBuilder(ChangeMinerStatePacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
@@ -64,32 +58,15 @@ public class ModMessages {
                 .consumerMainThread(ChangeMinerStatePacket_C2S::handle)
                 .add();
 
-        net.messageBuilder(AirJumpSkillPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(AirJumpSkillPacket_C2S::new)
-                .encoder(AirJumpSkillPacket_C2S::toBytes)
-                .consumerMainThread(AirJumpSkillPacket_C2S::handle)
+        net.messageBuilder(ComboSkillPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(ComboSkillPacket_C2S::new)
+                .encoder(ComboSkillPacket_C2S::toBytes)
+                .consumerMainThread(ComboSkillPacket_C2S::handle)
                 .add();
-
-        net.messageBuilder(PlaceBlockSkillPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(PlaceBlockSkillPacket_C2S::new)
-                .encoder(PlaceBlockSkillPacket_C2S::toBytes)
-                .consumerMainThread(PlaceBlockSkillPacket_C2S::handle)
-                .add();
-
-        net.messageBuilder(LauncherSwingSkillPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(LauncherSwingSkillPacket_C2S::new)
-                .encoder(LauncherSwingSkillPacket_C2S::toBytes)
-                .consumerMainThread(LauncherSwingSkillPacket_C2S::handle)
-                .add();
-        net.messageBuilder(ComboSkillC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(ComboSkillC2SPacket::new)
-                .encoder(ComboSkillC2SPacket::toBytes)
-                .consumerMainThread(ComboSkillC2SPacket::handle)
-                .add();
-        net.messageBuilder(ComboTriggeredC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(ComboTriggeredC2SPacket::new)
-                .encoder(ComboTriggeredC2SPacket::toBytes)
-                .consumerMainThread(ComboTriggeredC2SPacket::handle)
+        net.messageBuilder(ComboTriggeredPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(ComboTriggeredPacket_C2S::new)
+                .encoder(ComboTriggeredPacket_C2S::toBytes)
+                .consumerMainThread(ComboTriggeredPacket_C2S::handle)
                 .add();
 
         //Client
@@ -98,10 +75,10 @@ public class ModMessages {
                 .encoder(HitStopPacket_S2C::toBytes)
                 .consumerMainThread(HitStopPacket_S2C::handle)
                 .add();
-        net.messageBuilder(ComboStandbyS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(ComboStandbyS2CPacket::new)
-                .encoder(ComboStandbyS2CPacket::toBytes)
-                .consumerMainThread(ComboStandbyS2CPacket::handle)
+        net.messageBuilder(ComboStandbyPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(ComboStandbyPacket_S2C::new)
+                .encoder(ComboStandbyPacket_S2C::toBytes)
+                .consumerMainThread(ComboStandbyPacket_S2C::handle)
                 .add();
 
         net.messageBuilder(CameraLockPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
@@ -133,13 +110,6 @@ public class ModMessages {
                 .encoder(MinerStateSyncPacket_S2C::toBytes)
                 .consumerMainThread(MinerStateSyncPacket_S2C::handle)
                 .add();
-
-        net.messageBuilder(DashSkillPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(DashSkillPacket_C2S::new)
-                .encoder(DashSkillPacket_C2S::toBytes)
-                .consumerMainThread(DashSkillPacket_C2S::handle)
-                .add();
-
     }
 
 

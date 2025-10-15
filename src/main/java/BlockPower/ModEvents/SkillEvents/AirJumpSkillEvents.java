@@ -2,7 +2,7 @@ package BlockPower.ModEvents.SkillEvents;
 
 
 import BlockPower.Main.Main;
-import BlockPower.Skills.AirJumpSkill;
+import BlockPower.Skills.NormalSkills.AirJumpSkill;
 import BlockPower.Util.Commons;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.server.level.ServerPlayer;

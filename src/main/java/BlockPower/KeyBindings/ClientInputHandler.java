@@ -2,14 +2,14 @@ package BlockPower.KeyBindings;
 
 import BlockPower.ModItems.ModItems;
 import BlockPower.ModMessages.C2SPacket.ChangeMinerStatePacket_C2S;
-import BlockPower.ModMessages.ComboSkillPacket.ComboTriggeredC2SPacket;
-import BlockPower.ModMessages.SkillC2SPacket.AirJumpSkillPacket_C2S;
-import BlockPower.ModMessages.SkillC2SPacket.DashSkillPacket_C2S;
+import BlockPower.ModMessages.ComboSkillPacket.ComboTriggeredPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
-import BlockPower.Skills.*;
+import BlockPower.ModMessages.NormalSkillC2SPacket.NormalSkillPacket_C2S;
+import BlockPower.ModMessages.NormalSkillC2SPacket.NormalSkillType;
 import BlockPower.Skills.ComboSkills.Client.ClientComboData;
-import BlockPower.Skills.ComboSkills.ComboSkill;
 import BlockPower.Skills.ComboSkills.ComboSkillType;
+import BlockPower.Skills.MinerState.client.ClientMinerState;
+import BlockPower.Skills.NormalSkills.*;
 import BlockPower.Util.TaskManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.Input;
@@ -40,53 +40,50 @@ public class ClientInputHandler {
             ModMessages.sendToServer(new ChangeMinerStatePacket_C2S());
         }
 
-        if (KeyBindings.MINECART_RUSH.consumeClick()) {
-            SkillTrigger.triggerSkill(new RushMinecartSkill());
-        }
-
-        if (KeyBindings.DROP_ANVIL.consumeClick()) {
-            SkillTrigger.triggerSkill(new DropAnvilSkill());
-        }
-
         if (KeyBindings.CUSTOM_SPACE.consumeClick()) {
-            String result = "";
             if (!localPlayer.onGround()) {
                 if (localPlayer.input.up) {
-                    result = "w";
-                    ModMessages.sendToServer(new AirJumpSkillPacket_C2S("w"));
+                    ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.AIR_JUMP, new AirJumpSkill("w")));
                 } else {
-                    ModMessages.sendToServer(new AirJumpSkillPacket_C2S(""));
+                    ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.AIR_JUMP, new AirJumpSkill("")));
                 }
             }
         }
 
         if (KeyBindings.DASH.consumeClick()) {
             Input playerInput = localPlayer.input;
-            String result = "w";
             if (playerInput.left) {
-                result = "a";
-                ModMessages.sendToServer(new DashSkillPacket_C2S("a"));
+                ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.DASH, new DashSkill("a")));
             } else if (playerInput.right) {
-                result = "d";
-                ModMessages.sendToServer(new DashSkillPacket_C2S("d"));
+                ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.DASH, new DashSkill("d")));
             } else if (playerInput.down) {
-                result = "s";
-                ModMessages.sendToServer(new DashSkillPacket_C2S("s"));
+                ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.DASH, new DashSkill("s")));
             } else {
-                ModMessages.sendToServer(new DashSkillPacket_C2S("w"));
+                ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.DASH, new DashSkill("w")));
             }
+        }
+
+        // 挖掘状态下才能触发技能
+        if (!ClientMinerState.isMinerMode()) return;
+
+        if (KeyBindings.MINECART_RUSH.consumeClick()) {
+            ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.MINECART_RUSH, new RushMinecartSkill()));
+        }
+
+        if (KeyBindings.DROP_ANVIL.consumeClick()) {
+            ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.DROP_ANVIL, new DropAnvilSkill()));
         }
 
         if (KeyBindings.PLACE_BLOCK.consumeClick()) {
             if (localPlayer.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) return;
-            SkillTrigger.triggerSkill(new PlaceBlockSkill());
+            ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.PLACE_BLOCK, new PlaceBlockSkill()));
         }
 
         if (KeyBindings.LAUNCHER_SWING.consumeClick()) {
             if (localPlayer.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) return;
             if (localPlayer.getXRot() >= -25.0F) return;//玩家抬头角度大于25度时才会触发LauncherSwing
             taskManager.runOnceWithCooldown(localPlayer, "LAUNCHER_SWING", 9, () -> {
-                SkillTrigger.triggerSkill(new LauncherSwingSkill());
+                ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.LAUNCHER_SWING, new LauncherSwingSkill()));
             });
         }
 
@@ -95,7 +92,7 @@ public class ClientInputHandler {
             if (ClientComboData.getFirstActiveComboSkill() == null) return;
             // 总是触发第一个可释放的连携技
             ComboSkillType comboSkillType = ClientComboData.getFirstActiveComboSkill();
-            ModMessages.sendToServer(new ComboTriggeredC2SPacket(comboSkillType));
+            ModMessages.sendToServer(new ComboTriggeredPacket_C2S(comboSkillType));
             // 移除已触发的连携技
             ClientComboData.removeActiveChainSkill(comboSkillType);
         }

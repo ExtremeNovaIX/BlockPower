@@ -7,16 +7,16 @@ import net.minecraft.network.FriendlyByteBuf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ComboStandbyS2CPacket extends AbstractS2CPacket {
-    private static final Logger log = LoggerFactory.getLogger(ComboStandbyS2CPacket.class);
+public class ComboStandbyPacket_S2C extends AbstractS2CPacket {
+    private static final Logger log = LoggerFactory.getLogger(ComboStandbyPacket_S2C.class);
     private final ComboSkillType comboSkillType;
 
 
-    public ComboStandbyS2CPacket(ComboSkillType comboSkillType) {
+    public ComboStandbyPacket_S2C(ComboSkillType comboSkillType) {
         this.comboSkillType = comboSkillType;
     }
 
-    public ComboStandbyS2CPacket(FriendlyByteBuf buf) {
+    public ComboStandbyPacket_S2C(FriendlyByteBuf buf) {
         this.comboSkillType = buf.readEnum(ComboSkillType.class);
     }
 

@@ -1,4 +1,4 @@
-package BlockPower.ModMessages.SkillC2SPacket;
+package BlockPower.Skills.NormalSkills;
 
 import BlockPower.ModItems.ModItems;
 import BlockPower.ModMessages.ModMessages;
@@ -7,24 +7,21 @@ import BlockPower.ModMessages.S2CPacket.HitStopPacket_S2C;
 import BlockPower.ModMessages.S2CPacket.ShakePacket_S2C;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Skills.ComboSkills.ComboSkillType;
-import BlockPower.Skills.LauncherSwingSkill;
+import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Util.ComboManager.PlayerComboManager;
 import BlockPower.Util.Commons;
 import BlockPower.Util.TaskManager;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
-public class LauncherSwingSkillPacket_C2S extends AbstractSkillPacket_C2S {
-    private static final Logger LOGGER = LogManager.getLogger();
+//TODO 修改成一段时间内combo上限6次，并且后几次击退明显增大，防止无限连
+public class LauncherSwingSkill implements IPacketSerializableSkill {
     private static final TaskManager taskManager = TaskManager.getInstance(false);
 
     // 理想的作战距离（格），弹簧会试图维持这个距离
@@ -38,22 +35,23 @@ public class LauncherSwingSkillPacket_C2S extends AbstractSkillPacket_C2S {
     // 连击状态的持续时间 (Ticks)
     private static final int COMBO_DURATION_TICKS = 15;
 
-
-    public LauncherSwingSkillPacket_C2S() {
-        super(new LauncherSwingSkill());
-    }
-
-    public LauncherSwingSkillPacket_C2S(FriendlyByteBuf buf) {
-        super(new LauncherSwingSkill());
+    @Override
+    public String getSkillName() {
+        return "LauncherSwing";
     }
 
     @Override
-    public void toBytes(FriendlyByteBuf buf) {
-
+    public String getSkillDescription() {
+        return "";
     }
 
     @Override
-    protected void handleServerSide(ServerPlayer player) {
+    public int getSkillLevel() {
+        return 0;
+    }
+
+    @Override
+    public void triggerSkill(ServerPlayer player) {
         if (player.getXRot() >= -25.0F) return;
 
         ItemStack mainHandItem = player.getMainHandItem();
@@ -113,7 +111,34 @@ public class LauncherSwingSkillPacket_C2S extends AbstractSkillPacket_C2S {
         PlayerComboManager.recordCombo(player, ComboSkillType.CHASE);
     }
 
+
     @Override
-    protected void afterHandleServerSide(ServerPlayer player) {
+    public AllResourceType getSkillCostType() {
+        return null;
+    }
+
+    @Override
+    public double getSkillCostAmount() {
+        return 0;
+    }
+
+    @Override
+    public boolean isSkillConsumeResource() {
+        return false;
+    }
+
+    @Override
+    public boolean isSkillAutoLocked() {
+        return false;
+    }
+
+    @Override
+    public void writeParams(FriendlyByteBuf buf) {
+
+    }
+
+    @Override
+    public void readParams(FriendlyByteBuf buf) {
+
     }
 }

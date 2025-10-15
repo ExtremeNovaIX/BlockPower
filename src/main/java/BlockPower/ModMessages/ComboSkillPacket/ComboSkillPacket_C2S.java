@@ -8,15 +8,15 @@ import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ComboSkillC2SPacket extends AbstractC2SPacket {
-    private static final Logger log = LoggerFactory.getLogger(ComboSkillC2SPacket.class);
+public class ComboSkillPacket_C2S extends AbstractC2SPacket {
+    private static final Logger log = LoggerFactory.getLogger(ComboSkillPacket_C2S.class);
     private ComboSkillType comboSkillType;
 
-    public ComboSkillC2SPacket(ComboSkillType comboSkillType) {
+    public ComboSkillPacket_C2S(ComboSkillType comboSkillType) {
         this.comboSkillType = comboSkillType;
     }
 
-    public ComboSkillC2SPacket(FriendlyByteBuf buf) {
+    public ComboSkillPacket_C2S(FriendlyByteBuf buf) {
         this.comboSkillType = buf.readEnum(ComboSkillType.class);
     }
 
@@ -30,6 +30,7 @@ public class ComboSkillC2SPacket extends AbstractC2SPacket {
         ComboSkill skill = comboSkillType.getSkill();
         if (skill != null) {
             skill.triggerSkill(player);
+            log.info("Server received ComboSkillPacket_C2S:{}", skill);
         } else {
             log.error("ComboSkillC2SPacket: 无法触发技能,comboSkillType={}", comboSkillType);
         }

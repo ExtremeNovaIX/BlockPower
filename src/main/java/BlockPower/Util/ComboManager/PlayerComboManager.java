@@ -1,6 +1,6 @@
 package BlockPower.Util.ComboManager;
 
-import BlockPower.ModMessages.ComboSkillPacket.ComboStandbyS2CPacket;
+import BlockPower.ModMessages.ComboSkillPacket.ComboStandbyPacket_S2C;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.Skills.ComboSkills.ComboSkillType;
 import BlockPower.Util.Timer.TickListener;
@@ -58,7 +58,7 @@ public class PlayerComboManager {
                 // 遍历所有可触发的连击技能
                 for (ComboSkillType type : activeChainSkills) {
                     // 通知客户端连携已就绪
-                    ModMessages.sendToPlayer(new ComboStandbyS2CPacket(type), (ServerPlayer) player);
+                    ModMessages.sendToPlayer(new ComboStandbyPacket_S2C(type), (ServerPlayer) player);
                     // 重置连击数，并进入冷却
                     history.comboStandby(type);
                 }

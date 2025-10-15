@@ -1,7 +1,7 @@
-package BlockPower.ModMessages.SkillC2SPacket;
+package BlockPower.Skills.NormalSkills;
 
 import BlockPower.ModBlocks.ModBlocks;
-import BlockPower.Skills.PlaceBlockSkill;
+import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Util.Commons;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -15,22 +15,24 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class PlaceBlockSkillPacket_C2S extends AbstractSkillPacket_C2S {
-    public PlaceBlockSkillPacket_C2S() {
-        super(new PlaceBlockSkill());
-    }
-
-    public PlaceBlockSkillPacket_C2S(FriendlyByteBuf buf) {
-        super(new PlaceBlockSkill());
+public class PlaceBlockSkill implements IPacketSerializableSkill {
+    @Override
+    public String getSkillName() {
+        return "PlaceBlock";
     }
 
     @Override
-    public void toBytes(FriendlyByteBuf buf) {
-
+    public String getSkillDescription() {
+        return "";
     }
 
     @Override
-    protected void handleServerSide(ServerPlayer player) {
+    public int getSkillLevel() {
+        return 0;
+    }
+
+    @Override
+    public void triggerSkill(ServerPlayer player) {
         Level level = player.level();
         BlockPos blockBelowPos = player.blockPosition().below();
         Block block = level.getBlockState(blockBelowPos).getBlock();
@@ -41,11 +43,36 @@ public class PlaceBlockSkillPacket_C2S extends AbstractSkillPacket_C2S {
             SoundType soundType = newState.getSoundType();
             SoundEvent placeSound = soundType.getPlaceSound();
             player.level().playSound(null, player, placeSound, SoundSource.BLOCKS, 1.0F, 1.0F);
-            super.consumeResource(player, skill);
         }
     }
 
     @Override
-    protected void afterHandleServerSide(ServerPlayer player) {
+    public AllResourceType getSkillCostType() {
+        return AllResourceType.DIRT;
+    }
+
+    @Override
+    public double getSkillCostAmount() {
+        return 1;
+    }
+
+    @Override
+    public boolean isSkillConsumeResource() {
+        return true;
+    }
+
+    @Override
+    public boolean isSkillAutoLocked() {
+        return false;
+    }
+
+    @Override
+    public void writeParams(FriendlyByteBuf buf) {
+
+    }
+
+    @Override
+    public void readParams(FriendlyByteBuf buf) {
+
     }
 }
