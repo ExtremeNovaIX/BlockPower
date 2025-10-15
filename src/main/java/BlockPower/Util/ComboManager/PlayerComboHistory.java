@@ -51,18 +51,19 @@ public class PlayerComboHistory {
     public void refreshComboWindow() {
         long currentTick = TickListener.getServerTicks();
 
-        Iterator<Map.Entry<ComboSkillType, AtomicChainData>> iterator = comboCountMap.entrySet().iterator();
-
-        while (iterator.hasNext()) {
-            Map.Entry<ComboSkillType, AtomicChainData> entry = iterator.next();
+        for (Map.Entry<ComboSkillType, AtomicChainData> entry : comboCountMap.entrySet()) {
             AtomicChainData atomicChainData = entry.getValue();
 
             ComboSkill comboSkill = entry.getKey().getSkill();
             int comboWindowTick = comboSkill.getComboWindowTick();
             //检查是否过期
             if (currentTick - atomicChainData.lastTriggerTick > comboWindowTick) {
-                //移除整个条目，清除过期连击
-                iterator.remove();
+                //把当前连击数重置为0
+                if (atomicChainData.count > 0) {
+                    log.debug("Combo reset: {} count {} exceeded window of {} ticks.",
+                            entry.getKey(), atomicChainData.count, comboWindowTick);
+                }
+                atomicChainData.count = 0;
             }
         }
     }
