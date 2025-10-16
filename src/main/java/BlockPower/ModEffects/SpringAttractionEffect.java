@@ -13,7 +13,9 @@ public class SpringAttractionEffect implements ITickBasedEffect {
     // 弹簧的力度系数 (劲度)。值越大，拉/推的力越强。
     private double SPRING_CONSTANT = 0.25;
     // 弹簧引力的最大有效范围（的平方）
-    private double MAX_COMBO_RANGE_SQR = Math.pow(5, 2);
+    private double MAX_COMBO_RANGE = 5;
+    // 弹簧引力的最大有效范围（的平方）
+    private double MAX_COMBO_RANGE_SQR = Math.pow(MAX_COMBO_RANGE, 2);
     // 弹簧的“死区”范围（格）。在最佳距离±此范围内，不施加力，以防止抖动。
     private double DEAD_ZONE = 0.5;
     // 连击状态的持续时间 (Ticks)
@@ -89,12 +91,12 @@ public class SpringAttractionEffect implements ITickBasedEffect {
         this.SPRING_CONSTANT = SPRING_CONSTANT;
     }
 
-    public double getMAX_COMBO_RANGE_SQR() {
-        return MAX_COMBO_RANGE_SQR;
+    public double getMAX_COMBO_RANGE() {
+        return MAX_COMBO_RANGE;
     }
 
-    public void setMAX_COMBO_RANGE_SQR(double MAX_COMBO_RANGE_SQR) {
-        this.MAX_COMBO_RANGE_SQR = MAX_COMBO_RANGE_SQR;
+    public void setMAX_COMBO_RANGE(double MAX_COMBO_RANGE) {
+        this.MAX_COMBO_RANGE = MAX_COMBO_RANGE;
     }
 
     public double getDEAD_ZONE() {

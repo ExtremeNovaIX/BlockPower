@@ -2,10 +2,14 @@ package BlockPower.Util.ModEffect;
 
 import BlockPower.ModEffects.ITickBasedEffect;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class ModEffectManager {
+
 
     private static final Map<Entity, Map<Class<? extends ITickBasedEffect>, ITickBasedEffect>> activeServerEffects = new WeakHashMap<>();
     private static final Map<Entity, Map<Class<? extends ITickBasedEffect>, ITickBasedEffect>> activeClientEffects = new WeakHashMap<>();
@@ -17,6 +21,7 @@ public class ModEffectManager {
     // 用于暂存下一Tick需要移除的效果。键为实体，值为该实体待移除的效果类集合
     private static final Map<Entity, Set<Class<? extends ITickBasedEffect>>> pendingServerRemovals = new WeakHashMap<>();
     private static final Map<Entity, Set<Class<? extends ITickBasedEffect>>> pendingClientRemovals = new WeakHashMap<>();
+    private static final Logger log = LoggerFactory.getLogger(ModEffectManager.class);
 
 
     /**
@@ -43,6 +48,7 @@ public class ModEffectManager {
         return isClientSide ? activeClientEffects : activeServerEffects;
     }
 
+    //TODO 添加跨端效果自动发送
     /**
      * 将添加效果操作推入队列，在下一次 tickAll 迭代开始前安全添加。
      */
@@ -94,11 +100,24 @@ public class ModEffectManager {
      * 在开始遍历前，处理所有添加和移除操作。
      */
     private static void processPendingModifications(boolean isClientSide) {
+        String levelName = isClientSide ? "Client:" : "Server:";
+
         Map<Entity, Map<Class<? extends ITickBasedEffect>, ITickBasedEffect>> mainMap = getEffectMap(isClientSide);
 
         Map<Entity, Set<Class<? extends ITickBasedEffect>>> pendingRemovals = getPendingRemovals(isClientSide);
         // 遍历所有待移除的效果
         pendingRemovals.forEach((entity, effectClasses) -> {
+
+            if (!effectClasses.isEmpty()) {
+                String entityName;
+                if (entity instanceof Player player) {
+                    entityName = player.getGameProfile().getName();
+                } else {
+                    entityName = entity.toString();
+                }
+                log.info("{}Removing effects: {} for entity: {}", levelName, effectClasses, entityName);
+            }
+
             Map<Class<? extends ITickBasedEffect>, ITickBasedEffect> entityEffects = mainMap.get(entity);
             if (entityEffects != null) {
                 for (Class<? extends ITickBasedEffect> effectClass : effectClasses) {
@@ -109,11 +128,21 @@ public class ModEffectManager {
         pendingRemovals.clear();
 
         // 遍历所有待添加的实体和效果
-        Map<Entity, List<ITickBasedEffect>> pendingMap = getPendingAdditions(isClientSide);
-        pendingMap.forEach((entity, effects) -> {
+        Map<Entity, List<ITickBasedEffect>> pendingAdds = getPendingAdditions(isClientSide);
+        pendingAdds.forEach((entity, effects) -> {
             // 获取该实体的效果Map，如果不存在则创建
             Map<Class<? extends ITickBasedEffect>, ITickBasedEffect> entityEffects =
                     mainMap.computeIfAbsent(entity, k -> new HashMap<>());
+
+            if (!effects.isEmpty()) {
+                String entityName;
+                if (entity instanceof Player player) {
+                    entityName = player.getGameProfile().getName();
+                } else {
+                    entityName = entity.toString();
+                }
+                log.info("{}Adding effects: {} for entity: {}", levelName, effects, entityName);
+            }
 
             // 将所有待添加的效果放入实体Map
             for (ITickBasedEffect effect : effects) {
@@ -123,7 +152,7 @@ public class ModEffectManager {
         });
 
         // 清空列表，等待下一 Tick
-        pendingMap.clear();
+        pendingAdds.clear();
     }
 
     /**
