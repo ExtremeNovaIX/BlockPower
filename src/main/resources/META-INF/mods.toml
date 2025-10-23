@@ -1,20 +1,16 @@
-# 必填 - 指定mod加载器类型
 modLoader="javafml"
-# 必填 - 指定Forge加载器版本范围
+
 loaderVersion="${loader_version_range}"
-# 必填 - 模组许可证
+
 license="${mod_license}"
 
 [[mods]]
-# 【修正点】将 modId 改回硬编码的 "blockpower"，以兼容 IDE 的静态分析
 modId="blockpower"
-# 其他信息仍然使用占位符，可以从 gradle.properties 自动更新
 version="${mod_version}"
 displayName="${mod_name}"
 authors="${mod_authors}"
 description='''${mod_description}'''
 
-# 依赖关系中的 "blockpower" 保持硬编码
 [[dependencies.blockpower]]
 modId="forge"
 mandatory=true

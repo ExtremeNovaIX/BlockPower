@@ -1,5 +1,9 @@
 package BlockPower.ModItems;
 
+import BlockPower.ModEntities.MagmaBlock.MagmaEntity;
+import BlockPower.ModMessages.ComboSkillPacket.ComboTriggeredPacket_C2S;
+import BlockPower.ModMessages.ModMessages;
+import BlockPower.Skills.ComboSkills.ComboSkillType;
 import BlockPower.Util.Commons;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -13,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class DebugItem extends Item {
     public static final Logger LOGGER = LoggerFactory.getLogger(DebugItem.class);
+
     public DebugItem(Properties properties) {
         super(properties);
     }
@@ -24,7 +29,7 @@ public class DebugItem extends Item {
         if (!level.isClientSide) {
             Commons.sendDebugMessage(player, "Server:调试物品使用于位置: " + pos.toShortString());
             testServerMethod(player);
-        }else{
+        } else {
             Commons.sendDebugMessage(player, "Client:调试物品使用于位置: " + pos.toShortString());
             testClientMethod(player);
         }
@@ -34,6 +39,7 @@ public class DebugItem extends Item {
 
     private void testServerMethod(Player player) {
         LOGGER.info("testServerMethod");
+        ModMessages.sendToServer(new ComboTriggeredPacket_C2S(ComboSkillType.MAGMA_BLOCK));
     }
 
     private void testClientMethod(Player player) {

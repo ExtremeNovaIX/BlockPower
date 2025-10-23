@@ -1,9 +1,7 @@
 package BlockPower.Skills.ComboSkills;
 
-import net.minecraft.world.level.block.MagmaBlock;
-
 public enum ComboSkillType {
-    MAGMA_BLOCK(new MagmaBlockSkill());
+    MAGMA_BLOCK(new MagmaBlockComboSkill());
 
     private final ComboSkill skillInstance;
 

@@ -23,4 +23,6 @@ public interface ComboSkill {
 
     // 连携技窗口时间（单位：tick）
     int getComboWindowTick();
+
+    String getTextureLocation();
 }

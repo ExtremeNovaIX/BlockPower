@@ -116,7 +116,7 @@ public class Commons {
     }
 
     /**
-     * 对半径内的实体造成伤害并击退
+     * 对半径内的实体造成伤害并应用云迹和失衡效果
      *
      * @param mainEntity   释放技能的实体
      * @param skillUser    释放技能的玩家
@@ -125,7 +125,7 @@ public class Commons {
      * @param soundEvent   音效
      * @return 半径内的实体列表
      */
-    public static List<Entity> applyDamage(@NotNull Entity mainEntity, Player skillUser, float damage, double detectRadius, SoundEvent soundEvent) {
+    public static List<Entity> applyDamage(@NotNull Entity mainEntity, Player skillUser, float damage, double detectRadius,@Nullable SoundEvent soundEvent) {
         List<Entity> entities = detectEntity(mainEntity, detectRadius, skillUser);
         if (!entities.isEmpty()) {
             entities.forEach(entity -> {
@@ -133,7 +133,7 @@ public class Commons {
                 ModEffectManager.addEffect(entity, new UnBalanceEffect(entity, 9));
                 //为每个被击中的实体启动粒子计时器
                 ModEffectManager.addEffect(entity, new CloudTrailEffect(entity, 40));
-                if (!mainEntity.level().isClientSide) {
+                if (soundEvent != null && !mainEntity.level().isClientSide) {
                     //限制5tick内最多播放3次声音
                     taskManager.runTimesWithCooldown(mainEntity, "play_sound", 2, 5, () ->
                             mainEntity.level().playSound(null,

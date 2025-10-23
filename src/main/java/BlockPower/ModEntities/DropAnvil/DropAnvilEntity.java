@@ -275,7 +275,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
     }
 
     @Override
-    public EntityDataAccessor<Integer> getStateDataAccessor() {
+    public @NotNull EntityDataAccessor<Integer> getStateDataAccessor() {
         return DATA_STATE;
     }
 

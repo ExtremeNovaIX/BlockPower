@@ -1,7 +1,8 @@
-package BlockPower.ModRenderer;
+package BlockPower.ModEvents;
 
 import BlockPower.ModEntities.DropAnvil.DropAnvilRenderer;
 import BlockPower.ModEntities.FakeItem.FakeItemRenderer;
+import BlockPower.ModEntities.MagmaBlock.MagmaEntityRenderer;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModEntities.RushMinecart.FakeRailRenderer;
 import BlockPower.ModEntities.RushMinecart.RushMinecartRenderer;
@@ -20,6 +21,7 @@ public class RenderRegisterEvents {
         EntityRenderers.register(ModEntities.FAKE_RAIL_ENTITY.get(), FakeRailRenderer::new);
         EntityRenderers.register(ModEntities.RUSH_MINECART.get(), RushMinecartRenderer::new);
         EntityRenderers.register(ModEntities.DROP_ANVIL.get(), DropAnvilRenderer::new);
+        EntityRenderers.register(ModEntities.MAGMA_ENTITY.get(), MagmaEntityRenderer::new);
         event.registerEntityRenderer(ModEntities.FAKE_ITEM.get(), FakeItemRenderer::new);
     }
 }

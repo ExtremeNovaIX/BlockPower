@@ -63,23 +63,28 @@ public class ClientInputHandler {
             }
         }
 
-        // 挖掘状态下才能触发技能
-        if (!ClientMinerState.isMinerMode()) return;
-
         if (KeyBindings.MINECART_RUSH.consumeClick()) {
+            // 挖掘状态下才能触发技能
+            if (!ClientMinerState.isMinerMode()) return;
             ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.MINECART_RUSH, new RushMinecartSkill()));
         }
 
         if (KeyBindings.DROP_ANVIL.consumeClick()) {
+            // 挖掘状态下才能触发技能
+            if (!ClientMinerState.isMinerMode()) return;
             ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.DROP_ANVIL, new DropAnvilSkill()));
         }
 
         if (KeyBindings.PLACE_BLOCK.consumeClick()) {
+            // 挖掘状态下才能触发技能
+            if (!ClientMinerState.isMinerMode()) return;
             if (localPlayer.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) return;
             ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.PLACE_BLOCK, new PlaceBlockSkill()));
         }
 
         if (KeyBindings.LAUNCHER_SWING.consumeClick()) {
+            // 挖掘状态下才能触发技能
+            if (!ClientMinerState.isMinerMode()) return;
             if (localPlayer.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) return;
             if (localPlayer.getXRot() >= -25.0F) return;//玩家抬头角度大于25度时才会触发LauncherSwing
             taskManager.runOnceWithCooldown(localPlayer, "LAUNCHER_SWING", 9, () -> {
@@ -88,10 +93,15 @@ public class ClientInputHandler {
         }
 
         if (KeyBindings.COMBO_SKILL.consumeClick()) {
-            LOGGER.info("COMBO_SKILL key triggered");
+            // 挖掘状态下才能触发技能
+            if (!ClientMinerState.isMinerMode()) return;
             if (ClientComboData.getFirstActiveComboSkill() == null) return;
             // 总是触发第一个可释放的连携技
-            ComboSkillType comboSkillType = ClientComboData.getFirstActiveComboSkill();
+            ClientComboData.ActiveSkillData activeSkillData = ClientComboData.getFirstActiveComboSkill();
+            if (activeSkillData == null) return;
+
+            LOGGER.info("COMBO_SKILL key triggered");
+            ComboSkillType comboSkillType = activeSkillData.getType();
             ModMessages.sendToServer(new ComboTriggeredPacket_C2S(comboSkillType));
             // 移除已触发的连携技
             ClientComboData.removeActiveChainSkill(comboSkillType);

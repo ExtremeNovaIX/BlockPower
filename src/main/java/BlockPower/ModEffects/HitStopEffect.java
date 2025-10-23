@@ -57,6 +57,10 @@ public class HitStopEffect implements ITickBasedEffect {
 
     @Override
     public void tick() {
+        //TODO 暂时弃用
+        if (true) {
+            return;
+        }
         // 检查是否正处于卡帧状态
         if (tickTimer.isFinished()) {
             return;

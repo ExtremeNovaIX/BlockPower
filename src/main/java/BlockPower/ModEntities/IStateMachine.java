@@ -2,18 +2,29 @@ package BlockPower.ModEntities;
 
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.world.entity.Entity;
+import org.jetbrains.annotations.NotNull;
 
 public interface IStateMachine<E extends Enum<E>> {
 
     /**
      * 实现类必须提供用于同步状态的DataAccessor。
      */
+    @NotNull
     EntityDataAccessor<Integer> getStateDataAccessor();
 
     /**
      * 实现类必须提供其状态枚举的所有值。
      */
+    @NotNull
     E[] getStateEnumValues();
+
+
+    /**
+     * 每次状态改变时调用，默认实现为空。
+     */
+    default void onStateChange(E newState, E oldState) {
+
+    }
 
     default E getState() {
         //this实现了IStateMachine接口的实体对象
@@ -23,6 +34,11 @@ public interface IStateMachine<E extends Enum<E>> {
 
     default void setState(E newState) {
         Entity entity = (Entity) this;
-        entity.getEntityData().set(getStateDataAccessor(), newState.ordinal());
+        E oldState = getState();
+        // 只有当状态改变时才调用onStateChange
+        if (oldState != newState) {
+            onStateChange(newState, oldState);
+            entity.getEntityData().set(getStateDataAccessor(), newState.ordinal());
+        }
     }
 }

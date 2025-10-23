@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import static BlockPower.ModMessages.ModMessages.sendToPlayer;
 
 public class EffectSender {
+    //TODO 合并到ModEffectManager，实现跨端效果自动发送
     private static final TaskManager taskManager = TaskManager.getInstance(false);
 
     /**

@@ -292,7 +292,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
     }
 
     @Override
-    public EntityDataAccessor<Integer> getStateDataAccessor() {
+    public @NotNull EntityDataAccessor<Integer> getStateDataAccessor() {
         return DATA_STATE;
     }
 

@@ -17,11 +17,10 @@ import static BlockPower.Main.Main.MOD_ID;
 
 @Mod(MOD_ID)
 public class Main {
-    //TODO 修复铁砧技能放出失败（如在地上放置铁砧导致铁砧无法放出）导致技能锁死锁问题
-    //TODO 为技能实体类加一个unlock方法，用于标识技能结束时调用，用于解锁技能
+    //TODO 重构技能锁系统，以不同的优先度区分
 
     public static final String MOD_ID = "blockpower";
-    private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     public Main() {
         printWelcome();

@@ -3,7 +3,7 @@ package BlockPower.Skills.ComboSkills;
 import BlockPower.ModEntities.MagmaBlock.MagmaEntity;
 import net.minecraft.world.entity.player.Player;
 
-public class MagmaBlockSkill implements ComboSkill {
+public class MagmaBlockComboSkill implements ComboSkill {
     @Override
     public String getSkillName() {
         return "MagmaBlockCombo";
@@ -21,7 +21,7 @@ public class MagmaBlockSkill implements ComboSkill {
 
     @Override
     public void triggerSkill(Player player) {
-        MagmaEntity.spawnMagmaEntity(player,20);
+        MagmaEntity.spawnMagmaEntity(player);
     }
 
     @Override
@@ -37,5 +37,10 @@ public class MagmaBlockSkill implements ComboSkill {
     @Override
     public int getComboWindowTick() {
         return 20;
+    }
+
+    @Override
+    public String getTextureLocation() {
+        return null;
     }
 }
