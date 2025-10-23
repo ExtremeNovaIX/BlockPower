@@ -1,7 +1,9 @@
 package BlockPower.Skills.ComboSkills;
 
+import net.minecraft.world.level.block.MagmaBlock;
+
 public enum ComboSkillType {
-    PICKAXE_HIT(new PickaxeHitComboSkill());
+    MAGMA_BLOCK(new MagmaBlockSkill());
 
     private final ComboSkill skillInstance;
 

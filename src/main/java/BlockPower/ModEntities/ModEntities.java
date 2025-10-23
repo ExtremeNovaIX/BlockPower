@@ -3,6 +3,7 @@ package BlockPower.ModEntities;
 import BlockPower.Main.Main;
 import BlockPower.ModEntities.DropAnvil.DropAnvilEntity;
 import BlockPower.ModEntities.FakeItem.FakeItem;
+import BlockPower.ModEntities.MagmaBlock.MagmaEntity;
 import BlockPower.ModEntities.RushMinecart.FakeRailEntity;
 import BlockPower.ModEntities.RushMinecart.RushMinecartEntity;
 import net.minecraft.world.entity.EntityType;
@@ -49,4 +50,13 @@ public class ModEntities {
                             .noSave()
                             .noSummon()
                             .build("fake_item"));
+    public static final RegistryObject<EntityType<MagmaEntity>> MAGMA_ENTITY =
+            ENTITY_TYPES.register("magma_entity",
+                    () -> EntityType.Builder.<MagmaEntity>of(MagmaEntity::new, MobCategory.MISC)
+                            .sized(1F, 1F)
+                            .clientTrackingRange(128) // 客户端追踪范围
+                            .updateInterval(1) // 更新间隔
+                            .noSave()
+                            .noSummon()
+                            .build("magma_entity"));
 }

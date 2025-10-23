@@ -66,7 +66,7 @@ public class LauncherSwingSkill implements IPacketSerializableSkill {
         ModMessages.sendToPlayer(new ShakePacket_S2C(4, 2F), player);
 
         // 记录连击
-        PlayerComboManager.recordCombo(player, ComboSkillType.PICKAXE_HIT);
+        PlayerComboManager.recordCombo(player, ComboSkillType.MAGMA_BLOCK);
     }
 
 
