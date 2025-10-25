@@ -104,7 +104,7 @@ public class ClientInputHandler {
             ComboSkillType comboSkillType = activeSkillData.getType();
             ModMessages.sendToServer(new ComboTriggeredPacket_C2S(comboSkillType));
             // 移除已触发的连携技
-            ClientComboData.removeActiveChainSkill(comboSkillType);
+            ClientComboData.triggerSkillAnimation(comboSkillType);
         }
 
     }

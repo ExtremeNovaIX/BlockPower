@@ -2,6 +2,7 @@ package BlockPower.ModMessages.ComboSkillPacket;
 
 import BlockPower.ModMessages.S2CPacket.AbstractS2CPacket;
 import BlockPower.Skills.ComboSkills.Client.ClientComboData;
+import BlockPower.Skills.ComboSkills.ComboSkill;
 import BlockPower.Skills.ComboSkills.ComboSkillType;
 import net.minecraft.network.FriendlyByteBuf;
 import org.slf4j.Logger;
@@ -28,8 +29,14 @@ public class ComboStandbyPacket_S2C extends AbstractS2CPacket {
     @Override
     protected void handleClientSide() {
         log.info("Client-ComboStandbyC2SPacket: {} is ready to trigger", comboSkillType);
-        //TODO 调用渲染逻辑等
-        ClientComboData.addActiveChainSkill(comboSkillType);
+        ComboSkill skill = comboSkillType.getSkill();
+        if (skill == null) {
+            log.warn("Received ComboStandbyPacket_S2C for a skill type with no instance: {}", comboSkillType);
+            return;
+        }
+        int durationTicks = skill.getComboWindowTick();
+        log.info("Client-ComboStandbyC2SPacket: {} is ready for {} ticks", comboSkillType, durationTicks);
+        ClientComboData.addActiveChainSkill(comboSkillType, durationTicks);
     }
 
 }

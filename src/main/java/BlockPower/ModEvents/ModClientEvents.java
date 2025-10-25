@@ -2,15 +2,29 @@ package BlockPower.ModEvents;
 
 import BlockPower.Main.Main;
 import BlockPower.ModItems.ModItems;
+import BlockPower.Skills.ComboSkills.Client.ComboHudRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @Mod.EventBusSubscriber(modid = Main.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ModClientEvents {
+
+    public static final ResourceLocation COMBO_HUD_OVERLAY = new ResourceLocation(Main.MOD_ID, "combo_hud");
+
+    @SubscribeEvent
+    public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
+        // 在快捷栏上方绘制
+        event.registerAbove(
+                new ResourceLocation("minecraft", "hotbar"),
+                COMBO_HUD_OVERLAY.getPath(),
+                new ComboHudRenderer()
+        );
+    }
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {

@@ -1,6 +1,7 @@
 package BlockPower.ModEvents;
 
 import BlockPower.Main.Main;
+import BlockPower.Skills.ComboSkills.Client.ClientComboData;
 import BlockPower.Util.ClientCameraTrackingManager;
 import BlockPower.Util.ModEffect.ModEffectManager;
 import net.minecraftforge.api.distmarker.Dist;
@@ -18,6 +19,7 @@ public class ForgeClientEvents {
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             ModEffectManager.tickAll(true);
+            ClientComboData.clientTick();
         }
     }
 

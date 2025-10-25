@@ -1,8 +1,6 @@
 package BlockPower.ModItems;
 
-import BlockPower.ModEntities.MagmaBlock.MagmaEntity;
 import BlockPower.ModMessages.ComboSkillPacket.ComboStandbyPacket_S2C;
-import BlockPower.ModMessages.ComboSkillPacket.ComboTriggeredPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.Skills.ComboSkills.ComboSkillType;
 import BlockPower.Util.Commons;
@@ -17,10 +15,10 @@ import net.minecraft.world.level.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DebugItem extends Item {
-    public static final Logger LOGGER = LoggerFactory.getLogger(DebugItem.class);
+public class DebugItem2 extends Item {
+    public static final Logger LOGGER = LoggerFactory.getLogger(DebugItem2.class);
 
-    public DebugItem(Properties properties) {
+    public DebugItem2(Properties properties) {
         super(properties);
     }
 
@@ -41,7 +39,7 @@ public class DebugItem extends Item {
 
     private void testServerMethod(Player player) {
         LOGGER.info("testServerMethod");
-        ModMessages.sendToPlayer(new ComboStandbyPacket_S2C(ComboSkillType.MAGMA_BLOCK), (ServerPlayer) player);
+        ModMessages.sendToPlayer(new ComboStandbyPacket_S2C(ComboSkillType.TEST), (ServerPlayer) player);
     }
 
     private void testClientMethod(Player player) {
