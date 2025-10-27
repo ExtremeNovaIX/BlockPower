@@ -2,6 +2,7 @@ package BlockPower.Skills.NormalSkills;
 
 import BlockPower.ModEntities.DropAnvil.DropAnvilEntity;
 import BlockPower.Skills.MinerState.server.AllResourceType;
+import BlockPower.Skills.SkillExecutionResult;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -22,8 +23,9 @@ public class DropAnvilSkill implements IPacketSerializableSkill {
     }
 
     @Override
-    public void triggerSkill(ServerPlayer player) {
+    public SkillExecutionResult triggerSkill(ServerPlayer player) {
         DropAnvilEntity.createDropAnvil(player);
+        return SkillExecutionResult.success();
     }
 
     @Override

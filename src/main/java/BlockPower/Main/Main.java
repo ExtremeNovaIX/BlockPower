@@ -2,6 +2,7 @@ package BlockPower.Main;
 
 import BlockPower.ModBlocks.ModBlocks;
 import BlockPower.ModBlocks.ModEntityBlocks;
+import BlockPower.ModCreativeTabs.ModCreativeTabs;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModItems.ModItems;
 import BlockPower.ModMessages.ModMessages;
@@ -33,6 +34,7 @@ public class Main {
         ModEntities.ENTITY_TYPES.register(modEventBus);
         MinecraftForge.EVENT_BUS.register(this);
         ModMessages.register();
+        ModCreativeTabs.CREATIVE_MODE_TABS.register(modEventBus);
         LOGGER.debug("BlockPower register over,have fun!");
     }
 

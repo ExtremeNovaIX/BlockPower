@@ -3,6 +3,8 @@ package BlockPower.ModMessages.C2SPacket;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
@@ -11,9 +13,11 @@ import java.util.function.Supplier;
  * 它封装了所有C2S数据包共有的模板代码，例如线程处理。
  */
 public abstract class AbstractC2SPacket {
+    private static final Logger log = LoggerFactory.getLogger(AbstractC2SPacket.class);
 
     /**
      * 子类必须实现此方法，以定义如何将它们自己的数据写入字节流。
+     *
      * @param buf The buffer to write to.
      */
     public abstract void toBytes(FriendlyByteBuf buf);
@@ -34,31 +38,38 @@ public abstract class AbstractC2SPacket {
             if (!checkLegit(player)) return;
 
             // 调用抽象方法，让子类去实现具体的服务端逻辑
-            handleServerSide(player);
-            afterHandleServerSide(player);
+            try {
+                handleServerSide(player);
+                afterHandleServerSide(player);
+            } catch (Exception e) {
+                log.error("Error while handling packet {} for player {}", this.getClass().getSimpleName(), player.getGameProfile().getName(), e);
+            }
         });
     }
 
     /**
      * 子类必须实现此方法，以定义当服务端收到该数据包时应执行的具体逻辑。
+     *
      * @param player 发送该数据包的玩家。
      */
     protected abstract void handleServerSide(ServerPlayer player);
 
     /**
      * 子类可选实现此方法，以定义当服务端收到该数据包时是否合法。
+     *
      * @param player 发送该数据包的玩家。
      * @return 如果数据包合法则返回true，会执行handleServerSide内逻辑，否则返回false。
      */
-    protected boolean checkLegit(ServerPlayer player){
+    protected boolean checkLegit(ServerPlayer player) {
         return true;
     }
 
     /**
      * 子类可选实现此方法，会在handleServerSide之后执行
+     *
      * @param player 发送该数据包的玩家。
      */
-    protected void afterHandleServerSide(ServerPlayer player){
+    protected void afterHandleServerSide(ServerPlayer player) {
     }
 
 }

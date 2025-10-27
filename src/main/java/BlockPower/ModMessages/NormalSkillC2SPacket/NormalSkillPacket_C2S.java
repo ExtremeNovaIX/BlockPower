@@ -1,7 +1,10 @@
 package BlockPower.ModMessages.NormalSkillC2SPacket;
 
+import BlockPower.ModException.SilentSkillException;
+import BlockPower.ModException.SkillException;
 import BlockPower.Skills.NormalSkills.IPacketSerializableSkill;
 import BlockPower.Skills.NormalSkills.ISkill;
+import BlockPower.Skills.SkillExecutionResult;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -50,6 +53,9 @@ public class NormalSkillPacket_C2S extends AbstractSkillPacket_C2S{
 
     @Override
     protected void handleServerSide(ServerPlayer player) {
-        skill.triggerSkill(player);
+        SkillExecutionResult skillExecutionResult = skill.triggerSkill(player);
+        if (!skillExecutionResult.isSuccess()) {
+            throw new SilentSkillException(skill, skillExecutionResult.getMessage());
+        }
     }
 }

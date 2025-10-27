@@ -1,6 +1,7 @@
 package BlockPower.Skills.NormalSkills;
 
 import BlockPower.Skills.MinerState.server.AllResourceType;
+import BlockPower.Skills.SkillExecutionResult;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.network.FriendlyByteBuf;
@@ -49,7 +50,7 @@ public class AirJumpSkill implements IPacketSerializableSkill {
     }
 
     @Override
-    public void triggerSkill(ServerPlayer player) {
+    public SkillExecutionResult triggerSkill(ServerPlayer player) {
         if (!player.onGround() && AirJumpSkill.getPlayerAirTicks(player) >= 3) {
             taskManager.runOnce(player, "airJump", () -> {
                 Vec3 motion;
@@ -62,6 +63,7 @@ public class AirJumpSkill implements IPacketSerializableSkill {
                 timerManager.setTimer(player, "noFallDamage", 100);
             });
         }
+        return SkillExecutionResult.success();
     }
 
     /**

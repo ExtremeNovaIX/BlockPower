@@ -1,6 +1,7 @@
 package BlockPower.Skills.NormalSkills;
 
 import BlockPower.Skills.MinerState.server.AllResourceType;
+import BlockPower.Skills.SkillExecutionResult;
 import BlockPower.Util.Commons;
 import BlockPower.Util.TaskManager;
 import net.minecraft.network.FriendlyByteBuf;
@@ -36,8 +37,8 @@ public class DashSkill implements IPacketSerializableSkill {
     }
 
     @Override
-    public void triggerSkill(ServerPlayer player) {
-        if (Commons.isSpectatorOrCreativeMode(player)) return;
+    public SkillExecutionResult triggerSkill(ServerPlayer player) {
+        if (Commons.isSpectatorOrCreativeMode(player)) return SkillExecutionResult.fail("Player is Spectator or Creative Mode");
         taskManager.runOnceWithCooldown(player, "dashingCoolDown", 10, () -> {
             Vec3 lookAngle = player.getLookAngle().normalize();
             //根据玩家的最后方向输入决定冲刺方向
@@ -51,7 +52,10 @@ public class DashSkill implements IPacketSerializableSkill {
             player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), finalVec));
             player.setSprinting(true);
         });
+        return SkillExecutionResult.success();
     }
+
+
 
     public String getKeyResult() {
         return keyResult;

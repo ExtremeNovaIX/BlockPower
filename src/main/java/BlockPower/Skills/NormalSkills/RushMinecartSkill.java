@@ -2,6 +2,7 @@ package BlockPower.Skills.NormalSkills;
 
 import BlockPower.ModEntities.RushMinecart.RushMinecartEntity;
 import BlockPower.Skills.MinerState.server.AllResourceType;
+import BlockPower.Skills.SkillExecutionResult;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -22,8 +23,9 @@ public class RushMinecartSkill implements IPacketSerializableSkill {
     }
 
     @Override
-    public void triggerSkill(ServerPlayer player) {
+    public SkillExecutionResult triggerSkill(ServerPlayer player) {
         RushMinecartEntity.createRushMinecart(player);
+        return SkillExecutionResult.success();
     }
 
     @Override

@@ -9,6 +9,7 @@ import BlockPower.ModMessages.S2CPacket.ShakePacket_S2C;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Skills.ComboSkills.ComboSkillType;
 import BlockPower.Skills.MinerState.server.AllResourceType;
+import BlockPower.Skills.SkillExecutionResult;
 import BlockPower.Util.ComboManager.PlayerComboManager;
 import BlockPower.Util.Commons;
 import BlockPower.Util.ModEffect.ModEffectManager;
@@ -40,13 +41,14 @@ public class LauncherSwingSkill implements IPacketSerializableSkill {
     }
 
     @Override
-    public void triggerSkill(ServerPlayer player) {
-        if (player.getXRot() >= -25.0F) return;
+    public SkillExecutionResult triggerSkill(ServerPlayer player) {
+        if (player.getXRot() >= -25.0F) return SkillExecutionResult.fail("XRot must be less than -25.0F");
 
         ItemStack mainHandItem = player.getMainHandItem();
-        if (mainHandItem.getItem() != ModItems.PIXEL_CORE.get()) return;
+        if (mainHandItem.getItem() != ModItems.PIXEL_CORE.get()) return SkillExecutionResult.fail("Main hand item must be PIXEL_CORE");
         Commons.changePixelCoreNBT(player,3F,1F,1F);
         launcherSwing(player);
+        return SkillExecutionResult.success();
     }
 
     private void launcherSwing(ServerPlayer player) {

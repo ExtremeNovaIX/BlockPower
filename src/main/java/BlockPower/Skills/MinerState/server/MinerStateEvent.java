@@ -3,6 +3,7 @@ package BlockPower.Skills.MinerState.server;
 import BlockPower.ModEntities.FakeItem.FakeItem;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.ModMessages.S2CPacket.ResourceSyncPacket_S2C;
+import BlockPower.Skills.MinerState.client.ClientMinerState;
 import BlockPower.Skills.MinerState.server.strategy.ResourceGenerationStrategy;
 import BlockPower.Skills.MinerState.server.strategy.ResourceStrategyFactory;
 import BlockPower.Util.TaskManager;
@@ -32,10 +33,12 @@ public class MinerStateEvent {
     public static void onBreakingBlock(PlayerEvent.BreakSpeed event) {
         Player player = event.getEntity();
         // 确认玩家处于minerState状态
-        if (minerStateMap.getOrDefault(player, false)) {
-            if (player.level().isClientSide()) {
+        if (player.level().isClientSide()) {
+            if (ClientMinerState.isMinerMode()) {
                 event.setNewSpeed(0F);
-            } else {
+            }
+        } else {
+            if (minerStateMap.getOrDefault(player, false)) {
                 event.setNewSpeed(0F);
                 ResourceGenerationStrategy strategy = ResourceStrategyFactory.getStrategy(player.getMainHandItem());
                 taskManager.runOnceWithCooldown(player, "minerState", strategy.getDigCoolDown(), () -> {
