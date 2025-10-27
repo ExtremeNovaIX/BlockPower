@@ -1,5 +1,6 @@
 package BlockPower.ModMessages.NormalSkillC2SPacket;
 
+import BlockPower.ModItems.ModItems;
 import BlockPower.ModMessages.C2SPacket.AbstractC2SPacket;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.MinerState.server.PlayerResourceData;
@@ -29,6 +30,7 @@ abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket{
     protected boolean checkLegit(ServerPlayer player) {
         if (Commons.isSpectatorOrCreativeMode(player)) return true;
         if (skillLockManager.isLocked(player)) return false;//如果玩家被技能锁锁定，直接返回false
+        if (player.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) return false;//如果玩家主手物品不是像素核心，直接返回false
 
         PlayerResourceData playerResourceData = playerResourceManager.getPlayerData(player);
         // 检查技能资源是否足够

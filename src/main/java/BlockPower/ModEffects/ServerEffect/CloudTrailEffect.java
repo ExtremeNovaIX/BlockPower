@@ -18,10 +18,12 @@ public class CloudTrailEffect implements ITickBasedEffect {
     @Override
     public void tick() {
         ServerLevel serverLevel = (ServerLevel) entity.level();
+        double speedSquared = entity.getDeltaMovement().lengthSqr();
+        if (speedSquared < Math.pow(0.2, 2)) return;
         serverLevel.sendParticles(
                 ParticleTypes.CLOUD,
                 entity.getX(),
-                entity.getY() + 1.0,
+                entity.getY() + 0.5,
                 entity.getZ(),
                 3,
                 0.3, 0.3, 0.3,

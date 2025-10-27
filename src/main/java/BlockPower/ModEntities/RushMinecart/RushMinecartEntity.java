@@ -11,6 +11,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
@@ -48,7 +49,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
         ENDING        //技能结束, 准备销毁
     }
 
-    private static final Integer MAX_SPEED = 2;
+    private static final Float MAX_SPEED = 2f;
 
     private final ServerPlayer player;
 
@@ -212,12 +213,14 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
     private void spawnRailAt(Vec3 pos) {
         FakeRailEntity fakeRail = new FakeRailEntity(this.level(), pos.x(), pos.y(), pos.z(), this.getYRot());
         this.level().addFreshEntity(fakeRail);
+        player.swing(InteractionHand.MAIN_HAND, true);
     }
 
     public void spawnInitialRail() {
         Vec3 initialPos = this.position();
         this.spawnRailAt(initialPos);
         this.lastRailPlacementPos = initialPos;
+        player.swing(InteractionHand.MAIN_HAND, true);
     }
 
     public static void createRushMinecart(ServerPlayer player) {

@@ -18,6 +18,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -161,6 +162,7 @@ public class MagmaEntity extends Entity implements IStateMachine<MagmaEntity.Mag
             case INIT:
                 break;
             case SEARCHING, END:
+                player.swing(InteractionHand.MAIN_HAND, true);
                 // 播放放置音效
                 player.level().playSound(null, this.getX(), this.getY(), this.getZ(),
                         SoundEvents.STONE_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);

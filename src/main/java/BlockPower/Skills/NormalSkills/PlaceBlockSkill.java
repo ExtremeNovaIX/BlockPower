@@ -10,6 +10,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -82,6 +83,8 @@ public class PlaceBlockSkill implements IPacketSerializableSkill {
         // 播放放置音效
         SoundEvent placeSound = level.getBlockState(placementPos).getSoundType().getPlaceSound();
         player.level().playSound(null, player, placeSound, SoundSource.BLOCKS, 1.0F, 1.0F);
+
+        player.swing(InteractionHand.MAIN_HAND, true);
 
         return SkillExecutionResult.success();
     }
