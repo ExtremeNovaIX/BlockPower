@@ -1,10 +1,13 @@
 package BlockPower.ModEntities.DropAnvil;
 
+import BlockPower.ModEffects.ClientEffect.PlayerSneakEffect;
+import BlockPower.ModEffects.ClientEffect.ScreenShakeEffect;
 import BlockPower.ModEntities.IStateMachine;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Util.Commons;
 import BlockPower.Util.ModEffect.EffectSender;
+import BlockPower.Util.ModEffect.ModEffectManager;
 import BlockPower.Util.SkillLock.SkillLockManager;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;

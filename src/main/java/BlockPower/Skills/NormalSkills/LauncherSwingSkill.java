@@ -1,6 +1,6 @@
 package BlockPower.Skills.NormalSkills;
 
-import BlockPower.ModEffects.SpringAttractionEffect;
+import BlockPower.ModEffects.ServerEffect.SpringAttractionEffect;
 import BlockPower.ModItems.ModItems;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.ModMessages.S2CPacket.CameraLockPacket_S2C;
@@ -14,11 +14,9 @@ import BlockPower.Util.Commons;
 import BlockPower.Util.ModEffect.ModEffectManager;
 import BlockPower.Util.TaskManager;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 

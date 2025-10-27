@@ -1,16 +1,25 @@
-package BlockPower.ModEffects;
+package BlockPower.ModEffects.ClientEffect;
 
+import BlockPower.ModEffects.ITickBasedEffect;
 import BlockPower.Util.ModEffect.ModEffectManager;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 
 
-public class PlayerSneakEffect implements ITickBasedEffect {
-    private boolean isPlayerSneak = true;
+public class PlayerSneakEffect implements IClientTickBasedEffect {
+    private boolean isPlayerSneak;
+
+    public PlayerSneakEffect() {
+        this.isPlayerSneak = true;
+    }
+
+    public PlayerSneakEffect(FriendlyByteBuf buf) {
+    }
 
     public static void handlePlayerSneakEffect(RenderPlayerEvent.Pre event) {
         Player player = event.getEntity();
@@ -48,7 +57,12 @@ public class PlayerSneakEffect implements ITickBasedEffect {
     }
 
     @Override
-    public boolean isClientSide() {
-        return true;
+    public void writeToBuffer(FriendlyByteBuf buf) {
+
+    }
+
+    @Override
+    public ClientEffectEnum getType() {
+        return ClientEffectEnum.PLAYER_SNEAK;
     }
 }

@@ -1,6 +1,12 @@
 package BlockPower.Util.ModEffect;
 
+import BlockPower.ModEffects.ClientEffect.IClientTickBasedEffect;
 import BlockPower.ModEffects.ITickBasedEffect;
+import BlockPower.ModException.EffectException;
+import BlockPower.ModMessages.ModMessages;
+import BlockPower.ModMessages.S2CPacket.EffectAddSyncPacket_S2C;
+import BlockPower.ModMessages.S2CPacket.EffectRemoveSyncPacket_S2C;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import org.slf4j.Logger;
@@ -48,7 +54,6 @@ public class ModEffectManager {
         return isClientSide ? activeClientEffects : activeServerEffects;
     }
 
-    //TODO 添加跨端效果自动发送
     /**
      * 将添加效果操作推入队列，在下一次 tickAll 迭代开始前安全添加。
      */
@@ -57,6 +62,12 @@ public class ModEffectManager {
         Map<Entity, List<ITickBasedEffect>> pendingMap = getPendingAdditions(effect.isClientSide());
         // 将效果加入对应实体的待添加列表
         pendingMap.computeIfAbsent(entity, k -> new ArrayList<>()).add(effect);
+
+        // 对于客户端效果，还需要发送添加包进行同步
+        if (effect instanceof IClientTickBasedEffect cEffect && entity instanceof ServerPlayer player) {
+            if (cEffect.getType() == null) throw new EffectException(cEffect);
+            ModMessages.sendToPlayer(new EffectAddSyncPacket_S2C(cEffect), player);
+        }
     }
 
     /**
@@ -66,11 +77,21 @@ public class ModEffectManager {
      * @param effectClass 效果类
      */
     public static void removeEffect(Entity entity, Class<? extends ITickBasedEffect> effectClass) {
-        boolean isClientSide = entity.level().isClientSide();
+        Optional<? extends ITickBasedEffect> effect = ModEffectManager.getEntityEffect(entity, effectClass);
+        if (effect.isEmpty()) return;
+        boolean isClientSide = effect.get().isClientSide();
+        // 根据效果的运行端选择正确的队列
         Map<Entity, Set<Class<? extends ITickBasedEffect>>> pendingMap = getPendingRemovals(isClientSide);
-
         // 将待移除的效果类加入对应实体的Set中
         pendingMap.computeIfAbsent(entity, k -> new HashSet<>()).add(effectClass);
+
+        // 对于客户端效果，还需要发送移除包进行同步
+        if (isClientSide && entity instanceof ServerPlayer player) {
+            // 检查当前effectClass是否为IClientTickBasedEffect的子类
+            if (IClientTickBasedEffect.class.isAssignableFrom(effectClass)) {
+                ModMessages.sendToPlayer(new EffectRemoveSyncPacket_S2C(effectClass.asSubclass(IClientTickBasedEffect.class)), player);
+            }
+        }
     }
 
     /**

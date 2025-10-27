@@ -1,7 +1,7 @@
 package BlockPower.ModEvents.EffectEvents;
 
 import BlockPower.Main.Main;
-import BlockPower.ModEffects.UnBalanceEffect;
+import BlockPower.ModEffects.ServerEffect.UnBalanceEffect;
 import BlockPower.Util.ModEffect.ModEffectManager;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;

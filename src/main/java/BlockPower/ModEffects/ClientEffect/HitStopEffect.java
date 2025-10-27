@@ -1,5 +1,6 @@
-package BlockPower.ModEffects;
+package BlockPower.ModEffects.ClientEffect;
 
+import BlockPower.ModEffects.ITickBasedEffect;
 import BlockPower.Util.Timer.TickTimer;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;

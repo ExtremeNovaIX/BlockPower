@@ -64,6 +64,16 @@ public class ModMessages {
                 .add();
 
         //Client
+        net.messageBuilder(EffectAddSyncPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(EffectAddSyncPacket_S2C::new)
+                .encoder(EffectAddSyncPacket_S2C::toBytes)
+                .consumerMainThread(EffectAddSyncPacket_S2C::handle)
+                .add();
+        net.messageBuilder(EffectRemoveSyncPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(EffectRemoveSyncPacket_S2C::new)
+                .encoder(EffectRemoveSyncPacket_S2C::toBytes)
+                .consumerMainThread(EffectRemoveSyncPacket_S2C::handle)
+                .add();
         net.messageBuilder(HitStopPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(HitStopPacket_S2C::new)
                 .encoder(HitStopPacket_S2C::toBytes)

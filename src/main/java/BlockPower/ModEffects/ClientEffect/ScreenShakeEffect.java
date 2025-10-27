@@ -1,8 +1,10 @@
-package BlockPower.ModEffects;
+package BlockPower.ModEffects.ClientEffect;
 
+import BlockPower.ModEffects.ITickBasedEffect;
 import BlockPower.Util.ModEffect.ModEffectManager;
 import BlockPower.Util.Timer.TickTimer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ViewportEvent;
@@ -13,7 +15,7 @@ import java.util.Random;
  * 屏幕震动，仅用于客户端
  */
 @OnlyIn(Dist.CLIENT)
-public class ScreenShakeEffect implements ITickBasedEffect {
+public class ScreenShakeEffect implements IClientTickBasedEffect {
     private static final Random random = new Random();
 
     private static TickTimer timer;
@@ -23,6 +25,11 @@ public class ScreenShakeEffect implements ITickBasedEffect {
     public ScreenShakeEffect(int duration, float strength) {
         timer = new TickTimer(duration, true);
         shakeStrength = strength;
+    }
+
+    public ScreenShakeEffect(FriendlyByteBuf buf) {
+        timer = new TickTimer(buf.readInt(), true);
+        shakeStrength = buf.readFloat();
     }
 
     public static void applyScreenShakeIfActive(ViewportEvent.ComputeCameraAngles event) {
@@ -50,7 +57,13 @@ public class ScreenShakeEffect implements ITickBasedEffect {
     }
 
     @Override
-    public boolean isClientSide() {
-        return true;
+    public void writeToBuffer(FriendlyByteBuf buf) {
+        buf.writeInt(timer.getTickDuration());
+        buf.writeFloat(shakeStrength);
+    }
+
+    @Override
+    public ClientEffectEnum getType() {
+        return ClientEffectEnum.SCREEN_SHAKE;
     }
 }

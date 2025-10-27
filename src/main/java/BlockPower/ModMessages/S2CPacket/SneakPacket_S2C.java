@@ -1,6 +1,6 @@
 package BlockPower.ModMessages.S2CPacket;
 
-import BlockPower.ModEffects.PlayerSneakEffect;
+import BlockPower.ModEffects.ClientEffect.PlayerSneakEffect;
 import BlockPower.Util.ModEffect.ModEffectManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;

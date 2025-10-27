@@ -1,5 +1,6 @@
-package BlockPower.ModEffects;
+package BlockPower.ModEffects.ServerEffect;
 
+import BlockPower.ModEffects.ITickBasedEffect;
 import BlockPower.Util.SkillLock.SkillLockManager;
 import BlockPower.Util.Timer.TickTimer;
 import net.minecraft.server.level.ServerPlayer;

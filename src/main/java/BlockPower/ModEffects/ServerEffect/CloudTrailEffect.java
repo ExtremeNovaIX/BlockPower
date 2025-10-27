@@ -1,7 +1,7 @@
-package BlockPower.ModEffects;
+package BlockPower.ModEffects.ServerEffect;
 
+import BlockPower.ModEffects.ITickBasedEffect;
 import BlockPower.Util.Timer.TickTimer;
-import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;

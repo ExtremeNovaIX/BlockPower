@@ -1,5 +1,6 @@
-package BlockPower.ModEffects;
+package BlockPower.ModEffects.ServerEffect;
 
+import BlockPower.ModEffects.ITickBasedEffect;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;

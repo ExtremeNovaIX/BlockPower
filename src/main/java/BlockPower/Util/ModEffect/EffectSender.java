@@ -1,5 +1,6 @@
 package BlockPower.Util.ModEffect;
 
+import BlockPower.ModEffects.ClientEffect.ScreenShakeEffect;
 import BlockPower.ModMessages.S2CPacket.HitStopPacket_S2C;
 import BlockPower.ModMessages.S2CPacket.ShakePacket_S2C;
 import BlockPower.ModMessages.S2CPacket.SneakPacket_S2C;
@@ -14,21 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import static BlockPower.ModMessages.ModMessages.sendToPlayer;
 
 public class EffectSender {
-    //TODO 合并到ModEffectManager，实现跨端效果自动发送
     private static final TaskManager taskManager = TaskManager.getInstance(false);
-
-    /**
-     * 触发玩家屏幕震动
-     *
-     * @param duration     震动持续时间
-     * @param strength     震动强度
-     * @param serverPlayer 目标玩家
-     */
-    public static void sendScreenShake(int duration, float strength, ServerPlayer serverPlayer) {
-        sendToPlayer(new ShakePacket_S2C(duration, strength), serverPlayer);
-    }
-
-
     /**
      * 向指定区域内的所有玩家广播屏幕震动效果，强度随距离衰减。
      *
@@ -51,7 +38,7 @@ public class EffectSender {
                 double distance = player.position().distanceTo(mainPos);
 
                 if (distance <= minRadius) {
-                    sendScreenShake(duration, maxStrength, player);
+                    ModEffectManager.addEffect(player, new ScreenShakeEffect(duration, maxStrength));
                 } else if (distance <= maxStrength) {
                     // 根据距离计算强度衰减（线性衰减）
                     // 距离越近，(1 - distance / maxRadius) 的值越接近1，强度越高
@@ -60,7 +47,7 @@ public class EffectSender {
 
                     // 如果计算出的强度大于0，则向该玩家发送数据包
                     if (calculatedStrength > 0) {
-                        sendToPlayer(new ShakePacket_S2C(duration, calculatedStrength), player);
+                        ModEffectManager.addEffect(player, new ScreenShakeEffect(duration, calculatedStrength));
                     }
                 }
             }

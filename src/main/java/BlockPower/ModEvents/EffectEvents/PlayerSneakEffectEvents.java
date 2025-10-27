@@ -1,7 +1,7 @@
 package BlockPower.ModEvents.EffectEvents;
 
 import BlockPower.Main.Main;
-import BlockPower.ModEffects.PlayerSneakEffect;
+import BlockPower.ModEffects.ClientEffect.PlayerSneakEffect;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

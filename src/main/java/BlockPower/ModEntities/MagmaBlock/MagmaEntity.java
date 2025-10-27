@@ -1,8 +1,8 @@
 package BlockPower.ModEntities.MagmaBlock;
 
-import BlockPower.ModEffects.AttractEntityEffect;
-import BlockPower.ModEffects.CloudTrailEffect;
-import BlockPower.ModEffects.UnBalanceEffect;
+import BlockPower.ModEffects.ServerEffect.AttractEntityEffect;
+import BlockPower.ModEffects.ServerEffect.CloudTrailEffect;
+import BlockPower.ModEffects.ServerEffect.UnBalanceEffect;
 import BlockPower.ModEntities.IStateMachine;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
@@ -10,7 +10,6 @@ import BlockPower.Util.ModEffect.EffectSender;
 import net.minecraft.sounds.SoundEvents;
 import BlockPower.Util.Commons;
 import BlockPower.Util.ModEffect.ModEffectManager;
-import BlockPower.Util.TaskManager;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -19,8 +18,6 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -28,8 +25,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 

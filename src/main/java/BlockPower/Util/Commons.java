@@ -1,7 +1,7 @@
 package BlockPower.Util;
 
-import BlockPower.ModEffects.CloudTrailEffect;
-import BlockPower.ModEffects.UnBalanceEffect;
+import BlockPower.ModEffects.ServerEffect.CloudTrailEffect;
+import BlockPower.ModEffects.ServerEffect.UnBalanceEffect;
 import BlockPower.ModItems.ModItems;
 import BlockPower.Util.ModEffect.ModEffectManager;
 import BlockPower.Util.Timer.TimerManager;
