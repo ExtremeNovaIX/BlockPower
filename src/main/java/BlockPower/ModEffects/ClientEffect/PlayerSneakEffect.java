@@ -10,7 +10,7 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 
-
+//TODO 修复潜行效果自动跨端发送不成功问题
 public class PlayerSneakEffect implements IClientTickBasedEffect {
     private boolean isPlayerSneak;
 

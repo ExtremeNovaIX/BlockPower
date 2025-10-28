@@ -15,11 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static BlockPower.Main.Main.MOD_ID;
-
+//TODO 修复在技能结束一瞬间触发技能可以无视技能锁的问题
 @Mod(MOD_ID)
 public class Main {
-    //TODO 重构技能锁系统，以不同的优先度区分
-
     public static final String MOD_ID = "blockpower";
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 

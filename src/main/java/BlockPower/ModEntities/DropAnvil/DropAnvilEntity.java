@@ -1,5 +1,6 @@
 package BlockPower.ModEntities.DropAnvil;
 
+import BlockPower.ModEffects.ClientEffect.PlayerSneakEffect;
 import BlockPower.ModEntities.IStateMachine;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
@@ -7,6 +8,7 @@ import BlockPower.Skills.SkillLock.LockPriority;
 import BlockPower.Skills.SkillLock.SkillLockManager;
 import BlockPower.Util.Commons;
 import BlockPower.Util.ModEffect.EffectSender;
+import BlockPower.Util.ModEffect.ModEffectManager;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.nbt.CompoundTag;
@@ -27,23 +29,20 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 import static BlockPower.Util.Commons.applyDamage;
 import static BlockPower.Util.ModEffect.EffectSender.broadcastScreenShake;
 
 public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEntity.AnvilState> {
-    private int onGroundLifeTime = 100;
-
-    private int onSkyLifeTime = 600;
+    private static final int LIFE_TICK = 100;
+    private int currLifeTick = 0;
 
     private final ServerPlayer player;
 
-    private final Random r = new Random();
+    private String lockID;
 
-    private final Logger LOGGER = LoggerFactory.getLogger(DropAnvilEntity.class);
+    private final Random r = new Random();
 
     private static final TimerManager timerManager = TimerManager.getInstance(false);
 
@@ -51,28 +50,18 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
 
     private static final EntityDataAccessor<Integer> DATA_STATE = SynchedEntityData.defineId(DropAnvilEntity.class, EntityDataSerializers.INT);
 
-    private static final EntityDataAccessor<java.util.Optional<java.util.UUID>> DATA_OWNER_UUID = SynchedEntityData.defineId(DropAnvilEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<Optional<UUID>> DATA_OWNER_UUID = SynchedEntityData.defineId(DropAnvilEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
     private boolean isPlacedBelow = false;
 
-    private boolean isPlayerStandingOnAnvil = false;
-
-    private boolean lastTickIsPlayerStandingOnAnvil = false;
-
-    //TODO 重构状态机逻辑
+    private boolean isPlayerStandingOnAnvil = true;
 
     public enum AnvilState {
-        INITIALIZING, //初始化逻辑
+        INIT,
         ANIMATING,//动画逻辑
-        DROPPING,//正常坠落逻辑
+        DROPPING,//坠落逻辑
+        ON_GROUND,//在地面时的逻辑
         ENDING//结束逻辑
-    }
-
-    @Override
-    protected void defineSynchedData() {
-        // 在构造时注册DataAccessor并设置默认State
-        this.getEntityData().define(DATA_STATE, AnvilState.INITIALIZING.ordinal());
-        this.getEntityData().define(DATA_OWNER_UUID, Optional.empty());
     }
 
     public DropAnvilEntity(EntityType<?> entityType, Level level) {
@@ -84,6 +73,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
         super(ModEntities.DROP_ANVIL.get(), player.level());
         this.player = player;
         this.getEntityData().set(DATA_OWNER_UUID, Optional.of(player.getUUID()));
+        this.lockID = player.getName().getString() + "_AnvilLock:" + this.getUUID();
     }
 
     public DropAnvilEntity(ServerPlayer player, double x, double y, double z) {
@@ -91,29 +81,40 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
         this.setPos(x, y, z);
         this.player = player;
         this.getEntityData().set(DATA_OWNER_UUID, Optional.of(player.getUUID()));
+        this.lockID = player.getName().getString() + "_AnvilLock:" + this.getUUID();
     }
 
     @Override
     public void tick() {
         super.tick();
-        handleAnvilDiscard();
+        currLifeTick++;
         handleAnvilMovement();
         if (!this.level().isClientSide) {
-            updateState();
-            handlePlayerSneak();
+            handleStateChange();
+            handlePlayerReset();
+            handleStateAction();
         }
     }
 
-    private void handlePlayerSneak() {
+    /**
+     * 如果玩家脱离铁砧，则重置状态
+     */
+    private void handlePlayerReset() {
+        if (!isPlayerStandingOnAnvil) return;
+
+        //如果玩家按下shift，则设置骑乘状态为false
         if (this.player.isShiftKeyDown()) {
             this.isPlayerStandingOnAnvil = false;
-        }
+            EffectSender.sendPlayerSneak(player, false);
 
-        boolean stateChanged = this.lastTickIsPlayerStandingOnAnvil != this.isPlayerStandingOnAnvil;
-        if (stateChanged) {
-            EffectSender.sendPlayerSneak(this.player, this.isPlayerStandingOnAnvil);
+            SkillLockManager.unlock(player, lockID);
+            player.noPhysics = false;
+            player.setNoGravity(false);
         }
+    }
 
+    @Override
+    public void handleStateAction() {
         if (this.isPlayerStandingOnAnvil) {
             taskManager.runOnce(this, "reset_speed", () -> {
                 player.setDeltaMovement(Vec3.ZERO);
@@ -125,102 +126,107 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
             Vec3 desiredVelocity = targetPosition.subtract(player.position());
             // 将这个矢量直接设置为玩家的运动矢量
             player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), desiredVelocity));
-        } else {
-            taskManager.runOnce(this, "reset_player", () -> {
-                SkillLockManager.unlock(player, player.getName().getString() + "_AnvilLock");
-                player.noPhysics = false;
-                player.setNoGravity(false);
-            });
         }
 
-        this.lastTickIsPlayerStandingOnAnvil = this.isPlayerStandingOnAnvil;
+        if (getState() == AnvilState.DROPPING) {
+            hurtEntity();
+        }
+
     }
 
-    private void updateState() {
-        AnvilState anvilState = getState();
-        if (this.onGround()) {
+    @Override
+    public void handleStateChange() {
+        //如果铁砧超出世界范围，则切换到ENDING状态
+        if (this.position().y < -64) {
             setState(AnvilState.ENDING);
+            return;
         }
 
-        //如果不是初始化状态，且速度大于0.2，进入掉落状态
-        if (getState() != AnvilState.INITIALIZING) {
-            if (this.getDeltaMovement().length() > 0.2) {
+        //如果铁砧生命周期结束，则切换到ENDING状态
+        if (currLifeTick >= LIFE_TICK) {
+            setState(AnvilState.ENDING);
+            return;
+        }
+
+        //在地面时切换到ON_GROUND状态
+        if (this.onGround()) {
+            setState(AnvilState.ON_GROUND);
+            return;
+        }
+
+        //如果不是初始化状态或者动画状态，且速度大于0.1，进入掉落状态
+        if (getState() != AnvilState.INIT && getState() != AnvilState.ANIMATING) {
+            if (this.getDeltaMovement().length() > 0.1) {
                 setState(AnvilState.DROPPING);
-            } else {
-                if (timerManager.isTimerCyclingDue(this, "ending", 5)) {
-                    setState(AnvilState.ENDING);
-                }
+                return;
             }
         }
 
+        AnvilState anvilState = getState();
         switch (anvilState) {
-            case INITIALIZING:
-                SkillLockManager.lock(player, player.getName().getString() + "_AnvilLock", LockPriority.LOWEST);
-                if (!timerManager.isTimerCyclingDue(this, "initializing", 5)) {
-                    isPlayerStandingOnAnvil = true;
-                    Commons.changePixelCoreNBT(player, 1.0F, null, null);
-                } else {
+            case INIT:
+                setState(AnvilState.ANIMATING);
+                break;
+            case ANIMATING:
+                //5tick后切换到掉落状态
+                if (timerManager.isTimerCyclingDue(this, "anvil_animating", 5)) {
                     setState(AnvilState.DROPPING);
                 }
                 break;
+
             case DROPPING:
-                hurtEntity();
-                break;
-            case ENDING:
+                if (this.onGround()) {
+                    setState(AnvilState.ON_GROUND);
+                }
                 break;
         }
     }
 
+    @Override
+    public void onStateChange(AnvilState newState, AnvilState oldState) {
+        switch (newState) {
+            case ANIMATING:
+                //添加技能锁
+                SkillLockManager.lock(player, lockID, LockPriority.LOWEST);
+                //设置玩家站立在铁砧上
+                isPlayerStandingOnAnvil = true;
+                EffectSender.sendPlayerSneak(player, true);
+                //切换像素核心材质为铁砧
+                Commons.changePixelCoreNBT(player, 1.0F, null, null);
+                break;
+            case ON_GROUND:
+                // 落地时播放落地音效
+                this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
+                        SoundEvents.ANVIL_LAND,
+                        SoundSource.PLAYERS, 0.5f, r.nextFloat(0.5f) + 0.8f);
+                break;
+            case ENDING:
+                // 重置状态逻辑
+                isPlayerStandingOnAnvil = false;
+                EffectSender.sendPlayerSneak(player, false);
+                SkillLockManager.unlock(player, lockID);
+                player.noPhysics = false;
+                player.setNoGravity(false);
+
+                this.discard();
+                break;
+        }
+    }
 
     private void hurtEntity() {
         List<Entity> entityList = applyDamage(this, player, 10F, 9, ModSounds.ANVIL_SOUND.get());
         Commons.knockBackEntity(this, entityList, 1.5);
         if (!entityList.isEmpty()) {
             broadcastScreenShake(this, 6, 2f, 15, 7);
-            //触发一次卡帧动画以后不再出现卡帧动画效果
-//            taskManager.runOnce(this, "hitStop", () -> {
-//                sendHitStop(5, player, this);
-//            });
-        }
-    }
-
-    private void handleAnvilDiscard() {
-        if (this.position().y < -64) {
-            this.discard();
-        }
-
-        if (this.onGround()) {
-            onSkyLifeTime = 600;
-            onGroundLifeTime--;
-        } else {
-            onGroundLifeTime = 100;
-            onSkyLifeTime--;
-        }
-
-        if (onSkyLifeTime <= 0 || onGroundLifeTime <= 0) {
-            isPlayerStandingOnAnvil = false;
-            if (player != null) {
-                player.noPhysics = false;
-                player.setNoGravity(false);
-            }
-            this.discard();
         }
     }
 
     private void handleAnvilMovement() {
         if (!this.isNoGravity()) {
-            this.setDeltaMovement(this.getDeltaMovement().add(0.0, -0.16, 0.0));
+            this.setDeltaMovement(this.getDeltaMovement().add(0.0, -0.2, 0.0));
         }
         this.move(MoverType.SELF, this.getDeltaMovement());
-        this.setDeltaMovement(this.getDeltaMovement().scale(0.98));
-
-        if (this.onGround()) {
-            taskManager.runOnce(this, "playSound", () -> {
-                this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
-                        SoundEvents.ANVIL_LAND,
-                        SoundSource.PLAYERS, 0.5f, r.nextFloat(0.5f) + 0.8f);
-            });
-        }
+        this.setDeltaMovement(this.getDeltaMovement().scale(0.99));
     }
 
     public static void createDropAnvil(ServerPlayer player) {
@@ -237,6 +243,14 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
 //            dropAnvil.setPos(spawnPos.x, spawnPos.y - 1, spawnPos.z);
         }
     }
+
+    @Override
+    protected void defineSynchedData() {
+        // 在构造时注册DataAccessor并设置默认State
+        this.getEntityData().define(DATA_STATE, AnvilState.INIT.ordinal());
+        this.getEntityData().define(DATA_OWNER_UUID, Optional.empty());
+    }
+
 
     @Override
     protected void readAdditionalSaveData(CompoundTag p_20052_) {
@@ -256,11 +270,6 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
     @Override
     public boolean canCollideWith(@NotNull Entity entity) {
         return entity instanceof DropAnvilEntity || entity == this.player;
-    }
-
-    @Override
-    public boolean isPushable() {
-        return false;
     }
 
     @Override
@@ -284,10 +293,5 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
     @Override
     public AnvilState[] getStateEnumValues() {
         return AnvilState.values();
-    }
-
-    @Override
-    public void onStateChange(AnvilState newState, AnvilState oldState) {
-        
     }
 }

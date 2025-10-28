@@ -309,6 +309,16 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
 
     }
 
+    @Override
+    public void handleStateChange() {
+
+    }
+
+    @Override
+    public void handleStateAction() {
+
+    }
+
     public Vec3 getMinecartSpeed() {
         return minecartSpeed;
     }

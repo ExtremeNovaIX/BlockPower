@@ -55,7 +55,8 @@ public class MagmaEntity extends Entity implements IStateMachine<MagmaEntity.Mag
         }
     }
 
-    private void handleStateAction() {
+    @Override
+    public void handleStateAction() {
         MagmaEntityState currState = getState();
         switch (currState) {
             case INIT:
@@ -131,7 +132,8 @@ public class MagmaEntity extends Entity implements IStateMachine<MagmaEntity.Mag
         }
     }
 
-    private void handleStateChange() {
+    @Override
+    public void handleStateChange() {
         if (currentTick >= MAX_LIFE_TICK) {
             setState(MagmaEntityState.END);
             return;
