@@ -5,10 +5,11 @@ import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import org.jetbrains.annotations.NotNull;
 
 public class DropAnvilSkill implements IPacketSerializableSkill {
     @Override
-    public String getSkillName() {
+    public @NotNull String getSkillName() {
         return "DropAnvil";
     }
 
@@ -53,8 +54,4 @@ public class DropAnvilSkill implements IPacketSerializableSkill {
         return true;
     }
 
-    @Override
-    public boolean isSkillAutoLocked() {
-        return true;
-    }
 }

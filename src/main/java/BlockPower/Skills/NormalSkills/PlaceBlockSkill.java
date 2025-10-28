@@ -22,10 +22,11 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.ForgeMod;
+import org.jetbrains.annotations.NotNull;
 
 public class PlaceBlockSkill implements IPacketSerializableSkill {
     @Override
-    public String getSkillName() {
+    public @NotNull String getSkillName() {
         return "PlaceBlock";
     }
 
@@ -102,11 +103,6 @@ public class PlaceBlockSkill implements IPacketSerializableSkill {
     @Override
     public boolean isSkillConsumeResource() {
         return true;
-    }
-
-    @Override
-    public boolean isSkillAutoLocked() {
-        return false;
     }
 
     @Override

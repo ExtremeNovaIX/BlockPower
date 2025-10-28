@@ -8,6 +8,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 public class DashSkill implements IPacketSerializableSkill {
     private static final TaskManager taskManager = TaskManager.getInstance(false);
@@ -22,7 +23,7 @@ public class DashSkill implements IPacketSerializableSkill {
     }
 
     @Override
-    public String getSkillName() {
+    public @NotNull String getSkillName() {
         return "Dash";
     }
 
@@ -86,8 +87,4 @@ public class DashSkill implements IPacketSerializableSkill {
         return false;
     }
 
-    @Override
-    public boolean isSkillAutoLocked() {
-        return false;
-    }
 }

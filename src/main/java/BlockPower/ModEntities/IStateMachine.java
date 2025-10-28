@@ -20,11 +20,9 @@ public interface IStateMachine<E extends Enum<E>> {
 
 
     /**
-     * 每次状态改变时调用，默认实现为空。
+     * 每次状态改变时调用
      */
-    default void onStateChange(E newState, E oldState) {
-
-    }
+    void onStateChange(E newState, E oldState)
 
     default E getState() {
         //this实现了IStateMachine接口的实体对象

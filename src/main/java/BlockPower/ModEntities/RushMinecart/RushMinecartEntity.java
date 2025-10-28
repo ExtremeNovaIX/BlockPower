@@ -3,8 +3,9 @@ package BlockPower.ModEntities.RushMinecart;
 import BlockPower.ModEntities.IStateMachine;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
+import BlockPower.Skills.SkillLock.LockPriority;
+import BlockPower.Skills.SkillLock.SkillLockManager;
 import BlockPower.Util.Commons;
-import BlockPower.Util.SkillLock.SkillLockManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -57,8 +58,6 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
 
     private static final TimerManager timerManager = TimerManager.getInstance(false);//全局计时器管理类
 
-    private static final SkillLockManager skillLockManager = SkillLockManager.getInstance();
-
     private Vec3 minecartSpeed = Vec3.ZERO;
 
     private static final EntityDataAccessor<Integer> DATA_STATE = SynchedEntityData.defineId(RushMinecartEntity.class, EntityDataSerializers.INT);
@@ -107,12 +106,13 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
         switch (currentState) {
             case INITIALIZING:
                 player.startRiding(this);
+                SkillLockManager.lock(player, player.getName().getString() + "_MinecartLock", LockPriority.LOWEST);
                 setState(RushMinecartState.RUSHING);
                 break;
 
             case RUSHING:
                 if (this.getFirstPassenger() != player) {
-                    skillLockManager.unlock(player);
+                    SkillLockManager.unlock(player, player.getName().getString() + "_MinecartLock");
                     setState(RushMinecartState.SEEKING);
                     break;
                 }
@@ -148,7 +148,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
 
             case CRASHED:
                 //TODO 修改为按速度大小决定伤害检测范围
-                skillLockManager.unlock(player);
+                SkillLockManager.unlock(player, player.getName().getString() + "_MinecartLock");
                 if (this.getFirstPassenger() == player) {
                     player.stopRiding();
                 }
@@ -302,6 +302,11 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
     @Override
     public RushMinecartState[] getStateEnumValues() {
         return RushMinecartState.values();
+    }
+
+    @Override
+    public void onStateChange(RushMinecartState newState, RushMinecartState oldState) {
+
     }
 
     public Vec3 getMinecartSpeed() {

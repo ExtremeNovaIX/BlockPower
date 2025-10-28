@@ -9,6 +9,7 @@ import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ public class AirJumpSkill implements IPacketSerializableSkill {
     }
 
     @Override
-    public String getSkillName() {
+    public @NotNull String getSkillName() {
         return "AirJump";
     }
 
@@ -124,8 +125,4 @@ public class AirJumpSkill implements IPacketSerializableSkill {
         return false;
     }
 
-    @Override
-    public boolean isSkillAutoLocked() {
-        return false;
-    }
 }

@@ -1,7 +1,8 @@
 package BlockPower.ModEffects.ServerEffect;
 
 import BlockPower.ModEffects.ITickBasedEffect;
-import BlockPower.Util.SkillLock.SkillLockManager;
+import BlockPower.Skills.SkillLock.LockPriority;
+import BlockPower.Skills.SkillLock.SkillLockManager;
 import BlockPower.Util.Timer.TickTimer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -11,7 +12,6 @@ import net.minecraft.world.phys.Vec3;
 
 
 public class UnBalanceEffect implements ITickBasedEffect {
-    private static final SkillLockManager skillLockManager = SkillLockManager.getInstance();
     private final TickTimer timer;
     // 内部处理器，可以是 Mob 类型也可以是 Player 类型
     private final IEffectHandler handler;
@@ -113,16 +113,19 @@ public class UnBalanceEffect implements ITickBasedEffect {
      */
     private static class PlayerUnbalanceHandler implements IEffectHandler {
         private final ServerPlayer affectedPlayer;
-
+        private boolean a = false;
         public PlayerUnbalanceHandler(ServerPlayer player) {
             this.affectedPlayer = player;
+
         }
 
         @Override
         public void tick(int remainingTicks) {
-            if (affectedPlayer.isRemoved()) return;
-            // 对玩家应用技能锁
-            skillLockManager.overrideableLock(affectedPlayer, remainingTicks);
+            if (a) return;
+            // 仅一次为玩家添加技能锁
+            String skillLockID = affectedPlayer.getName().getString() + "_UnBalanceEffect";
+            SkillLockManager.lock(affectedPlayer, skillLockID, LockPriority.HIGHEST,remainingTicks);
+            a = true;
         }
 
         @Override

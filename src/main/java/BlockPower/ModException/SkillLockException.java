@@ -1,5 +1,9 @@
 package BlockPower.ModException;
 
+import BlockPower.Skills.SkillLock.SkillLockManager;
+
+import static BlockPower.Skills.SkillLock.SkillLockManager.LOCK_MAX_TICK;
+
 /**
  * 与 SkillLockManager 相关的操作中发生的特定异常。
  * 当 SkillLockManager 的API被不正确地调用时，应抛出此异常，
@@ -8,25 +12,17 @@ package BlockPower.ModException;
  * 通常由编程错误引起，调用者应修复其调用代码，而不是捕获此异常。
  */
 public class SkillLockException extends RuntimeException {
-  /**
-   * 构造一个新的 SkillLockException，并指定详细的错误信息。
-   *
-   * @param message 详细的错误信息，用于向开发者解释错误原因。
-   */
-  public SkillLockException(String message) {
-    super(message);
-  }
 
-  /**
-   * 构造一个新的 SkillLockException，并指定详细的错误信息和异常原因。
-   * <p>
-   * 这个构造函数允许你包装另一个底层异常，形成异常链，
-   * 这对于调试非常有用。
-   *
-   * @param message 详细的错误信息。
-   * @param cause   异常的原因（通常是另一个被捕获的异常）。
-   */
-  public SkillLockException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    /**
+     * 超时异常，如果超过20秒没解锁，则认为技能意外锁死。
+     * 此时抛出异常提醒开发者修复代码，避免技能锁死。
+     */
+    public SkillLockException(String lockId, SkillLockManager.LockData lockData,long currentTick) {
+        super("Skill Lock out of time(" + LOCK_MAX_TICK + "ticks). " +
+                "LockId: " + lockId + ", Priority: " + lockData.priority + ", " +
+                "Duration: " + lockData.duration + ", " +
+                "StartTick: " + lockData.startTick + ", " +
+                "CurrentTick: " + currentTick
+        );
+    }
 }

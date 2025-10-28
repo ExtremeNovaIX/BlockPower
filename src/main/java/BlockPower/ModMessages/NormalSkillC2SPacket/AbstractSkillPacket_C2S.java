@@ -6,8 +6,8 @@ import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.MinerState.server.PlayerResourceData;
 import BlockPower.Skills.MinerState.server.PlayerResourceManager;
 import BlockPower.Skills.NormalSkills.ISkill;
+import BlockPower.Skills.SkillLock.SkillLockManager;
 import BlockPower.Util.Commons;
-import BlockPower.Util.SkillLock.SkillLockManager;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +16,6 @@ abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket{
     private static final Logger log = LoggerFactory.getLogger(AbstractSkillPacket_C2S.class);
     protected ISkill skill;
     protected static final PlayerResourceManager playerResourceManager = PlayerResourceManager.getInstance();
-    protected static final SkillLockManager skillLockManager = SkillLockManager.getInstance();
 
     public AbstractSkillPacket_C2S(ISkill skill) {
         this.skill = skill;
@@ -29,7 +28,7 @@ abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket{
     @Override
     protected boolean checkLegit(ServerPlayer player) {
         if (Commons.isSpectatorOrCreativeMode(player)) return true;
-        if (skillLockManager.isLocked(player)) return false;//如果玩家被技能锁锁定，直接返回false
+        if (SkillLockManager.isLocked(player)) return false;//如果玩家被技能锁锁定，直接返回false
         if (player.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) return false;//如果玩家主手物品不是像素核心，直接返回false
 
         PlayerResourceData playerResourceData = playerResourceManager.getPlayerData(player);
@@ -49,10 +48,6 @@ abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket{
     @Override
     protected void afterHandleServerSide(ServerPlayer player) {
         consumeResource(player, skill);
-
-        if (this.isSkillAutoLocked()) {
-            skillLockManager.lock(player);
-        }
     }
 
     protected void consumeResource(ServerPlayer player, ISkill skill) {
@@ -67,9 +62,5 @@ abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket{
 
     protected boolean isSkillConsumeResource() {
         return skill.isSkillConsumeResource();
-    }
-
-    protected boolean isSkillAutoLocked() {
-        return skill.isSkillAutoLocked();
     }
 }

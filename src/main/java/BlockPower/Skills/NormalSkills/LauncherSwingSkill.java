@@ -18,6 +18,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class LauncherSwingSkill implements IPacketSerializableSkill {
     private static final TaskManager taskManager = TaskManager.getInstance(false);
 
     @Override
-    public String getSkillName() {
+    public @NotNull String getSkillName() {
         return "LauncherSwing";
     }
 
@@ -82,11 +83,6 @@ public class LauncherSwingSkill implements IPacketSerializableSkill {
 
     @Override
     public boolean isSkillConsumeResource() {
-        return false;
-    }
-
-    @Override
-    public boolean isSkillAutoLocked() {
         return false;
     }
 

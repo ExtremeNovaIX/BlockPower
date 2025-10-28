@@ -1,14 +1,12 @@
 package BlockPower.ModEntities.DropAnvil;
 
-import BlockPower.ModEffects.ClientEffect.PlayerSneakEffect;
-import BlockPower.ModEffects.ClientEffect.ScreenShakeEffect;
 import BlockPower.ModEntities.IStateMachine;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
+import BlockPower.Skills.SkillLock.LockPriority;
+import BlockPower.Skills.SkillLock.SkillLockManager;
 import BlockPower.Util.Commons;
 import BlockPower.Util.ModEffect.EffectSender;
-import BlockPower.Util.ModEffect.ModEffectManager;
-import BlockPower.Util.SkillLock.SkillLockManager;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.nbt.CompoundTag;
@@ -51,8 +49,6 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
 
     private static final TaskManager taskManager = TaskManager.getInstance(false);
 
-    private static final SkillLockManager skillLockManager = SkillLockManager.getInstance();
-
     private static final EntityDataAccessor<Integer> DATA_STATE = SynchedEntityData.defineId(DropAnvilEntity.class, EntityDataSerializers.INT);
 
     private static final EntityDataAccessor<java.util.Optional<java.util.UUID>> DATA_OWNER_UUID = SynchedEntityData.defineId(DropAnvilEntity.class, EntityDataSerializers.OPTIONAL_UUID);
@@ -62,6 +58,8 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
     private boolean isPlayerStandingOnAnvil = false;
 
     private boolean lastTickIsPlayerStandingOnAnvil = false;
+
+    //TODO 重构状态机逻辑
 
     public enum AnvilState {
         INITIALIZING, //初始化逻辑
@@ -129,7 +127,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
             player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), desiredVelocity));
         } else {
             taskManager.runOnce(this, "reset_player", () -> {
-                skillLockManager.unlock(player);
+                SkillLockManager.unlock(player, player.getName().getString() + "_AnvilLock");
                 player.noPhysics = false;
                 player.setNoGravity(false);
             });
@@ -157,6 +155,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
 
         switch (anvilState) {
             case INITIALIZING:
+                SkillLockManager.lock(player, player.getName().getString() + "_AnvilLock", LockPriority.LOWEST);
                 if (!timerManager.isTimerCyclingDue(this, "initializing", 5)) {
                     isPlayerStandingOnAnvil = true;
                     Commons.changePixelCoreNBT(player, 1.0F, null, null);
@@ -285,5 +284,10 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
     @Override
     public AnvilState[] getStateEnumValues() {
         return AnvilState.values();
+    }
+
+    @Override
+    public void onStateChange(AnvilState newState, AnvilState oldState) {
+        
     }
 }

@@ -2,6 +2,7 @@ package BlockPower.ModEvents;
 
 import BlockPower.Main.Main;
 import BlockPower.Skills.MinerState.server.PlayerResourceManager;
+import BlockPower.Skills.SkillLock.SkillLockManager;
 import BlockPower.Util.ModEffect.ModEffectManager;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
@@ -18,6 +19,7 @@ public class ForgeServerEvents {
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             ModEffectManager.tickAll(false);
+            SkillLockManager.serverTick();
         }
     }
 
