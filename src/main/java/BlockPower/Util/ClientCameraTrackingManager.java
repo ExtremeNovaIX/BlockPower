@@ -7,7 +7,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
 public class ClientCameraTrackingManager {
-
+//TODO 改写为Effect驱动
     public static int trackedEntityId = -1; // -1 表示没有目标
     private static final float SMOOTHING_FACTOR = 0.2f; // 平滑系数 (值越小，转动越慢越平滑；值越大，转动越快)
     private static int trackingTime = 10;

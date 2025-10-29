@@ -45,13 +45,7 @@ abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket{
         }
     }
 
-    @Override
-    protected void afterHandleServerSide(ServerPlayer player) {
-        consumeResource(player, skill);
-    }
-
     protected void consumeResource(ServerPlayer player, ISkill skill) {
-        if (!this.isSkillConsumeResource()) return;
         if (Commons.isSpectatorOrCreativeMode(player)) return;
         if (skill.getSkillCostType() == null && skill.getSkillCostAmount() == 0) return;
         AllResourceType type = skill.getSkillCostType();

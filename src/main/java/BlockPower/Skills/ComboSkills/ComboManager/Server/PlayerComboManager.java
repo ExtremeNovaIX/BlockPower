@@ -1,4 +1,4 @@
-package BlockPower.Util.ComboManager;
+package BlockPower.Skills.ComboSkills.ComboManager.Server;
 
 import BlockPower.ModMessages.ComboSkillPacket.ComboStandbyPacket_S2C;
 import BlockPower.ModMessages.ModMessages;

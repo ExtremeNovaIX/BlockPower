@@ -1,4 +1,4 @@
-package BlockPower.Util.ModEffect;
+package BlockPower.ModEffects.EffectManager;
 
 import BlockPower.ModEffects.ClientEffect.IClientTickBasedEffect;
 import BlockPower.ModEffects.ITickBasedEffect;
@@ -67,6 +67,7 @@ public class ModEffectManager {
         if (effect instanceof IClientTickBasedEffect cEffect && entity instanceof ServerPlayer player) {
             if (cEffect.getType() == null) throw new EffectException(cEffect);
             ModMessages.sendToPlayer(new EffectAddSyncPacket_S2C(cEffect), player);
+            log.info("Auto send EffectAddSyncPacket_S2C: {} to {}", cEffect, player.getGameProfile().getName());
         }
     }
 
@@ -90,6 +91,7 @@ public class ModEffectManager {
             // 检查当前effectClass是否为IClientTickBasedEffect的子类
             if (IClientTickBasedEffect.class.isAssignableFrom(effectClass)) {
                 ModMessages.sendToPlayer(new EffectRemoveSyncPacket_S2C(effectClass.asSubclass(IClientTickBasedEffect.class)), player);
+                log.info("Auto send EffectRemoveSyncPacket_S2C: {} to {}", effectClass.asSubclass(IClientTickBasedEffect.class), player.getGameProfile().getName());
             }
         }
     }

@@ -2,7 +2,7 @@ package BlockPower.ModEvents;
 
 import BlockPower.Main.Main;
 import BlockPower.ModItems.ModItems;
-import BlockPower.Skills.ComboSkills.Client.ComboHudRenderer;
+import BlockPower.Skills.ComboSkills.ComboManager.Client.ComboHudRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;

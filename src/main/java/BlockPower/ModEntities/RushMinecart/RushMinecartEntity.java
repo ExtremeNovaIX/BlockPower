@@ -30,8 +30,8 @@ import java.util.List;
 
 import static BlockPower.Util.Commons.applyDamage;
 import static BlockPower.Util.Commons.detectEntity;
-import static BlockPower.Util.ModEffect.EffectSender.broadcastScreenShake;
-import static BlockPower.Util.ModEffect.EffectSender.sendHitStop;
+import static BlockPower.ModEffects.EffectManager.EffectSender.broadcastScreenShake;
+import static BlockPower.ModEffects.EffectManager.EffectSender.sendHitStop;
 
 public class RushMinecartEntity extends AbstractMinecart implements IStateMachine<RushMinecartEntity.RushMinecartState> {
 

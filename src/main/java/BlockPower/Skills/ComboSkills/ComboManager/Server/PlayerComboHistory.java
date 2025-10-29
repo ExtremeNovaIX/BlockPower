@@ -1,4 +1,4 @@
-package BlockPower.Util.ComboManager;
+package BlockPower.Skills.ComboSkills.ComboManager.Server;
 
 import BlockPower.Skills.ComboSkills.ComboSkill;
 import BlockPower.Skills.ComboSkills.ComboSkillType;

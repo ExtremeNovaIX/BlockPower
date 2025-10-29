@@ -3,7 +3,7 @@ package BlockPower.Util;
 import BlockPower.ModEffects.ServerEffect.CloudTrailEffect;
 import BlockPower.ModEffects.ServerEffect.UnBalanceEffect;
 import BlockPower.ModItems.ModItems;
-import BlockPower.Util.ModEffect.ModEffectManager;
+import BlockPower.ModEffects.EffectManager.ModEffectManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;

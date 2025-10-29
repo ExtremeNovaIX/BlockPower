@@ -1,7 +1,7 @@
 package BlockPower.ModMessages.ComboSkillPacket;
 
 import BlockPower.ModMessages.S2CPacket.AbstractS2CPacket;
-import BlockPower.Skills.ComboSkills.Client.ClientComboData;
+import BlockPower.Skills.ComboSkills.ComboManager.Client.ClientComboData;
 import BlockPower.Skills.ComboSkills.ComboSkill;
 import BlockPower.Skills.ComboSkills.ComboSkillType;
 import net.minecraft.network.FriendlyByteBuf;

@@ -120,11 +120,13 @@ public class ModMessages {
     // 一个辅助方法，用于从客户端向服务端发包
     public static <MSG> void sendToServer(MSG message) {
         INSTANCE.sendToServer(message);
+        LOGGER.info("Server received: {}", message);
     }
 
     // 一个辅助方法，用于从服务端向特定玩家发包
     public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), message);
+        LOGGER.info("Sent packet to player {}: {}", player.getGameProfile().getName(), message);
     }
 
     // 一个辅助方法，用于从服务端向所有玩家发包

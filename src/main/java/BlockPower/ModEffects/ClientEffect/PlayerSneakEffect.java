@@ -1,7 +1,6 @@
 package BlockPower.ModEffects.ClientEffect;
 
-import BlockPower.ModEffects.ITickBasedEffect;
-import BlockPower.Util.ModEffect.ModEffectManager;
+import BlockPower.ModEffects.EffectManager.ModEffectManager;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;

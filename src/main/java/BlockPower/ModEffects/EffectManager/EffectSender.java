@@ -1,8 +1,7 @@
-package BlockPower.Util.ModEffect;
+package BlockPower.ModEffects.EffectManager;
 
 import BlockPower.ModEffects.ClientEffect.ScreenShakeEffect;
 import BlockPower.ModMessages.S2CPacket.HitStopPacket_S2C;
-import BlockPower.ModMessages.S2CPacket.ShakePacket_S2C;
 import BlockPower.ModMessages.S2CPacket.SneakPacket_S2C;
 import BlockPower.Util.Commons;
 import BlockPower.Util.TaskManager;

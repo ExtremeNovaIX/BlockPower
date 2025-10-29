@@ -58,5 +58,8 @@ public class NormalSkillPacket_C2S extends AbstractSkillPacket_C2S {
         if (!skillExecutionResult.isSuccess()) {
             throw new SilentSkillException(skill, skillExecutionResult.getMessage());
         }
+        // 检查是否需要消耗资源
+        if (!this.isSkillConsumeResource()) return;
+        consumeResource(player, skill);
     }
 }

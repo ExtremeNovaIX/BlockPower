@@ -1,14 +1,12 @@
 package BlockPower.ModEntities.DropAnvil;
 
-import BlockPower.ModEffects.ClientEffect.PlayerSneakEffect;
 import BlockPower.ModEntities.IStateMachine;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Skills.SkillLock.LockPriority;
 import BlockPower.Skills.SkillLock.SkillLockManager;
 import BlockPower.Util.Commons;
-import BlockPower.Util.ModEffect.EffectSender;
-import BlockPower.Util.ModEffect.ModEffectManager;
+import BlockPower.ModEffects.EffectManager.EffectSender;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.nbt.CompoundTag;
@@ -26,13 +24,11 @@ import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 import static BlockPower.Util.Commons.applyDamage;
-import static BlockPower.Util.ModEffect.EffectSender.broadcastScreenShake;
+import static BlockPower.ModEffects.EffectManager.EffectSender.broadcastScreenShake;
 
 public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEntity.AnvilState> {
     private static final int LIFE_TICK = 100;
@@ -201,13 +197,13 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
                         SoundSource.PLAYERS, 0.5f, r.nextFloat(0.5f) + 0.8f);
                 break;
             case ENDING:
-                // 重置状态逻辑
-                isPlayerStandingOnAnvil = false;
-                EffectSender.sendPlayerSneak(player, false);
-                SkillLockManager.unlock(player, lockID);
-                player.noPhysics = false;
-                player.setNoGravity(false);
-
+                if (isPlayerStandingOnAnvil) {
+                    // 重置状态逻辑
+                    EffectSender.sendPlayerSneak(player, false);
+                    SkillLockManager.unlock(player, lockID);
+                    player.noPhysics = false;
+                    player.setNoGravity(false);
+                }
                 this.discard();
                 break;
         }

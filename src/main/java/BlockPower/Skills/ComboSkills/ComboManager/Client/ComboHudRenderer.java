@@ -1,7 +1,6 @@
-package BlockPower.Skills.ComboSkills.Client;
+package BlockPower.Skills.ComboSkills.ComboManager.Client;
 
 import BlockPower.Main.Main;
-import BlockPower.Skills.ComboSkills.Client.ClientComboData;
 import BlockPower.Skills.ComboSkills.ComboSkill;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;

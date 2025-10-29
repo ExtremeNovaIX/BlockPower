@@ -6,7 +6,7 @@ import BlockPower.ModMessages.ComboSkillPacket.ComboTriggeredPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.ModMessages.NormalSkillC2SPacket.NormalSkillPacket_C2S;
 import BlockPower.ModMessages.NormalSkillC2SPacket.NormalSkillType;
-import BlockPower.Skills.ComboSkills.Client.ClientComboData;
+import BlockPower.Skills.ComboSkills.ComboManager.Client.ClientComboData;
 import BlockPower.Skills.ComboSkills.ComboSkillType;
 import BlockPower.Skills.MinerState.client.ClientMinerState;
 import BlockPower.Skills.NormalSkills.*;

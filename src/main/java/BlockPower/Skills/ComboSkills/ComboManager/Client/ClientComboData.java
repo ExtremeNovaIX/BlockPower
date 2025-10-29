@@ -1,4 +1,4 @@
-package BlockPower.Skills.ComboSkills.Client;
+package BlockPower.Skills.ComboSkills.ComboManager.Client;
 
 import BlockPower.Skills.ComboSkills.ComboSkillType;
 import net.minecraftforge.api.distmarker.Dist;
