@@ -3,8 +3,10 @@ package BlockPower.ModEvents;
 import BlockPower.Main.Main;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModItems.ModItems;
+import BlockPower.ModParticles.AdvancedParticle;
 import BlockPower.ModParticles.GlowingSparkParticle;
 import BlockPower.ModParticles.ModParticles;
+import BlockPower.ModParticles.ParticleRibbon;
 import BlockPower.ModRenderers.*;
 import BlockPower.Skills.ComboSkills.ComboManager.Client.ComboHudRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -47,6 +49,8 @@ public class ModClientEvents {
     @SubscribeEvent
     public static void registerParticleFactories(RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(ModParticles.GLOWING_SPARK.get(), GlowingSparkParticle.Provider::new);
+        event.registerSpriteSet(ModParticles.ADVANCED_PARTICLE.get(), AdvancedParticle.Factory::new);
+        event.registerSpriteSet(ModParticles.RIBBON_PARTICLE.get(), ParticleRibbon.Factory::new);
     }
 
     @SubscribeEvent

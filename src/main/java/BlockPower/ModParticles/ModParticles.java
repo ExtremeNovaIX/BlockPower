@@ -14,7 +14,6 @@ public class ModParticles {
     public static final DeferredRegister<ParticleType<?>> PARTICLE_TYPES =
             DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, Main.MOD_ID);
 
-    // 注册新的粒子类型
     public static final RegistryObject<ParticleType<GlowingSparkParticleOptions>> GLOWING_SPARK =
             PARTICLE_TYPES.register("glowing_spark",
                     () -> new ParticleType<>(true, GlowingSparkParticleOptions.DESERIALIZER) {
@@ -24,5 +23,13 @@ public class ModParticles {
                             return GlowingSparkParticleOptions.CODEC;
                         }
                     });
+    public static final RegistryObject<ParticleType<ParticleData>> ADVANCED_PARTICLE =
+            PARTICLE_TYPES.register("advanced_particle",
+                    () -> new AdvancedParticleType(true)
+            );
+    public static final RegistryObject<ParticleType<RibbonParticleData>> RIBBON_PARTICLE =
+            PARTICLE_TYPES.register("ribbon_particle",
+                    () -> new RibbonParticleType(true)
+            );
 
 }
