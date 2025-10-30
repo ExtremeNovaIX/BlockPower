@@ -64,13 +64,5 @@ public class KeyBindings {
             BLOCKPOWER_KEY
     );
 
-    public static final KeyMapping BARRIER_WALL = new KeyMapping(
-            "key.blockpower.barrier_wall",
-            KeyConflictContext.IN_GAME,
-            InputConstants.Type.KEYSYM,
-            InputConstants.KEY_G, // 使用G键作为墙技能按键
-            BLOCKPOWER_KEY
-    );
-
 
 }

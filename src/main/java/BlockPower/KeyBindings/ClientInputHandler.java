@@ -93,11 +93,5 @@ public class ClientInputHandler {
             });
         }
 
-        if (KeyBindings.BARRIER_WALL.consumeClick()) {
-            if (localPlayer.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) return;
-            LOGGER.info("BARRIER_WALL key triggered");
-            SkillTrigger.triggerSkill(new BarrierWallSkill());
-        }
-
     }
 }
