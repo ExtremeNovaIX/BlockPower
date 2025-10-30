@@ -170,13 +170,13 @@ public class ParticleRibbon extends AdvancedParticle {
             vertices2[2].mul(boxTranslate);
             vertices2[3].mul(boxTranslate);
 
+            // [修复] UV 逻辑: 强制采样纹理 (unnamed.jpg) 的 "中心"
             float vMin = this.getV0();
             float vMax = this.getV1();
 
-            // [修复] 计算 U 轴的中心点
-            float u_center = (this.getU0() + this.getU1()) / 2.0f;
+            float u_center = (this.getU0() + this.getU1()) / 2.0f; // 纹理U轴中心点
 
-            // [修复] 强制 p1 和 p2 都使用纹理的中心 U 坐标
+            // 强制 p1 (头部) 和 p2 (尾部) 都使用纹理的 "中心"
             float u_p1 = u_center + texPanOffset;
             float u_p2 = u_center + texPanOffset;
 

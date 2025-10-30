@@ -5,8 +5,10 @@ import BlockPower.ModMessages.ComboSkillPacket.ComboStandbyPacket_S2C;
 import BlockPower.ModMessages.ComboSkillPacket.ComboTriggeredPacket_C2S;
 import BlockPower.ModMessages.NormalSkillC2SPacket.*;
 import BlockPower.ModMessages.S2CPacket.*;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
@@ -85,6 +87,12 @@ public class ModMessages {
                 .consumerMainThread(ComboStandbyPacket_S2C::handle)
                 .add();
 
+        net.messageBuilder(FireworkPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(FireworkPacket_S2C::new)
+                .encoder(FireworkPacket_S2C::toBytes)
+                .consumerMainThread(FireworkPacket_S2C::handle)
+                .add();
+
         net.messageBuilder(CameraLockPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(CameraLockPacket_S2C::new)
                 .encoder(CameraLockPacket_S2C::toBytes)
@@ -132,5 +140,13 @@ public class ModMessages {
     // 一个辅助方法，用于从服务端向所有玩家发包
     public static <MSG> void sendToAllClients(MSG message) {
         INSTANCE.send(PacketDistributor.ALL.noArg(), message);
+        LOGGER.info("Sent packet to all clients: {}", message);
+    }
+
+    // 一个辅助方法，用于从服务端向特定坐标一定范围内的所有玩家发包
+    public static <MSG> void sendToAllAround(MSG message, ResourceKey<Level> dimension, double x, double y, double z, double radius) {
+        PacketDistributor.TargetPoint target = new PacketDistributor.TargetPoint(x, y, z, radius, dimension);
+        INSTANCE.send(PacketDistributor.NEAR.with(() -> target), message);
+        LOGGER.info("Sent packet to all around (dim: {}, pos: {},{},{}, radius: {}): {}", dimension.location(), x, y, z, radius, message);
     }
 }

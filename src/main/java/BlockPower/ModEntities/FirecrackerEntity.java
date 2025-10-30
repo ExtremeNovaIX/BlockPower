@@ -4,11 +4,14 @@ import BlockPower.ModEffects.EffectManager.EffectSender;
 import BlockPower.ModEffects.EffectManager.ModEffectManager;
 import BlockPower.ModEffects.ServerEffect.AttractEntityEffect;
 import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
+import BlockPower.ModMessages.ModMessages;
+import BlockPower.ModMessages.S2CPacket.FireworkPacket_S2C;
 import BlockPower.ModParticles.GlowingSparkParticleOptions;
 import BlockPower.ModParticles.ModParticles;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Util.Commons;
 import BlockPower.Util.TaskManager;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -43,20 +46,20 @@ public class FirecrackerEntity extends Entity implements IStateMachine<Firecrack
     private static final int LIFE_TICK = 20;
     private int currLifeTick = 0;
 
-    private static final float MOVE_SPEED = 0.4f;
-    private static final float EXPLOSION_RADIUS = 7.0f;
-    private static final float EXPLOSION_DAMAGE = 8.0f;
-
     private final Player player;
 
-    private static final List<Vector3f> EXPLOSION_COLORS = List.of(
-            new Vector3f(1.0f, 0.1f, 0.1f),
-            new Vector3f(0.1f, 1.0f, 0.1f),
-            new Vector3f(0.1f, 0.1f, 1.0f)
+    private static final List<Pair<Vector3f, Vector3f>> FIREWORK_COLOR_PAIRS = List.of(
+            // 火红 - 橙
+            Pair.of(new Vector3f(1.0f, 0.0f, 0.0f), new Vector3f(1.0f, 0.4f, 0.0f)),
+            // 湖蓝 - 紫
+            Pair.of(new Vector3f(0.0f, 0.4f, 1.0f), new Vector3f(0.5f, 0.0f, 1.0f)),
+            // 天蓝 - 绿
+            Pair.of(new Vector3f(0.4f, 0.8f, 1.0f), new Vector3f(0.1f, 0.8f, 0.1f)),
+            // 紫 - 朱红
+            Pair.of(new Vector3f(0.5f, 0.0f, 1.0f), new Vector3f(0.86f, 0.08f, 0.24f))
     );
 
-    // 白色粒子
-    private static final GlowingSparkParticleOptions WHITE_PARTICLE = new GlowingSparkParticleOptions(new Vector3f(1.0f, 1.0f, 1.0f));
+    private static final Vector3f WHITE = new Vector3f(1.0f, 1.0f, 1.0f);
 
     public FirecrackerEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -74,7 +77,6 @@ public class FirecrackerEntity extends Entity implements IStateMachine<Firecrack
         super.tick();
         currLifeTick++;
         this.move(MoverType.SELF, this.getDeltaMovement());
-        this.setDeltaMovement(this.getDeltaMovement().scale(0.98));
         // 生成烟花尾迹
         this.level().addParticle(ParticleTypes.FIREWORK,
                 this.getX(), this.getY(), this.getZ(),
@@ -83,7 +85,6 @@ public class FirecrackerEntity extends Entity implements IStateMachine<Firecrack
             handleStateChange();
             handleStateAction();
         }
-
     }
 
 
@@ -186,18 +187,30 @@ public class FirecrackerEntity extends Entity implements IStateMachine<Firecrack
         serverLevel.playSound(null, x, y, z,
                 SoundEvents.FIREWORK_ROCKET_TWINKLE, SoundSource.NEUTRAL, 1.0f, (1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F) * 0.7F);
 
+        // 随机选择烟花颜色
+        int randomIndex = random.nextInt(FIREWORK_COLOR_PAIRS.size());
+        Pair<Vector3f, Vector3f> colorPair = FIREWORK_COLOR_PAIRS.get(randomIndex);
+        Vector3f color1 = colorPair.getFirst();
+        Vector3f color2 = colorPair.getSecond();
+        Vec3 pos = new Vec3(x, y, z);
+
+        ModMessages.sendToAllAround(new FireworkPacket_S2C(pos, color1, color2), player.level().dimension(), x, y, z, 64);
 
         // 球形粒子扩散
-        float explosionSpeed = 0.5f;
-        int PARTICLE_COUNT = 400;
+        float explosionSpeed = 0.4f;
+        int PARTICLE_COUNT = 100;
 
-        // 选择主颜色并创建自定义Options
-        Vector3f chosenColor = EXPLOSION_COLORS.get(this.random.nextInt(EXPLOSION_COLORS.size()));
-        GlowingSparkParticleOptions chosenColorOptions = new GlowingSparkParticleOptions(chosenColor);
+        Vector3f color1f = new Vector3f(color1.x, color1.y, color1.z);
+        Vector3f color2f = new Vector3f(color2.x, color2.y, color2.z);
+
+        // 创建主颜色
+        GlowingSparkParticleOptions color1Options = new GlowingSparkParticleOptions(color1f);
+        // 创建次要颜色
+        GlowingSparkParticleOptions color2Options = new GlowingSparkParticleOptions(color2f);
 
         // 发送 2/3 的主颜色粒子
         int mainParticleCount = PARTICLE_COUNT * 2 / 3;
-        serverLevel.sendParticles(chosenColorOptions,
+        serverLevel.sendParticles(color1Options,
                 x, y, z,
                 mainParticleCount,
                 0.0D,
@@ -205,11 +218,20 @@ public class FirecrackerEntity extends Entity implements IStateMachine<Firecrack
                 0.0D,
                 explosionSpeed);
 
-        // 发送 1/3 的白色粒子
-        int whiteParticleCount = PARTICLE_COUNT / 3;
-        serverLevel.sendParticles(WHITE_PARTICLE,
+        // 发送 1/3 的次要颜色粒子
+        int secondaryParticleCount = PARTICLE_COUNT - mainParticleCount;
+        serverLevel.sendParticles(color2Options,
                 x, y, z,
-                whiteParticleCount,
+                secondaryParticleCount,
+                0.0D,
+                0.0D,
+                0.0D,
+                explosionSpeed);
+
+        // 发送 1/3 的白色粒子
+        serverLevel.sendParticles(ParticleTypes.FLASH,
+                x, y, z,
+                secondaryParticleCount,
                 0.0D,
                 0.0D,
                 0.0D,
@@ -217,12 +239,9 @@ public class FirecrackerEntity extends Entity implements IStateMachine<Firecrack
 
 
         // 造成伤害和击退
-        List<Entity> entityList = Commons.applyDamage(this, player, EXPLOSION_DAMAGE, EXPLOSION_RADIUS, null);
+        List<Entity> entityList = Commons.applyDamage(this, player, 8f, 8f, null);
         Commons.knockBackEntity(this, entityList, 1.5);
     }
-
-
-
 
     public static void spawnFirecrackerEntity(Player player) {
         FirecrackerEntity firecracker = new FirecrackerEntity(player);
