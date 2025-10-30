@@ -1,6 +1,7 @@
 package BlockPower.ModItems;
 
 import BlockPower.Main.Main;
+import BlockPower.ModItems.PixelCore.PixelCoreItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;

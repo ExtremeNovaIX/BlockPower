@@ -1,7 +1,6 @@
-package BlockPower.ModEntities.DropAnvil;
+package BlockPower.ModEntities;
 
-import BlockPower.ModEntities.IStateMachine;
-import BlockPower.ModEntities.ModEntities;
+import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Skills.SkillLock.LockPriority;
 import BlockPower.Skills.SkillLock.SkillLockManager;
@@ -150,14 +149,6 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
             return;
         }
 
-        //如果不是初始化状态或者动画状态，且速度大于0.1，进入掉落状态
-        if (getState() != AnvilState.INIT && getState() != AnvilState.ANIMATING) {
-            if (this.getDeltaMovement().length() > 0.1) {
-                setState(AnvilState.DROPPING);
-                return;
-            }
-        }
-
         AnvilState anvilState = getState();
         switch (anvilState) {
             case INIT:
@@ -176,6 +167,14 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
                 }
                 break;
         }
+
+
+        //如果不是初始化状态状态，且有一定速度，进入掉落状态
+        if (getState() != AnvilState.INIT) {
+            if (this.getDeltaMovement().length() > 0) {
+                setState(AnvilState.DROPPING);
+            }
+        }
     }
 
     @Override
@@ -188,7 +187,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
                 isPlayerStandingOnAnvil = true;
                 EffectSender.sendPlayerSneak(player, true);
                 //切换像素核心材质为铁砧
-                Commons.changePixelCoreNBT(player, 1.0F, null, null);
+                Commons.changePixelCoreNBT(player, PixelCoreSkillState.ANVIL, null, null);
                 break;
             case ON_GROUND:
                 // 落地时播放落地音效
@@ -210,11 +209,13 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
     }
 
     private void hurtEntity() {
-        List<Entity> entityList = applyDamage(this, player, 10F, 9, ModSounds.ANVIL_SOUND.get());
-        Commons.knockBackEntity(this, entityList, 1.5);
-        if (!entityList.isEmpty()) {
-            broadcastScreenShake(this, 6, 2f, 15, 7);
-        }
+        taskManager.runOnceWithCooldown(this, "hurt_entity", 5, () -> {
+            List<Entity> entityList = applyDamage(this, player, 10F, 9, ModSounds.ANVIL_SOUND.get());
+            Commons.knockBackEntity(this, entityList, 1.5);
+            if (!entityList.isEmpty()) {
+                broadcastScreenShake(this, 6, 2f, 15, 7);
+            }
+        });
     }
 
     private void handleAnvilMovement() {

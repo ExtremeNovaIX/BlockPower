@@ -1,6 +1,6 @@
 package BlockPower.Skills.ComboSkills.ComboManager.Server;
 
-import BlockPower.Skills.ComboSkills.ComboSkill;
+import BlockPower.Skills.ComboSkills.IComboSkill;
 import BlockPower.Skills.ComboSkills.ComboSkillType;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TickListener;
@@ -54,8 +54,8 @@ public class PlayerComboHistory {
         for (Map.Entry<ComboSkillType, AtomicChainData> entry : comboCountMap.entrySet()) {
             AtomicChainData atomicChainData = entry.getValue();
 
-            ComboSkill comboSkill = entry.getKey().getSkill();
-            int comboWindowTick = comboSkill.getComboWindowTick();
+            IComboSkill IComboSkill = entry.getKey().getSkill();
+            int comboWindowTick = IComboSkill.getComboWindowTick();
             //检查是否过期
             if (currentTick - atomicChainData.lastTriggerTick > comboWindowTick) {
                 //把当前连击数重置为0
@@ -84,7 +84,7 @@ public class PlayerComboHistory {
                 continue;
             }
             //获取当前技能实例
-            ComboSkill skill = type.getSkill();
+            IComboSkill skill = type.getSkill();
             //获取当前技能连击次数
             int comboCount = atomicChainData.count;
             if (skill.canTriggerSkill(comboCount)) {
@@ -95,7 +95,7 @@ public class PlayerComboHistory {
     }
 
 
-    public class AtomicChainData {
+    public static class AtomicChainData {
         //连击的当前段数
         public int count;
         //上一次成功施放该段连击时的游戏 Tick 计数

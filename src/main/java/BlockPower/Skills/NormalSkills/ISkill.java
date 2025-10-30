@@ -37,4 +37,7 @@ public interface ISkill {
 
     // 是否消耗资源
     boolean isSkillConsumeResource();
+
+    // 记录连击次数
+    void recordCombo(ServerPlayer player);
 }

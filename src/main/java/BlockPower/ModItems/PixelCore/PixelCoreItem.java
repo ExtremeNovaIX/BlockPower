@@ -1,4 +1,4 @@
-package BlockPower.ModItems;
+package BlockPower.ModItems.PixelCore;
 
 import net.minecraft.world.item.Item;
 

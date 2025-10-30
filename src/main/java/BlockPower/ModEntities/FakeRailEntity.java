@@ -1,7 +1,5 @@
-package BlockPower.ModEntities.RushMinecart;
+package BlockPower.ModEntities;
 
-import BlockPower.ModEntities.FakeItem.FakeItem;
-import BlockPower.ModEntities.ModEntities;
 import BlockPower.Util.TaskManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;

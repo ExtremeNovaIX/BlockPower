@@ -1,8 +1,6 @@
 package BlockPower.ModItems;
 
-import BlockPower.ModEntities.MagmaBlock.MagmaEntity;
 import BlockPower.ModMessages.ComboSkillPacket.ComboStandbyPacket_S2C;
-import BlockPower.ModMessages.ComboSkillPacket.ComboTriggeredPacket_C2S;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.Skills.ComboSkills.ComboSkillType;
 import BlockPower.Util.Commons;
@@ -41,7 +39,7 @@ public class DebugItem extends Item {
 
     private void testServerMethod(Player player) {
         LOGGER.info("testServerMethod");
-        ModMessages.sendToPlayer(new ComboStandbyPacket_S2C(ComboSkillType.MAGMA_BLOCK), (ServerPlayer) player);
+        ModMessages.sendToPlayer(new ComboStandbyPacket_S2C(ComboSkillType.FIRECRACKER), (ServerPlayer) player);
     }
 
     private void testClientMethod(Player player) {

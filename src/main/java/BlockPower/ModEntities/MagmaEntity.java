@@ -1,10 +1,8 @@
-package BlockPower.ModEntities.MagmaBlock;
+package BlockPower.ModEntities;
 
 import BlockPower.ModEffects.ServerEffect.AttractEntityEffect;
 import BlockPower.ModEffects.ServerEffect.CloudTrailEffect;
 import BlockPower.ModEffects.ServerEffect.UnBalanceEffect;
-import BlockPower.ModEntities.IStateMachine;
-import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.ModEffects.EffectManager.EffectSender;
 import net.minecraft.sounds.SoundEvents;
@@ -26,6 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -197,7 +196,7 @@ public class MagmaEntity extends Entity implements IStateMachine<MagmaEntity.Mag
     }
 
     @Override
-    public EntityDataAccessor<Integer> getStateDataAccessor() {
+    public @NotNull EntityDataAccessor<Integer> getStateDataAccessor() {
         return DATA_STATE;
     }
 

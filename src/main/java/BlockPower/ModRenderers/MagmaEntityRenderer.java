@@ -1,5 +1,6 @@
-package BlockPower.ModEntities.MagmaBlock;
+package BlockPower.ModRenderers;
 
+import BlockPower.ModEntities.MagmaEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;

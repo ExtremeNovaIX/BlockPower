@@ -2,6 +2,9 @@ package BlockPower.Skills.NormalSkills;
 
 import BlockPower.ModBlocks.ModBlocks;
 import BlockPower.ModException.SkillException;
+import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
+import BlockPower.Skills.ComboSkills.ComboManager.Server.PlayerComboManager;
+import BlockPower.Skills.ComboSkills.ComboSkillType;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import BlockPower.Util.Commons;
@@ -79,7 +82,7 @@ public class PlaceBlockSkill implements IPacketSerializableSkill {
         // 如果目标位置为空气或液体方块，则可以替换为 decaying_dirt
         level.setBlockAndUpdate(placementPos, ModBlocks.DECAYING_DIRT.get().defaultBlockState());
         // 更改玩家像素核心为泥土材质
-        Commons.changePixelCoreNBT(player, 4.0F, 1.0F, -1.0F);
+        Commons.changePixelCoreNBT(player, PixelCoreSkillState.BLOCK, 1.0F, -1.0F);
 
         // 播放放置音效
         SoundEvent placeSound = level.getBlockState(placementPos).getSoundType().getPlaceSound();
@@ -103,6 +106,10 @@ public class PlaceBlockSkill implements IPacketSerializableSkill {
     @Override
     public boolean isSkillConsumeResource() {
         return true;
+    }
+
+    @Override
+    public void recordCombo(ServerPlayer player) {
     }
 
     @Override

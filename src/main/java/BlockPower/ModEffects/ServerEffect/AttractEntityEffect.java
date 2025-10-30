@@ -50,7 +50,7 @@ public class AttractEntityEffect implements ITickBasedEffect {
             if (entity.isRemoved() || mainEntity.isRemoved()) return;
 
             // 计算方向向量
-            Vec3 directionVec = mainEntity.getPosition(0).subtract(entity.getPosition(0)).normalize();
+            Vec3 directionVec = (mainEntity.getPosition(0).add(0, 1, 0)).subtract(entity.getPosition(0)).normalize();
             Vec3 forceVector = directionVec.scale(springConstant);
 
             if (entity instanceof ServerPlayer player) {

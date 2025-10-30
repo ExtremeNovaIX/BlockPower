@@ -1,7 +1,7 @@
 package BlockPower.Skills.ComboSkills.ComboManager.Client;
 
 import BlockPower.Main.Main;
-import BlockPower.Skills.ComboSkills.ComboSkill;
+import BlockPower.Skills.ComboSkills.IComboSkill;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -71,7 +71,7 @@ public class ComboHudRenderer implements IGuiOverlay {
 
         for (int i = 0; i < skillsToDraw; i++) {
             ClientComboData.ActiveSkillData skillData = activeSkills.get(i);
-            ComboSkill skill = skillData.getType().getSkill();
+            IComboSkill skill = skillData.getType().getSkill();
             if (skill == null) continue;
 
             // 根据连携技在本地缓存中的索引计算当前图标绘制位置
@@ -87,7 +87,7 @@ public class ComboHudRenderer implements IGuiOverlay {
     /**
      * 绘制技能图标及其所有效果
      */
-    private void drawSkillIcon(GuiGraphics guiGraphics, ClientComboData.ActiveSkillData skillData, ComboSkill skill,
+    private void drawSkillIcon(GuiGraphics guiGraphics, ClientComboData.ActiveSkillData skillData, IComboSkill skill,
                                int x, int y, float partialTick, boolean isAvailable) {
 
         // 获取基础数据
@@ -290,7 +290,7 @@ public class ComboHudRenderer implements IGuiOverlay {
      * @param guiGraphics GuiGraphics 实例
      * @param skill       技能实例
      */
-    private void drawIconTexture(GuiGraphics guiGraphics, ComboSkill skill) {
+    private void drawIconTexture(GuiGraphics guiGraphics, IComboSkill skill) {
         String iconPath = skill.getTextureLocation();
         if (iconPath != null) {
             ResourceLocation iconTexture = new ResourceLocation(Main.MOD_ID, iconPath);

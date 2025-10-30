@@ -1,12 +1,12 @@
 package BlockPower.Skills.ComboSkills;
 
-import BlockPower.ModEntities.MagmaEntity;
+import BlockPower.ModEntities.FirecrackerEntity;
 import net.minecraft.world.entity.player.Player;
 
-public class MagmaBlockComboSkill implements IComboSkill {
+public class FirecrackerComboSkill implements IComboSkill {
     @Override
     public String getSkillName() {
-        return "MagmaBlockCombo";
+        return "Firecracker";
     }
 
     @Override
@@ -21,17 +21,17 @@ public class MagmaBlockComboSkill implements IComboSkill {
 
     @Override
     public void triggerSkill(Player player) {
-        MagmaEntity.spawnMagmaEntity(player);
+        FirecrackerEntity.spawnFirecrackerEntity(player);
     }
 
     @Override
     public boolean canTriggerSkill(int comboCount) {
-        return comboCount >= 4;
+        return comboCount == 1;
     }
 
     @Override
     public int getCooldownTick() {
-        return 200;
+        return 400;
     }
 
     @Override
@@ -41,6 +41,6 @@ public class MagmaBlockComboSkill implements IComboSkill {
 
     @Override
     public String getTextureLocation() {
-        return "textures/gui/combo_skills/magma_block_combo_skill.png";
+        return "textures/gui/combo_skills/firecracker_combo_skill.png";
     }
 }

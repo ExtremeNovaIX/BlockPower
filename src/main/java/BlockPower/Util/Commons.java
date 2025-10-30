@@ -4,6 +4,7 @@ import BlockPower.ModEffects.ServerEffect.CloudTrailEffect;
 import BlockPower.ModEffects.ServerEffect.UnBalanceEffect;
 import BlockPower.ModItems.ModItems;
 import BlockPower.ModEffects.EffectManager.ModEffectManager;
+import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
@@ -189,12 +190,12 @@ public class Commons {
         return gameType == GameType.SPECTATOR || gameType == GameType.CREATIVE;
     }
 
-    public static void changePixelCoreNBT(Player player, @Nullable Float skillState, @Nullable Float toolType, @Nullable Float pixelCoreLevel) {
+    public static void changePixelCoreNBT(Player player, @Nullable PixelCoreSkillState skillState, @Nullable Float toolType, @Nullable Float pixelCoreLevel) {
         if (player.level().isClientSide) return;
         ItemStack mainHandItem = player.getMainHandItem();
         if (mainHandItem.getItem() != ModItems.PIXEL_CORE.get()) return;
         CompoundTag NBT = mainHandItem.getOrCreateTag();
-        NBT.putFloat("skill_state", Objects.requireNonNullElse(skillState, 0.0F));
+        NBT.putFloat("skill_state", Objects.requireNonNullElse(skillState, PixelCoreSkillState.DEFAULT).getId());
         NBT.putFloat("tool_type", Objects.requireNonNullElse(toolType, -1.0F));
         NBT.putFloat("pixel_core_level", Objects.requireNonNullElse(pixelCoreLevel, -1.0F));
         mainHandItem.setTag(NBT);

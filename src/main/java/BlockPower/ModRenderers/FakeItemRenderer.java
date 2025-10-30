@@ -1,4 +1,4 @@
-package BlockPower.ModEntities.FakeItem;
+package BlockPower.ModRenderers;
 
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemEntityRenderer;

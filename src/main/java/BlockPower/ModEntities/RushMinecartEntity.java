@@ -1,7 +1,6 @@
-package BlockPower.ModEntities.RushMinecart;
+package BlockPower.ModEntities;
 
-import BlockPower.ModEntities.IStateMachine;
-import BlockPower.ModEntities.ModEntities;
+import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Skills.SkillLock.LockPriority;
 import BlockPower.Skills.SkillLock.SkillLockManager;
@@ -116,7 +115,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
                     setState(RushMinecartState.SEEKING);
                     break;
                 }
-                Commons.changePixelCoreNBT(player, 2.0F, null, null);
+                Commons.changePixelCoreNBT(player, PixelCoreSkillState.RAIL, null, null);
                 hurtEntity(player);
                 break;
 

@@ -1,11 +1,6 @@
 package BlockPower.ModEntities;
 
 import BlockPower.Main.Main;
-import BlockPower.ModEntities.DropAnvil.DropAnvilEntity;
-import BlockPower.ModEntities.FakeItem.FakeItem;
-import BlockPower.ModEntities.MagmaBlock.MagmaEntity;
-import BlockPower.ModEntities.RushMinecart.FakeRailEntity;
-import BlockPower.ModEntities.RushMinecart.RushMinecartEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.registries.DeferredRegister;
@@ -59,4 +54,11 @@ public class ModEntities {
                             .noSave()
                             .noSummon()
                             .build("magma_entity"));
+    public static final RegistryObject<EntityType<FirecrackerEntity>> FIRECRACKER_ENTITY =
+            ENTITY_TYPES.register("firecracker_entity",
+                    () -> EntityType.Builder.<FirecrackerEntity>of(FirecrackerEntity::new, MobCategory.MISC)
+                            .sized(0.5F, 0.5F)
+                            .noSave()
+                            .noSummon()
+                            .build("firecracker_entity"));
 }

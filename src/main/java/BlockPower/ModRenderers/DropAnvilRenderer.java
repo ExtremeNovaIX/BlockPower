@@ -1,5 +1,6 @@
-package BlockPower.ModEntities.DropAnvil;
+package BlockPower.ModRenderers;
 
+import BlockPower.ModEntities.DropAnvilEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;

@@ -1,5 +1,6 @@
 package BlockPower.Skills.NormalSkills;
 
+import BlockPower.Skills.ComboSkills.ComboManager.Server.PlayerComboManager;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import BlockPower.Util.Commons;
@@ -85,6 +86,11 @@ public class DashSkill implements IPacketSerializableSkill {
     @Override
     public boolean isSkillConsumeResource() {
         return false;
+    }
+
+    @Override
+    public void recordCombo(ServerPlayer player) {
+
     }
 
 }

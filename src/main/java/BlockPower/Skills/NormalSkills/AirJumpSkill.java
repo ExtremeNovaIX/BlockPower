@@ -125,4 +125,9 @@ public class AirJumpSkill implements IPacketSerializableSkill {
         return false;
     }
 
+    @Override
+    public void recordCombo(ServerPlayer player) {
+
+    }
+
 }

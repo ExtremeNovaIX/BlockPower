@@ -1,6 +1,6 @@
 package BlockPower.Skills.MinerState.server;
 
-import BlockPower.ModEntities.FakeItem.FakeItem;
+import BlockPower.ModEntities.FakeItem;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.ModMessages.S2CPacket.ResourceSyncPacket_S2C;
 import BlockPower.Skills.MinerState.client.ClientMinerState;

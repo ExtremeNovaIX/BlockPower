@@ -2,15 +2,16 @@ package BlockPower.Skills.ComboSkills;
 
 public enum ComboSkillType {
     MAGMA_BLOCK(new MagmaBlockComboSkill()),
-    TEST(new TestComboSkill());
+    TEST(new TestComboSkill()),
+    FIRECRACKER(new FirecrackerComboSkill());
 
-    private final ComboSkill skillInstance;
+    private final IComboSkill skillInstance;
 
-    ComboSkillType(ComboSkill skillInstance) {
+    ComboSkillType(IComboSkill skillInstance) {
         this.skillInstance = skillInstance;
     }
 
-    public ComboSkill getSkill() {
+    public IComboSkill getSkill() {
         return this.skillInstance;
     }
 }

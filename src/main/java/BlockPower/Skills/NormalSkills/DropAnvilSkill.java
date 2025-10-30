@@ -1,6 +1,8 @@
 package BlockPower.Skills.NormalSkills;
 
-import BlockPower.ModEntities.DropAnvil.DropAnvilEntity;
+import BlockPower.ModEntities.DropAnvilEntity;
+import BlockPower.Skills.ComboSkills.ComboManager.Server.PlayerComboManager;
+import BlockPower.Skills.ComboSkills.ComboSkillType;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import net.minecraft.network.FriendlyByteBuf;
@@ -52,6 +54,11 @@ public class DropAnvilSkill implements IPacketSerializableSkill {
     @Override
     public boolean isSkillConsumeResource() {
         return true;
+    }
+
+    @Override
+    public void recordCombo(ServerPlayer player) {
+        PlayerComboManager.recordCombo(player, ComboSkillType.FIRECRACKER);
     }
 
 }

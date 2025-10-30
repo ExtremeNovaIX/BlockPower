@@ -2,7 +2,7 @@ package BlockPower.Skills.ComboSkills;
 
 import net.minecraft.world.entity.player.Player;
 
-public interface ComboSkill {
+public interface IComboSkill {
     // 技能名称
     String getSkillName();
 

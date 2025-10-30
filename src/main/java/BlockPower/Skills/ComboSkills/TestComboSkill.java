@@ -2,7 +2,7 @@ package BlockPower.Skills.ComboSkills;
 
 import net.minecraft.world.entity.player.Player;
 
-public class TestComboSkill implements ComboSkill {
+public class TestComboSkill implements IComboSkill {
     @Override
     public String getSkillName() {
         return "";

@@ -1,12 +1,19 @@
 package BlockPower.ModEvents;
 
 import BlockPower.Main.Main;
+import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModItems.ModItems;
+import BlockPower.ModParticles.GlowingSparkParticle;
+import BlockPower.ModParticles.ModParticles;
+import BlockPower.ModRenderers.*;
 import BlockPower.Skills.ComboSkills.ComboManager.Client.ComboHudRenderer;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -24,6 +31,22 @@ public class ModClientEvents {
                 COMBO_HUD_OVERLAY.getPath(),
                 new ComboHudRenderer()
         );
+    }
+
+    @SubscribeEvent
+    public static void onRenderRegister(final EntityRenderersEvent.RegisterRenderers event) {
+        EntityRenderers.register(ModEntities.FAKE_RAIL_ENTITY.get(), FakeRailRenderer::new);
+        EntityRenderers.register(ModEntities.RUSH_MINECART.get(), RushMinecartRenderer::new);
+        EntityRenderers.register(ModEntities.DROP_ANVIL.get(), DropAnvilRenderer::new);
+        EntityRenderers.register(ModEntities.MAGMA_ENTITY.get(), MagmaEntityRenderer::new);
+        EntityRenderers.register(ModEntities.FIRECRACKER_ENTITY.get(), FirecrackerEntityRenderer::new);
+
+        event.registerEntityRenderer(ModEntities.FAKE_ITEM.get(), FakeItemRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void registerParticleFactories(RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(ModParticles.GLOWING_SPARK.get(), GlowingSparkParticle.Provider::new);
     }
 
     @SubscribeEvent

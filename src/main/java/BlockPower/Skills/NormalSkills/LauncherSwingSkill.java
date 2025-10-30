@@ -2,6 +2,7 @@ package BlockPower.Skills.NormalSkills;
 
 import BlockPower.ModEffects.ServerEffect.SpringAttractionEffect;
 import BlockPower.ModItems.ModItems;
+import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.ModMessages.S2CPacket.CameraLockPacket_S2C;
 import BlockPower.ModMessages.S2CPacket.HitStopPacket_S2C;
@@ -47,7 +48,7 @@ public class LauncherSwingSkill implements IPacketSerializableSkill {
 
         ItemStack mainHandItem = player.getMainHandItem();
         if (mainHandItem.getItem() != ModItems.PIXEL_CORE.get()) return SkillExecutionResult.fail("Main hand item must be PIXEL_CORE");
-        Commons.changePixelCoreNBT(player,3F,1F,1F);
+        Commons.changePixelCoreNBT(player, PixelCoreSkillState.TOOL,1F,1F);
         launcherSwing(player);
         return SkillExecutionResult.success();
     }
@@ -65,9 +66,6 @@ public class LauncherSwingSkill implements IPacketSerializableSkill {
         ModMessages.sendToPlayer(new CameraLockPacket_S2C(targetEntity.getId()), player);
         ModMessages.sendToPlayer(new HitStopPacket_S2C(2), player);
         ModMessages.sendToPlayer(new ShakePacket_S2C(4, 2F), player);
-
-        // 记录连击
-        PlayerComboManager.recordCombo(player, ComboSkillType.MAGMA_BLOCK);
     }
 
 
@@ -84,6 +82,11 @@ public class LauncherSwingSkill implements IPacketSerializableSkill {
     @Override
     public boolean isSkillConsumeResource() {
         return false;
+    }
+
+    @Override
+    public void recordCombo(ServerPlayer player) {
+        PlayerComboManager.recordCombo(player, ComboSkillType.MAGMA_BLOCK);
     }
 
     @Override

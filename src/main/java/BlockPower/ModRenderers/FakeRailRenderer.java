@@ -1,6 +1,7 @@
 // 文件名: FakeRailRenderer.java
-package BlockPower.ModEntities.RushMinecart;
+package BlockPower.ModRenderers;
 
+import BlockPower.ModEntities.FakeRailEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
