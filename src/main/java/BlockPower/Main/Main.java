@@ -22,10 +22,9 @@ public class Main {
     public static final String MOD_ID = "blockpower";
     private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public Main() {
+    public Main(FMLJavaModLoadingContext context) {
         printWelcome();
-        //不要管这个报错，它是正常的
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        IEventBus modEventBus = context.getModEventBus();
         //注册事件总线
         ModSounds.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);

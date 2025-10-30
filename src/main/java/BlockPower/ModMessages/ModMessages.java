@@ -34,7 +34,7 @@ public class ModMessages {
     //定义通信频道
     public static void register() {
         SimpleChannel net = NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(MOD_ID, "messages"))
+                .named(ResourceLocation.tryParse(MOD_ID + ":messages"))
                 .networkProtocolVersion(() -> "1.0")
                 .clientAcceptedVersions(s -> true)
                 .serverAcceptedVersions(s -> true)
@@ -120,6 +120,12 @@ public class ModMessages {
                 .decoder(DashSkillPacket_C2S::new)
                 .encoder(DashSkillPacket_C2S::toBytes)
                 .consumerMainThread(DashSkillPacket_C2S::handle)
+                .add();
+
+        net.messageBuilder(BarrierWallSkillPacket_C2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(BarrierWallSkillPacket_C2S::new)
+                .encoder(BarrierWallSkillPacket_C2S::toBytes)
+                .consumerMainThread(BarrierWallSkillPacket_C2S::handle)
                 .add();
 
     }
