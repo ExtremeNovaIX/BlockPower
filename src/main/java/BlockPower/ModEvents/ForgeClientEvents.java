@@ -3,7 +3,7 @@ package BlockPower.ModEvents;
 import BlockPower.Main.Main;
 import BlockPower.Skills.ComboSkills.ComboManager.Client.ClientComboData;
 import BlockPower.Util.ClientCameraTrackingManager;
-import BlockPower.ModEffects.EffectManager.ModEffectManager;
+import BlockPower.ModEffects.ModEffectManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

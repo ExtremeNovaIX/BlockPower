@@ -3,7 +3,7 @@ package BlockPower.Util;
 import BlockPower.ModEffects.ServerEffect.CloudTrailEffect;
 import BlockPower.ModEffects.ServerEffect.UnBalanceEffect;
 import BlockPower.ModItems.ModItems;
-import BlockPower.ModEffects.EffectManager.ModEffectManager;
+import BlockPower.ModEffects.ModEffectManager;
 import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.ChatFormatting;
@@ -18,6 +18,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -58,6 +59,34 @@ public class Commons {
                 detectedEntity -> detectedEntity != mainEntity
                         && detectedEntity.distanceToSqr(mainEntity) <= radius * radius
                         && detectedEntity != blacklist
+                        && detectedEntity instanceof LivingEntity
+        );
+    }
+
+    /**
+     * 检测半径内的非技能释放者的LivingEntity
+     *
+     * @param pos    检测位置
+     * @param radius 检测半径
+     * @return 半径内的非技能释放者和非自身LivingEntity列表
+     */
+    public static List<Entity> detectEntity(@NotNull Vec3 pos, Level level, double radius, Player blacklist) {
+        //创建一个默认半径为radius的检测区域
+        AABB detectionArea = new AABB(
+                pos.x - radius,
+                pos.y - radius,
+                pos.z - radius,
+                pos.x + radius,
+                pos.y + radius,
+                pos.z + radius
+        );
+
+        //获取半径内的非技能释放者的LivingEntity
+        return level.getEntities(
+                blacklist,
+                detectionArea,
+                detectedEntity -> detectedEntity != null
+                        && detectedEntity.distanceToSqr(pos) <= radius * radius
                         && detectedEntity instanceof LivingEntity
         );
     }
@@ -126,7 +155,7 @@ public class Commons {
      * @param soundEvent   音效
      * @return 半径内的实体列表
      */
-    public static List<Entity> applyDamage(@NotNull Entity mainEntity, Player skillUser, float damage, double detectRadius,@Nullable SoundEvent soundEvent) {
+    public static List<Entity> applyDamage(@NotNull Entity mainEntity, Player skillUser, float damage, double detectRadius, @Nullable SoundEvent soundEvent) {
         List<Entity> entities = detectEntity(mainEntity, detectRadius, skillUser);
         if (!entities.isEmpty()) {
             entities.forEach(entity -> {

@@ -1,6 +1,6 @@
 package BlockPower.ModEffects.ClientEffect;
 
-import BlockPower.ModEffects.EffectManager.ModEffectManager;
+import BlockPower.ModEffects.ModEffectManager;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
@@ -18,6 +18,7 @@ public class PlayerSneakEffect implements IClientTickBasedEffect {
     }
 
     public PlayerSneakEffect(FriendlyByteBuf buf) {
+        this.isPlayerSneak = true;
     }
 
     public static void handlePlayerSneakEffect(RenderPlayerEvent.Pre event) {

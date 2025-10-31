@@ -1,18 +1,15 @@
 package BlockPower.ModEntities;
 
-import BlockPower.ModEffects.EffectManager.EffectSender;
-import BlockPower.ModEffects.EffectManager.ModEffectManager;
+import BlockPower.ModEffects.ClientEffect.ScreenShakeEffect;
+import BlockPower.ModEffects.ModEffectManager;
 import BlockPower.ModEffects.ServerEffect.AttractEntityEffect;
 import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.ModMessages.S2CPacket.FireworkPacket_S2C;
 import BlockPower.ModParticles.GlowingSparkParticleOptions;
-import BlockPower.ModParticles.ModParticles;
-import BlockPower.ModSounds.ModSounds;
 import BlockPower.Util.Commons;
 import BlockPower.Util.TaskManager;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -21,7 +18,6 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
@@ -143,7 +139,7 @@ public class FirecrackerEntity extends Entity implements IStateMachine<Firecrack
                 if (!targetList.isEmpty()) {
                     Entity targetEntity = targetList.get(0);
                     ModEffectManager.addEffect(targetEntity, new AttractEntityEffect(2, targetEntity, this));
-                    this.setDeltaMovement(this.getDeltaMovement().scale(1.1));
+                    this.setDeltaMovement(this.getDeltaMovement().scale(1.5));
                 }
                 break;
         }
@@ -162,7 +158,7 @@ public class FirecrackerEntity extends Entity implements IStateMachine<Firecrack
                 break;
             case ENDING:
                 explode();
-                EffectSender.broadcastScreenShake(this, 10, 1f, 11.0, 6.0);
+                ModEffectManager.addToAllAround(new ScreenShakeEffect(10, 0.8f), this.position(), this.level(), 11.0);
                 this.discard();
                 break;
         }
@@ -239,7 +235,7 @@ public class FirecrackerEntity extends Entity implements IStateMachine<Firecrack
 
 
         // 造成伤害和击退
-        List<Entity> entityList = Commons.applyDamage(this, player, 8f, 8f, null);
+        List<Entity> entityList = Commons.applyDamage(this, player, 12f, 6f, null);
         Commons.knockBackEntity(this, entityList, 1.5);
     }
 
@@ -249,7 +245,7 @@ public class FirecrackerEntity extends Entity implements IStateMachine<Firecrack
         Vec3 spawnPos = player.getEyePosition().add(player.getLookAngle().scale(1.0));
         firecracker.setPos(spawnPos);
         // 设置初始速度
-        firecracker.setDeltaMovement(player.getLookAngle());
+        firecracker.setDeltaMovement(player.getLookAngle().scale(1.5));
         player.level().addFreshEntity(firecracker);
     }
 

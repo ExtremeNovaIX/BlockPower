@@ -13,7 +13,7 @@ import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import BlockPower.Skills.ComboSkills.ComboManager.Server.PlayerComboManager;
 import BlockPower.Util.Commons;
-import BlockPower.ModEffects.EffectManager.ModEffectManager;
+import BlockPower.ModEffects.ModEffectManager;
 import BlockPower.Util.TaskManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;

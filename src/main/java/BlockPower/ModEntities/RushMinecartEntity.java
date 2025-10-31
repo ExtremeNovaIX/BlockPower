@@ -1,5 +1,7 @@
 package BlockPower.ModEntities;
 
+import BlockPower.ModEffects.ClientEffect.ScreenShakeEffect;
+import BlockPower.ModEffects.ModEffectManager;
 import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Skills.SkillLock.LockPriority;
@@ -29,8 +31,6 @@ import java.util.List;
 
 import static BlockPower.Util.Commons.applyDamage;
 import static BlockPower.Util.Commons.detectEntity;
-import static BlockPower.ModEffects.EffectManager.EffectSender.broadcastScreenShake;
-import static BlockPower.ModEffects.EffectManager.EffectSender.sendHitStop;
 
 public class RushMinecartEntity extends AbstractMinecart implements IStateMachine<RushMinecartEntity.RushMinecartState> {
 
@@ -265,8 +265,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
         if (!entityList.isEmpty()) {
             //玩家在车上时触发屏幕震动
             if (getState() == RushMinecartState.RUSHING && this.getFirstPassenger() == player) {
-                broadcastScreenShake(this, 6, 2.5f, 5, 3);
-                sendHitStop(4, (ServerPlayer) player, this);
+                ModEffectManager.addToAllAround(new ScreenShakeEffect(6, 1.8f), this.position(), this.level(), 7);
             }
 
             if (getState() == RushMinecartState.RUSHING) {

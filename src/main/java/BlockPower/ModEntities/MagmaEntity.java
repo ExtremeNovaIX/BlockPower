@@ -1,13 +1,13 @@
 package BlockPower.ModEntities;
 
+import BlockPower.ModEffects.ClientEffect.ScreenShakeEffect;
 import BlockPower.ModEffects.ServerEffect.AttractEntityEffect;
 import BlockPower.ModEffects.ServerEffect.CloudTrailEffect;
 import BlockPower.ModEffects.ServerEffect.UnBalanceEffect;
 import BlockPower.ModSounds.ModSounds;
-import BlockPower.ModEffects.EffectManager.EffectSender;
 import net.minecraft.sounds.SoundEvents;
 import BlockPower.Util.Commons;
-import BlockPower.ModEffects.EffectManager.ModEffectManager;
+import BlockPower.ModEffects.ModEffectManager;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -172,7 +172,7 @@ public class MagmaEntity extends Entity implements IStateMachine<MagmaEntity.Mag
                 // 播放岩浆块音效
                 this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
                         ModSounds.MAGMA_BLOCK_SOUND.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
-                EffectSender.broadcastScreenShake(this, 20, 1F, 8.0D, 4.0D);
+                ModEffectManager.addToAllAround(new ScreenShakeEffect(20, 1.2f), this.position(), this.level(), 8.0D);
                 break;
         }
     }

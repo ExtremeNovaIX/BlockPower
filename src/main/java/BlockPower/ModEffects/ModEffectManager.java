@@ -1,14 +1,16 @@
-package BlockPower.ModEffects.EffectManager;
+package BlockPower.ModEffects;
 
 import BlockPower.ModEffects.ClientEffect.IClientTickBasedEffect;
-import BlockPower.ModEffects.ITickBasedEffect;
 import BlockPower.ModException.EffectException;
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.ModMessages.S2CPacket.EffectAddSyncPacket_S2C;
 import BlockPower.ModMessages.S2CPacket.EffectRemoveSyncPacket_S2C;
+import BlockPower.Util.Commons;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,11 +65,29 @@ public class ModEffectManager {
         // 将效果加入对应实体的待添加列表
         pendingMap.computeIfAbsent(entity, k -> new ArrayList<>()).add(effect);
 
-        // 对于客户端效果，还需要发送添加包进行同步
+        // 对于客户端效果，发送添加包进行同步
         if (effect instanceof IClientTickBasedEffect cEffect && entity instanceof ServerPlayer player) {
             if (cEffect.getType() == null) throw new EffectException(cEffect);
             ModMessages.sendToPlayer(new EffectAddSyncPacket_S2C(cEffect), player);
             log.info("Auto send EffectAddSyncPacket_S2C: {} to {}", cEffect, player.getGameProfile().getName());
+        }
+    }
+
+    public static void addToAllAround(ITickBasedEffect effect, Vec3 pos, Level level, double radius) {
+        List<Entity> entityList = Commons.detectEntity(pos, level, radius, null);
+
+        entityList.forEach(entity -> {
+            // 根据效果的运行端选择正确的队列
+            Map<Entity, List<ITickBasedEffect>> pendingMap = getPendingAdditions(effect.isClientSide());
+            // 将效果加入对应实体的待添加列表
+            pendingMap.computeIfAbsent(entity, k -> new ArrayList<>()).add(effect);
+        });
+
+        // 对于客户端效果，发送添加包进行同步
+        if (effect instanceof IClientTickBasedEffect cEffect) {
+            if (cEffect.getType() == null) throw new EffectException(cEffect);
+            ModMessages.sendToAllAround(new EffectAddSyncPacket_S2C(cEffect), level.dimension(), pos.x(), pos.y(), pos.z(), radius);
+            log.info("Auto send EffectAddSyncPacket_S2C: {} to all around {}", cEffect, pos);
         }
     }
 

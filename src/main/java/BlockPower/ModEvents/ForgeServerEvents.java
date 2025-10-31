@@ -3,7 +3,7 @@ package BlockPower.ModEvents;
 import BlockPower.Main.Main;
 import BlockPower.Skills.MinerState.server.PlayerResourceManager;
 import BlockPower.Skills.SkillLock.SkillLockManager;
-import BlockPower.ModEffects.EffectManager.ModEffectManager;
+import BlockPower.ModEffects.ModEffectManager;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

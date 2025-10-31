@@ -1,11 +1,13 @@
 package BlockPower.ModEntities;
 
+import BlockPower.ModEffects.ClientEffect.PlayerSneakEffect;
+import BlockPower.ModEffects.ClientEffect.ScreenShakeEffect;
+import BlockPower.ModEffects.ModEffectManager;
 import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Skills.SkillLock.LockPriority;
 import BlockPower.Skills.SkillLock.SkillLockManager;
 import BlockPower.Util.Commons;
-import BlockPower.ModEffects.EffectManager.EffectSender;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.nbt.CompoundTag;
@@ -27,7 +29,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 import static BlockPower.Util.Commons.applyDamage;
-import static BlockPower.ModEffects.EffectManager.EffectSender.broadcastScreenShake;
 
 public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEntity.AnvilState> {
     private static final int LIFE_TICK = 100;
@@ -100,7 +101,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
         //如果玩家按下shift，则设置骑乘状态为false
         if (this.player.isShiftKeyDown()) {
             this.isPlayerStandingOnAnvil = false;
-            EffectSender.sendPlayerSneak(player, false);
+            ModEffectManager.removeEffect(player, PlayerSneakEffect.class);
 
             SkillLockManager.unlock(player, lockID);
             player.noPhysics = false;
@@ -185,7 +186,8 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
                 SkillLockManager.lock(player, lockID, LockPriority.LOWEST);
                 //设置玩家站立在铁砧上
                 isPlayerStandingOnAnvil = true;
-                EffectSender.sendPlayerSneak(player, true);
+                ModEffectManager.addEffect(player, new PlayerSneakEffect());
+                ModEffectManager.addEffect(player, new PlayerSneakEffect());
                 //切换像素核心材质为铁砧
                 Commons.changePixelCoreNBT(player, PixelCoreSkillState.ANVIL, null, null);
                 break;
@@ -198,7 +200,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
             case ENDING:
                 if (isPlayerStandingOnAnvil) {
                     // 重置状态逻辑
-                    EffectSender.sendPlayerSneak(player, false);
+                    ModEffectManager.removeEffect(player, PlayerSneakEffect.class);
                     SkillLockManager.unlock(player, lockID);
                     player.noPhysics = false;
                     player.setNoGravity(false);
@@ -213,7 +215,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
             List<Entity> entityList = applyDamage(this, player, 10F, 9, ModSounds.ANVIL_SOUND.get());
             Commons.knockBackEntity(this, entityList, 1.5);
             if (!entityList.isEmpty()) {
-                broadcastScreenShake(this, 6, 2f, 15, 7);
+                ModEffectManager.addToAllAround(new ScreenShakeEffect(10, 1.6f), this.position(), this.level(), 9);
             }
         });
     }

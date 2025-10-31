@@ -1,6 +1,6 @@
 package BlockPower.ModEffects.ClientEffect;
 
-import BlockPower.ModEffects.EffectManager.ModEffectManager;
+import BlockPower.ModEffects.ModEffectManager;
 import BlockPower.Util.Timer.TickTimer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
