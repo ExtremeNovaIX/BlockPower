@@ -107,5 +107,11 @@ public class ClientInputHandler {
             ClientComboData.triggerSkillAnimation(comboSkillType);
         }
 
+        if(KeyBindings.BARRIER_WALL.consumeClick()) {
+            if (!ClientMinerState.isMinerMode()) return;
+            if (localPlayer.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) return;
+            ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.BARRIER_WALL, new BarrierWallSkill()));
+        }
+
     }
 }

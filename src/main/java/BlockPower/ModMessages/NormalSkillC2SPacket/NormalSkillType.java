@@ -9,6 +9,7 @@ public enum NormalSkillType {
     MINECART_RUSH(RushMinecartSkill.class),
     DROP_ANVIL(DropAnvilSkill.class),
     PLACE_BLOCK(PlaceBlockSkill.class),
+    BARRIER_WALL(BarrierWallSkill.class),
     LAUNCHER_SWING(LauncherSwingSkill.class);
 
     public final Class<? extends ISkill> skillClass;
