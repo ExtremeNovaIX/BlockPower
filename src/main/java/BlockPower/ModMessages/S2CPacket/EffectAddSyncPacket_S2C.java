@@ -1,8 +1,8 @@
 package BlockPower.ModMessages.S2CPacket;
 
-import BlockPower.ModEffects.ClientEffect.ClientEffectEnum;
-import BlockPower.ModEffects.ClientEffect.IClientTickBasedEffect;
-import BlockPower.ModEffects.ModEffectManager;
+import BlockPower.Util.ModEffects.ClientEffect.ClientEffectEnum;
+import BlockPower.Util.ModEffects.ClientEffect.IClientTickBasedEffect;
+import BlockPower.Util.ModEffects.ModEffectManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;

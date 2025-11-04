@@ -1,8 +1,8 @@
 package BlockPower.ModEntities;
 
-import BlockPower.ModEffects.ClientEffect.PlayerSneakEffect;
-import BlockPower.ModEffects.ClientEffect.ScreenShakeEffect;
-import BlockPower.ModEffects.ModEffectManager;
+import BlockPower.Util.ModEffects.ClientEffect.PlayerSneakEffect;
+import BlockPower.Util.ModEffects.ClientEffect.ScreenShakeEffect;
+import BlockPower.Util.ModEffects.ModEffectManager;
 import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Skills.SkillLock.LockPriority;

@@ -1,7 +1,7 @@
 package BlockPower.ModMessages.S2CPacket;
 
-import BlockPower.ModEffects.ClientEffect.ScreenShakeEffect;
-import BlockPower.ModEffects.ModEffectManager;
+import BlockPower.Util.ModEffects.ClientEffect.ScreenShakeEffect;
+import BlockPower.Util.ModEffects.ModEffectManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import org.slf4j.Logger;

@@ -1,7 +1,7 @@
 package BlockPower.ModMessages.S2CPacket;
 
-import BlockPower.ModEffects.ClientEffect.HitStopEffect;
-import BlockPower.ModEffects.ModEffectManager;
+import BlockPower.Util.ModEffects.ClientEffect.HitStopEffect;
+import BlockPower.Util.ModEffects.ModEffectManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 

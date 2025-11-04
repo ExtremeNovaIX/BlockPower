@@ -10,6 +10,7 @@ version="${mod_version}"
 displayName="${mod_name}"
 authors="${mod_authors}"
 description='''${mod_description}'''
+mixinConfig = "${mod_id}.mixins.json"
 
 [[dependencies.blockpower]]
 modId="forge"

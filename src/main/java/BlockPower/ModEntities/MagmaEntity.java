@@ -1,13 +1,13 @@
 package BlockPower.ModEntities;
 
-import BlockPower.ModEffects.ClientEffect.ScreenShakeEffect;
-import BlockPower.ModEffects.ServerEffect.AttractEntityEffect;
-import BlockPower.ModEffects.ServerEffect.CloudTrailEffect;
-import BlockPower.ModEffects.ServerEffect.UnBalanceEffect;
+import BlockPower.Util.ModEffects.ClientEffect.ScreenShakeEffect;
+import BlockPower.Util.ModEffects.ServerEffect.AttractEntityEffect;
+import BlockPower.Util.ModEffects.ServerEffect.CloudTrailEffect;
+import BlockPower.Util.ModEffects.ServerEffect.UnBalanceEffect;
 import BlockPower.ModSounds.ModSounds;
 import net.minecraft.sounds.SoundEvents;
 import BlockPower.Util.Commons;
-import BlockPower.ModEffects.ModEffectManager;
+import BlockPower.Util.ModEffects.ModEffectManager;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;

@@ -1,6 +1,6 @@
 package BlockPower.Skills.NormalSkills;
 
-import BlockPower.ModEffects.ServerEffect.SpringAttractionEffect;
+import BlockPower.Util.ModEffects.ServerEffect.SpringAttractionEffect;
 import BlockPower.ModItems.ModItems;
 import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
 import BlockPower.ModMessages.ModMessages;
@@ -13,7 +13,7 @@ import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import BlockPower.Skills.ComboSkills.ComboManager.Server.PlayerComboManager;
 import BlockPower.Util.Commons;
-import BlockPower.ModEffects.ModEffectManager;
+import BlockPower.Util.ModEffects.ModEffectManager;
 import BlockPower.Util.TaskManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;

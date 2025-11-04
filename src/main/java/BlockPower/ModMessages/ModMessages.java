@@ -122,6 +122,12 @@ public class ModMessages {
                 .encoder(MinerStateSyncPacket_S2C::toBytes)
                 .consumerMainThread(MinerStateSyncPacket_S2C::handle)
                 .add();
+
+        net.messageBuilder(SyncKnockbackValueS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SyncKnockbackValueS2CPacket::new)
+                .encoder(SyncKnockbackValueS2CPacket::toBytes)
+                .consumerMainThread(SyncKnockbackValueS2CPacket::handle)
+                .add();
     }
 
 

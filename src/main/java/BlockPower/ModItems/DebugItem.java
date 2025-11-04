@@ -1,19 +1,20 @@
 package BlockPower.ModItems;
 
-import BlockPower.ModMessages.ComboSkillPacket.ComboStandbyPacket_S2C;
-import BlockPower.ModMessages.ModMessages;
-import BlockPower.Skills.ComboSkills.ComboSkillType;
+import BlockPower.Capability.ModCapabilities;
 import BlockPower.Util.Commons;
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class DebugItem extends Item {
     public static final Logger LOGGER = LoggerFactory.getLogger(DebugItem.class);
@@ -24,26 +25,20 @@ public class DebugItem extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        BlockPos pos = player.getOnPos();
-
         if (!level.isClientSide) {
-            Commons.sendDebugMessage(player, "Server:调试物品使用于位置: " + pos.toShortString());
             testServerMethod(player);
-        } else {
-            Commons.sendDebugMessage(player, "Client:调试物品使用于位置: " + pos.toShortString());
-            testClientMethod(player);
         }
-
         return InteractionResultHolder.pass(player.getItemInHand(hand));
     }
 
     private void testServerMethod(Player player) {
-        LOGGER.info("testServerMethod");
-        ModMessages.sendToPlayer(new ComboStandbyPacket_S2C(ComboSkillType.FIRECRACKER), (ServerPlayer) player);
-    }
-
-    private void testClientMethod(Player player) {
-        LOGGER.info("testClientMethod");
-
+        AABB area = new AABB(player.blockPosition()).inflate(11);
+        List<LivingEntity> entities = player.level().getEntitiesOfClass(LivingEntity.class, area);
+        for (LivingEntity entity : entities) {
+            entity.getCapability(ModCapabilities.KNOCKBACK_VALUE_CAPABILITY).ifPresent(knockbackValue -> {
+                double value = knockbackValue.getKnockbackValue();
+                Commons.sendDebugMessage(player, entity.getName().getString() + " Knockback: " + value);
+            });
+        }
     }
 }

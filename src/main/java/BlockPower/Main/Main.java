@@ -2,11 +2,11 @@ package BlockPower.Main;
 
 import BlockPower.ModBlocks.ModBlocks;
 import BlockPower.ModBlocks.ModEntityBlocks;
-import BlockPower.ModCreativeTabs.ModCreativeTabs;
+import BlockPower.Client.ModCreativeTabs.ModCreativeTabs;
 import BlockPower.ModEntities.ModEntities;
 import BlockPower.ModItems.ModItems;
 import BlockPower.ModMessages.ModMessages;
-import BlockPower.ModParticles.ModParticles;
+import BlockPower.Util.ModParticles.ModParticles;
 import BlockPower.ModSounds.ModSounds;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;

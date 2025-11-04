@@ -1,6 +1,6 @@
 package BlockPower.ModException;
 
-import BlockPower.ModEffects.ITickBasedEffect;
+import BlockPower.Util.ModEffects.ITickBasedEffect;
 
 public class EffectException extends RuntimeException {
     public EffectException(String message) {

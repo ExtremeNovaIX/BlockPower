@@ -1,9 +1,9 @@
 package BlockPower.Util;
 
-import BlockPower.ModEffects.ServerEffect.CloudTrailEffect;
-import BlockPower.ModEffects.ServerEffect.UnBalanceEffect;
+import BlockPower.Util.ModEffects.ServerEffect.CloudTrailEffect;
+import BlockPower.Util.ModEffects.ServerEffect.UnBalanceEffect;
 import BlockPower.ModItems.ModItems;
-import BlockPower.ModEffects.ModEffectManager;
+import BlockPower.Util.ModEffects.ModEffectManager;
 import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.ChatFormatting;
