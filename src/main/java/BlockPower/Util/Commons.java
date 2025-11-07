@@ -1,6 +1,5 @@
 package BlockPower.Util;
 
-import BlockPower.Debug.DebugUtils;
 import BlockPower.Util.ModEffects.ServerEffect.CloudTrailEffect;
 import BlockPower.Util.ModEffects.ServerEffect.UnBalanceEffect;
 import BlockPower.ModItems.ModItems;
@@ -133,9 +132,6 @@ public class Commons {
                 endPos = blockHitResult.getLocation();
             }
         }
-
-        DebugUtils.drawRaycastBox(level, startPos, endPos, radius);
-
         AABB searchBox = new AABB(startPos, endPos).inflate(radius);
         List<Entity> potentialEntities = level.getEntities(
                 owner,

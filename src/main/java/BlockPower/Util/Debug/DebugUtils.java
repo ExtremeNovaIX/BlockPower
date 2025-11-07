@@ -1,4 +1,4 @@
-package BlockPower.Debug;
+package BlockPower.Util.Debug;
 
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
