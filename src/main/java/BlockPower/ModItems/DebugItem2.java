@@ -4,12 +4,12 @@ import BlockPower.Capability.ModCapabilities;
 import BlockPower.Util.Commons;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,14 +31,15 @@ public class DebugItem2 extends Item {
     }
 
     private void testServerMethod(Player player) {
-        AABB area = new AABB(player.blockPosition()).inflate(11);
-        List<LivingEntity> entities = player.level().getEntitiesOfClass(LivingEntity.class, area);
-        for (LivingEntity entity : entities) {
-            entity.getCapability(ModCapabilities.KNOCKBACK_VALUE_CAPABILITY).ifPresent(knockbackValue -> {
-                knockbackValue.addKnockbackValue(10);
-                double value = knockbackValue.getKnockbackValue();
-                Commons.sendDebugMessage(player, entity.getName().getString() + " New Knockback: " + value);
-            });
+        List<Entity> entities = Commons.aabbDetectEntity(player, 11, player);
+        for (Entity entity : entities) {
+            if (entity instanceof LivingEntity livingEntity) {
+                livingEntity.getCapability(ModCapabilities.KNOCKBACK_VALUE_CAPABILITY).ifPresent(knockbackValue -> {
+                    knockbackValue.addKBPercent(10);
+                    double value = knockbackValue.getKBPercent();
+                    Commons.sendDebugMessage(player, entity.getName().getString() + " New Knockback: " + value);
+                });
+            }
         }
     }
 }

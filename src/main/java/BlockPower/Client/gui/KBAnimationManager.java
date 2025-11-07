@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
-public class KnockbackAnimationManager {
+public class KBAnimationManager {
 
     private static final int ANIMATION_DURATION_TICKS = 14;
     private static final float SHAKE_THRESHOLD = 0.05f;

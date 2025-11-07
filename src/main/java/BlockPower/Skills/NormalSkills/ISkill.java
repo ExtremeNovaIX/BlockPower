@@ -3,12 +3,9 @@ package BlockPower.Skills.NormalSkills;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import net.minecraft.server.level.ServerPlayer;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
 
 public interface ISkill {
     Logger log = LoggerFactory.getLogger(ISkill.class);
@@ -40,4 +37,10 @@ public interface ISkill {
 
     // 记录连击次数
     void recordCombo(ServerPlayer player);
+
+    // 获取技能击退百分比
+    double getSkillKBPercent();
+
+    // 获取技能伤害值
+    double getSkillDamage();
 }

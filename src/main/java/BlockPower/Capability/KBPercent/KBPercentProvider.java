@@ -1,4 +1,4 @@
-package BlockPower.Capability.KnockbackValue;
+package BlockPower.Capability.KBPercent;
 
 import BlockPower.Capability.ModCapabilities;
 import net.minecraft.core.Direction;
@@ -10,21 +10,21 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class KnockbackValueProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
+public class KBPercentProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
 
-    private final KnockbackValueImpl knockbackValueImpl;
-    private final LazyOptional<IKnockbackValue> optional;
+    private final KBPercentImpl KBPercentImpl;
+    private final LazyOptional<IKBPercent> optional;
 
     // 默认构造函数，用于客户端或不需要回调的场景
-    public KnockbackValueProvider() {
-        this.knockbackValueImpl = new KnockbackValueImpl();
-        this.optional = LazyOptional.of(() -> this.knockbackValueImpl);
+    public KBPercentProvider() {
+        this.KBPercentImpl = new KBPercentImpl();
+        this.optional = LazyOptional.of(() -> this.KBPercentImpl);
     }
 
     // 带回调的构造函数，用于服务器端
-    public KnockbackValueProvider(Runnable onValueUpdate) {
-        this.knockbackValueImpl = new KnockbackValueImpl(onValueUpdate);
-        this.optional = LazyOptional.of(() -> this.knockbackValueImpl);
+    public KBPercentProvider(Runnable onValueUpdate) {
+        this.KBPercentImpl = new KBPercentImpl(onValueUpdate);
+        this.optional = LazyOptional.of(() -> this.KBPercentImpl);
     }
 
     @NotNull
@@ -35,11 +35,11 @@ public class KnockbackValueProvider implements ICapabilityProvider, INBTSerializ
 
     @Override
     public CompoundTag serializeNBT() {
-        return knockbackValueImpl.serializeNBT();
+        return KBPercentImpl.serializeNBT();
     }
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
-        knockbackValueImpl.deserializeNBT(nbt);
+        KBPercentImpl.deserializeNBT(nbt);
     }
 }

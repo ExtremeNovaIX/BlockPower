@@ -16,7 +16,6 @@ public final class MathUtils {
      */
     public static final float TAU = (float) (2 * StrictMath.PI);
 
-    // 缓动函数
     /**
      * 慢速开始，快速结束 (t^5 曲线)。
      * @param t 输入时间比例 (0.0 到 1.0)

@@ -1,9 +1,9 @@
-package BlockPower.Capability.KnockbackValue;
+package BlockPower.Capability.KBPercent;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public class KnockbackValueImpl implements IKnockbackValue, INBTSerializable<CompoundTag> {
+public class KBPercentImpl implements IKBPercent, INBTSerializable<CompoundTag> {
     private double knockbackValue = 0.0;
     private long lastUpdateTick = 0;
 
@@ -12,21 +12,21 @@ public class KnockbackValueImpl implements IKnockbackValue, INBTSerializable<Com
 
     private Runnable onValueChanged;
 
-    public KnockbackValueImpl() {
+    public KBPercentImpl() {
         this(null);
     }
 
-    public KnockbackValueImpl(Runnable onValueChanged) {
+    public KBPercentImpl(Runnable onValueChanged) {
         this.onValueChanged = onValueChanged;
     }
 
     @Override
-    public double getKnockbackValue() {
+    public double getKBPercent() {
         return knockbackValue;
     }
 
     @Override
-    public void setKnockbackValue(double value) {
+    public void setKBPercent(double value) {
         double oldValue = this.knockbackValue;
         this.knockbackValue = Math.max(0.0, value);
         if (this.knockbackValue != oldValue) {
@@ -35,7 +35,7 @@ public class KnockbackValueImpl implements IKnockbackValue, INBTSerializable<Com
     }
 
     @Override
-    public void addKnockbackValue(double amount) {
+    public void addKBPercent(double amount) {
         if (amount > 0) {
             this.knockbackValue += amount;
             // 只有当值真正增加时才更新时间戳
@@ -45,7 +45,7 @@ public class KnockbackValueImpl implements IKnockbackValue, INBTSerializable<Com
     }
 
     @Override
-    public void resetKnockbackValue() {
+    public void resetKBPercent() {
         this.knockbackValue = 0.0;
         this.lastUpdateTick = 0;
         markDirty();
@@ -64,7 +64,7 @@ public class KnockbackValueImpl implements IKnockbackValue, INBTSerializable<Com
 
         // 检查是否超过了不衰减的时间
         if (currentTick - lastUpdateTick > DECAY_DELAY_TICKS) {
-            setKnockbackValue(this.knockbackValue - DECAY_AMOUNT_PER_TICK);
+            setKBPercent(this.knockbackValue - DECAY_AMOUNT_PER_TICK);
         }
     }
 

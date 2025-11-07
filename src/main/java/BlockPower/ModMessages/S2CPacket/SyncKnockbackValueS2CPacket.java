@@ -27,7 +27,7 @@ public class SyncKnockbackValueS2CPacket extends AbstractS2CPacket {
         // 获取当前玩家并更新其Capability数据
         if (Minecraft.getInstance().player != null) {
             Minecraft.getInstance().player.getCapability(ModCapabilities.KNOCKBACK_VALUE_CAPABILITY).ifPresent(cap -> {
-                cap.setKnockbackValue(this.knockbackValue);
+                cap.setKBPercent(this.knockbackValue);
             });
         }
     }

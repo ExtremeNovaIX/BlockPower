@@ -1,31 +1,31 @@
-package BlockPower.Capability.KnockbackValue;
+package BlockPower.Capability.KBPercent;
 
 import net.minecraft.nbt.CompoundTag;
 
-public interface IKnockbackValue {
+public interface IKBPercent {
 
     /**
      * 获取当前的击退值百分比。
      * @return 击退值百分比 (例如，100.0 代表 100%)
      */
-    double getKnockbackValue();
+    double getKBPercent();
 
     /**
      * 设置击退值百分比。
      * @param value 新的击退值百分比
      */
-    void setKnockbackValue(double value);
+    void setKBPercent(double value);
 
     /**
      * 增加击退值百分比。
      * @param amount 增加的量
      */
-    void addKnockbackValue(double amount);
+    void addKBPercent(double amount);
 
     /**
      * 重置击退值百分比为0。
      */
-    void resetKnockbackValue();
+    void resetKBPercent();
 
     /**
      * 在每个tick更新时调用，用于处理内部逻辑，例如自动衰减。

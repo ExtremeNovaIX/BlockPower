@@ -1,6 +1,6 @@
 package BlockPower.Client.Events;
 
-import BlockPower.Client.gui.KnockbackHud;
+import BlockPower.Client.gui.KBHud;
 import BlockPower.Main.Main;
 import BlockPower.Skills.ComboSkills.ComboManager.Client.ClientComboData;
 import BlockPower.Util.ClientCameraTrackingManager;
@@ -16,7 +16,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import static BlockPower.Client.gui.KnockbackHud.renderEntityKBHud;
+import static BlockPower.Client.gui.KBHud.renderEntityKBHud;
 
 @Mod.EventBusSubscriber(modid = Main.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientForgeEvents {
@@ -26,7 +26,7 @@ public class ClientForgeEvents {
 
     @SubscribeEvent
     public static void onRenderGui(RenderGuiEvent.Post event) {
-        KnockbackHud.render(event.getGuiGraphics());
+        KBHud.render(event.getGuiGraphics());
     }
 
     @SubscribeEvent

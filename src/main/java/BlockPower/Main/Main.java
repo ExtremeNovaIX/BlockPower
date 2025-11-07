@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import static BlockPower.Main.Main.MOD_ID;
 //TODO 修复在技能结束一瞬间触发技能可以无视技能锁的问题
+//TODO 修复实体多次受击问题
 @Mod(MOD_ID)
 public class Main {
     public static final String MOD_ID = "blockpower";

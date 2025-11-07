@@ -1,5 +1,6 @@
 package BlockPower.Skills.NormalSkills;
 
+import BlockPower.Util.KBUtils;
 import BlockPower.Util.ModEffects.ServerEffect.SpringAttractionEffect;
 import BlockPower.ModItems.ModItems;
 import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
@@ -47,22 +48,39 @@ public class LauncherSwingSkill implements IPacketSerializableSkill {
         if (player.getXRot() >= -25.0F) return SkillExecutionResult.fail("XRot must be less than -25.0F");
 
         ItemStack mainHandItem = player.getMainHandItem();
-        if (mainHandItem.getItem() != ModItems.PIXEL_CORE.get()) return SkillExecutionResult.fail("Main hand item must be PIXEL_CORE");
-        Commons.changePixelCoreNBT(player, PixelCoreSkillState.TOOL,1F,1F);
+        if (mainHandItem.getItem() != ModItems.PIXEL_CORE.get())
+            return SkillExecutionResult.fail("Main hand item must be PIXEL_CORE");
+        Commons.changePixelCoreNBT(player, PixelCoreSkillState.TOOL, 1F, 1F);
         launcherSwing(player);
         return SkillExecutionResult.success();
     }
 
     private void launcherSwing(ServerPlayer player) {
-        List<Entity> entities = Commons.applyDamage(player, player, 3F, 6, ModSounds.HIT_SOUND.get());
-        Commons.knockBackEntityUp(player, entities, 1); // 施加初始的上挑击飞
-
+        List<Entity> entities = Commons.aabbDetectEntity(player, 6, player);
         if (entities.isEmpty()) {
             return; // 未命中则不执行后续逻辑
         }
 
-        final Entity targetEntity = entities.get(0); // 锁定第一个目标
-        ModEffectManager.addEffect(player,new SpringAttractionEffect(player, targetEntity));
+        // 对每个实体单独应用伤害和击退百分比
+        entities.forEach(entity -> {
+            boolean result = Commons.applyDamage(player, null, entity, getSkillDamage());
+            if (result) {
+                // 分别对每个实体应用其对应的KB增长值
+                KBUtils.addKBPercent(List.of(entity), getSkillKBPercent() * KBUtils.calculateKBPercentMultiplier(entity));
+            }
+        });
+
+        for (int i = 0; i < entities.size(); i++) {
+            if (i == 0) {
+                Commons.knockBackEntityUp(player, entities, 1);
+            } else {
+                Commons.knockBackEntity(player, entities.get(i), 0.7, 1);
+            }
+        }
+        Commons.playSoundWithCooldown(player, ModSounds.HIT_SOUND.get(), 1f, 8);
+
+        final Entity targetEntity = entities.get(0);
+        ModEffectManager.addEffect(player, new SpringAttractionEffect(player, targetEntity));
         ModMessages.sendToPlayer(new CameraLockPacket_S2C(targetEntity.getId()), player);
         ModMessages.sendToPlayer(new HitStopPacket_S2C(2), player);
         ModMessages.sendToPlayer(new ShakePacket_S2C(4, 2F), player);
@@ -87,6 +105,16 @@ public class LauncherSwingSkill implements IPacketSerializableSkill {
     @Override
     public void recordCombo(ServerPlayer player) {
         PlayerComboManager.recordCombo(player, ComboSkillType.MAGMA_BLOCK);
+    }
+
+    @Override
+    public double getSkillKBPercent() {
+        return 4;
+    }
+
+    @Override
+    public double getSkillDamage() {
+        return 3;
     }
 
     @Override

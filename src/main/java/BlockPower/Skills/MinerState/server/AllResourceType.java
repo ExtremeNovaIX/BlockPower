@@ -10,10 +10,10 @@ import java.util.List;
  * 枚举在此处声明的顺序决定了资源在UI资源条上的渲染顺序。
  */
 public enum AllResourceType {
-    DIRT(Items.DIRT, 50),
-    WOOD(Items.OAK_PLANKS, 30),
-    STONE(Items.COBBLESTONE, 30),
-    IRON(Items.RAW_IRON, 80),
+    DIRT(Items.DIRT, 100),
+    WOOD(Items.OAK_PLANKS, 50),
+    STONE(Items.COBBLESTONE, 70),
+    IRON(Items.RAW_IRON, 100),
     GOLD(Items.RAW_GOLD, 16),
     DIAMOND(Items.DIAMOND, 8),
     NETHERITE(Items.NETHERITE_SCRAP, 4);

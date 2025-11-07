@@ -25,4 +25,6 @@ public interface IComboSkill {
     int getComboWindowTick();
 
     String getTextureLocation();
+
+    double getSkillKBPercent();
 }

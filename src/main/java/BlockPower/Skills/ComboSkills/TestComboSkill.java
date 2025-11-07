@@ -42,4 +42,9 @@ public class TestComboSkill implements IComboSkill {
     public String getTextureLocation() {
         return "textures/gui/combo_skills/magma_block_combo_skill.png";
     }
+
+    @Override
+    public double getSkillKBPercent() {
+        return 0;
+    }
 }

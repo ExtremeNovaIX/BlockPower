@@ -1,5 +1,6 @@
 package BlockPower.Util;
 
+import BlockPower.Debug.DebugUtils;
 import BlockPower.Util.ModEffects.ServerEffect.CloudTrailEffect;
 import BlockPower.Util.ModEffects.ServerEffect.UnBalanceEffect;
 import BlockPower.ModItems.ModItems;
@@ -17,22 +18,26 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 public class Commons {
     private static final Random r = new Random();
 
     private static final TimerManager timerManager = TimerManager.getInstance(false);
     private static final TaskManager taskManager = TaskManager.getInstance(false);
+    private static final Logger log = LoggerFactory.getLogger(Commons.class);
 
     /**
      * 检测半径内的非技能释放者的LivingEntity
@@ -41,7 +46,7 @@ public class Commons {
      * @param radius     检测半径
      * @return 半径内的非技能释放者和非自身LivingEntity列表
      */
-    public static List<Entity> detectEntity(@NotNull Entity mainEntity, double radius, Player blacklist) {
+    public static List<Entity> aabbDetectEntity(@NotNull Entity mainEntity, double radius, Player blacklist) {
         //创建一个默认半径为radius的检测区域
         AABB detectionArea = new AABB(
                 mainEntity.getX() - radius,
@@ -70,7 +75,7 @@ public class Commons {
      * @param radius 检测半径
      * @return 半径内的非技能释放者和非自身LivingEntity列表
      */
-    public static List<Entity> detectEntity(@NotNull Vec3 pos, Level level, double radius, Player blacklist) {
+    public static List<Entity> aabbDetectEntity(@NotNull Vec3 pos, Level level, double radius, Player blacklist) {
         //创建一个默认半径为radius的检测区域
         AABB detectionArea = new AABB(
                 pos.x - radius,
@@ -92,23 +97,110 @@ public class Commons {
     }
 
     /**
+     * 射线式检测实体
+     *
+     * @param mainEntity  发出射线的实体
+     * @param radius      射线半径
+     * @param blacklist   检测中要忽略的实体列表
+     * @param throughWall 射线是否穿透方块
+     * @param length      射线的最大长度
+     * @return 射线路径上检测到的实体列表
+     */
+    public static List<Entity> rayDetectEntity(@NotNull Entity mainEntity, double radius, @Nullable List<Entity> blacklist, boolean throughWall, double length) {
+        return rayDetectEntity(mainEntity.level(), mainEntity.getEyePosition(), mainEntity.getLookAngle(), radius, blacklist, throughWall, length, mainEntity);
+    }
+
+    /**
+     * 射线式检测实体
+     *
+     * @param level       进行检测的世界
+     * @param startPos    射线起点
+     * @param direction   射线方向 (应为单位向量)
+     * @param radius      射线半径
+     * @param blacklist   检测中要忽略的实体列表
+     * @param throughWall 射线是否穿透方块
+     * @param length      射线的最大长度
+     * @param owner       射线的所有者，用于忽略自身和进行方块碰撞检测
+     * @return 射线路径上检测到的实体列表
+     */
+    public static List<Entity> rayDetectEntity(@NotNull Level level, @NotNull Vec3 startPos, @NotNull Vec3 direction, double radius, @Nullable List<Entity> blacklist, boolean throughWall, double length, @Nullable Entity owner) {
+        Vec3 endPos = startPos.add(direction.normalize().scale(length));
+
+        if (!throughWall) {
+            ClipContext clipContext = new ClipContext(startPos, endPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, owner);
+            BlockHitResult blockHitResult = level.clip(clipContext);
+            if (blockHitResult.getType() != HitResult.Type.MISS) {
+                endPos = blockHitResult.getLocation();
+            }
+        }
+
+        DebugUtils.drawRaycastBox(level, startPos, endPos, radius);
+
+        AABB searchBox = new AABB(startPos, endPos).inflate(radius);
+        List<Entity> potentialEntities = level.getEntities(
+                owner,
+                searchBox,
+                entity -> entity instanceof LivingEntity &&
+                        entity.isPickable() &&
+                        (owner == null || !entity.equals(owner)) &&
+                        (blacklist == null || !blacklist.contains(entity))
+        );
+
+        List<Entity> detectedEntities = new ArrayList<>();
+        for (Entity entity : potentialEntities) {
+            AABB entityBoundingBox = entity.getBoundingBox().inflate(radius);
+            // 首先检查起点是否就在实体的碰撞箱内，覆盖近距离检测盲区
+            if (entityBoundingBox.contains(startPos)) {
+                detectedEntities.add(entity);
+                continue;
+            }
+            Optional<Vec3> intersection = entityBoundingBox.clip(startPos, endPos);
+            if (intersection.isPresent()) {
+                detectedEntities.add(entity);
+            }
+        }
+
+        detectedEntities.sort(Comparator.comparingDouble(e -> e.distanceToSqr(startPos)));
+
+        return detectedEntities;
+    }
+
+
+    /**
      * 击退实体
      *
-     * @param mainEntity     释放技能的实体
-     * @param effectedEntity 被击退的实体
-     * @param strength       击退强度
+     * @param mainEntity         释放技能的实体
+     * @param effectedEntity     被击退的实体
+     * @param verticalStrength   垂直击退强度
+     * @param horizontalStrength 水平击退强度
      */
-    public static void knockBackEntity(@NotNull Entity mainEntity, List<Entity> effectedEntity, double strength) {
-        if (effectedEntity == null || effectedEntity.isEmpty()) return;
+    public static void knockBackEntity(@NotNull Entity mainEntity, List<Entity> effectedEntity, double verticalStrength, double horizontalStrength) {
+        if (effectedEntity.isEmpty()) return;
         for (Entity entity : effectedEntity) {
             if (entity.isRemoved()) continue;
-            Vec3 knockbackVector = entity.position().subtract(mainEntity.position()).normalize();
-            entity.setDeltaMovement(mainEntity.getDeltaMovement().add(
-                    knockbackVector.x * strength,
-                    1 * strength,
-                    knockbackVector.z * strength
-            ));
+            knockBackEntity(mainEntity, entity, verticalStrength, horizontalStrength);
         }
+    }
+
+    /**
+     * 击退实体
+     *
+     * @param mainEntity         释放技能的实体
+     * @param effectedEntity     被击退的实体
+     * @param verticalStrength   垂直击退强度
+     * @param horizontalStrength 水平击退强度
+     */
+    public static void knockBackEntity(@NotNull Entity mainEntity, Entity effectedEntity, double verticalStrength, double horizontalStrength) {
+        if (effectedEntity == null || effectedEntity.isRemoved()) return;
+        if (verticalStrength == 0 && horizontalStrength == 0) return;
+        Vec3 kbForce = effectedEntity.position().subtract(mainEntity.position()).normalize();
+        Vec3 currentVelocity = effectedEntity.getDeltaMovement();
+
+        double newVelX = currentVelocity.x + kbForce.x * horizontalStrength;
+        double newVelZ = currentVelocity.z + kbForce.z * horizontalStrength;
+        double newVelY = currentVelocity.y / 2.0 + verticalStrength;
+
+        effectedEntity.setDeltaMovement(newVelX, newVelY, newVelZ);
     }
 
     /**
@@ -120,15 +212,13 @@ public class Commons {
      */
     public static void knockBackEntityUp(@NotNull Entity mainEntity, List<Entity> effectedEntity, double strength) {
         if (effectedEntity.isEmpty()) return;
-
-        // 垂直向上的力度
-        double horizontalRepelStrength = 0.45; // 水平推开的力度
+        double horizontalRepelStrength = 0.2; // 水平推开的力度
 
         // 获取玩家的水平朝向向量（忽略Y轴的抬头或低头）
         Vec3 lookVec = mainEntity.getLookAngle();
         Vec3 horizontalLook = new Vec3(lookVec.x, 0.0, lookVec.z).normalize();
 
-        // 创建一个“推后”向量，即玩家朝向的相反方向
+        // 玩家朝向的相反方向的向量
         Vec3 pushBackVec = horizontalLook.scale(horizontalRepelStrength);
 
         for (Entity entity : effectedEntity) {
@@ -146,33 +236,30 @@ public class Commons {
     }
 
     /**
-     * 对半径内的实体造成伤害并应用云迹和失衡效果
+     * 播放音效并设置冷却时间
      *
-     * @param mainEntity   释放技能的实体
-     * @param skillUser    释放技能的玩家
-     * @param damage       伤害值
-     * @param detectRadius 检测半径
-     * @param soundEvent   音效
-     * @return 半径内的实体列表
+     * @param mainEntity 释放技能的实体
+     * @param soundEvent 要播放的音效事件
+     * @param volume     音效音量
+     * @param cooldown   冷却时间
      */
-    public static List<Entity> applyDamage(@NotNull Entity mainEntity, Player skillUser, float damage, double detectRadius, @Nullable SoundEvent soundEvent) {
-        List<Entity> entities = detectEntity(mainEntity, detectRadius, skillUser);
-        if (!entities.isEmpty()) {
-            entities.forEach(entity -> {
-                entity.hurt(mainEntity.level().damageSources().mobAttack(skillUser), damage);
-                ModEffectManager.addEffect(entity, new UnBalanceEffect(entity, 9));
-                //为每个被击中的实体启动粒子计时器
-                ModEffectManager.addEffect(entity, new CloudTrailEffect(entity, 40));
-                if (soundEvent != null && !mainEntity.level().isClientSide) {
-                    //限制5tick内最多播放3次声音
-                    taskManager.runTimesWithCooldown(mainEntity, "play_sound", 2, 5, () ->
-                            mainEntity.level().playSound(null,
-                                    mainEntity.getX(), mainEntity.getY(), mainEntity.getZ(),
-                                    soundEvent, SoundSource.PLAYERS, 5f, r.nextFloat(0.2f) + 0.9f));
-                }
-            });
-        }
-        return entities;
+    public static void playSoundWithCooldown(@NotNull Entity mainEntity, SoundEvent soundEvent, float volume, int cooldown) {
+        if (mainEntity.level().isClientSide) return;
+        taskManager.runOnceWithCooldown(mainEntity, "playSoundWithCooldown", cooldown, () -> {
+            mainEntity.level().playSound(null,
+                    mainEntity.getX(), mainEntity.getY(), mainEntity.getZ(),
+                    soundEvent, SoundSource.PLAYERS, volume, r.nextFloat(0.4f) + 0.8f);
+        });
+    }
+
+    public static boolean applyDamage(@NotNull Entity mainEntity, Player skillUser, Entity detectedEntity, double baseDamage) {
+        if (detectedEntity.isRemoved()) return false;
+        double finalDamage = KBUtils.calculateSkillDamage(detectedEntity, baseDamage);
+        detectedEntity.hurt(mainEntity.level().damageSources().mobAttack(skillUser), (float) finalDamage);
+        ModEffectManager.addEffect(detectedEntity, new UnBalanceEffect(detectedEntity, 9));
+        //为每个被击中的实体启动粒子计时器
+        ModEffectManager.addEffect(detectedEntity, new CloudTrailEffect(detectedEntity, 40));
+        return true;
     }
 
     /**

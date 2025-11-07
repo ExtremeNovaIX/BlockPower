@@ -1,7 +1,7 @@
 package BlockPower.ModEvents;
 
-import BlockPower.Capability.IKnockbackData;
-import BlockPower.Capability.KnockbackValue.KnockbackValueProvider;
+import BlockPower.Capability.IKBPercentData;
+import BlockPower.Capability.KBPercent.KBPercentProvider;
 import BlockPower.Capability.ModCapabilities;
 import BlockPower.Main.Main;
 import BlockPower.ModMessages.ModMessages;
@@ -28,13 +28,13 @@ public class ForgeEvents {
                 Runnable onValueUpdate = () -> {
                     entity.getCapability(ModCapabilities.KNOCKBACK_VALUE_CAPABILITY).ifPresent(cap -> {
                         // 通过Mixin接口安全地获取Accessor并设置值
-                        if (entity instanceof IKnockbackData data) {
-                            entity.getEntityData().set(data.getKnockbackDataAccessor(), (float)cap.getKnockbackValue());
+                        if (entity instanceof IKBPercentData data) {
+                            entity.getEntityData().set(data.getKBPercentDataAccessor(), (float)cap.getKBPercent());
                         }
 
                         // 如果是玩家，额外发送一个数据包以确保HUD的实时性
                         if (entity instanceof ServerPlayer serverPlayer) {
-                            ModMessages.sendToPlayer(new SyncKnockbackValueS2CPacket(cap.getKnockbackValue()), serverPlayer);
+                            ModMessages.sendToPlayer(new SyncKnockbackValueS2CPacket(cap.getKBPercent()), serverPlayer);
                         }
                     });
                 };
@@ -42,14 +42,14 @@ public class ForgeEvents {
                 // 对于非玩家生物，只在服务器端附加带回调的Provider
                 if (!(entity instanceof Player)) {
                     if (!entity.level().isClientSide()) {
-                        event.addCapability(new ResourceLocation(Main.MOD_ID, "knockback_value"), new KnockbackValueProvider(onValueUpdate));
+                        event.addCapability(new ResourceLocation(Main.MOD_ID, "knockback_value"), new KBPercentProvider(onValueUpdate));
                     }
                 } else {
                     // 对于玩家，两端都附加，服务器端带回调
                     if (!entity.level().isClientSide()) {
-                        event.addCapability(new ResourceLocation(Main.MOD_ID, "knockback_value"), new KnockbackValueProvider(onValueUpdate));
+                        event.addCapability(new ResourceLocation(Main.MOD_ID, "knockback_value"), new KBPercentProvider(onValueUpdate));
                     } else {
-                        event.addCapability(new ResourceLocation(Main.MOD_ID, "knockback_value"), new KnockbackValueProvider());
+                        event.addCapability(new ResourceLocation(Main.MOD_ID, "knockback_value"), new KBPercentProvider());
                     }
                 }
             }
@@ -72,7 +72,7 @@ public class ForgeEvents {
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer serverPlayer) {
             serverPlayer.getCapability(ModCapabilities.KNOCKBACK_VALUE_CAPABILITY).ifPresent(cap -> {
-                ModMessages.sendToPlayer(new SyncKnockbackValueS2CPacket(cap.getKnockbackValue()), serverPlayer);
+                ModMessages.sendToPlayer(new SyncKnockbackValueS2CPacket(cap.getKBPercent()), serverPlayer);
             });
         }
     }
@@ -81,7 +81,7 @@ public class ForgeEvents {
     public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.getEntity() instanceof ServerPlayer serverPlayer) {
             serverPlayer.getCapability(ModCapabilities.KNOCKBACK_VALUE_CAPABILITY).ifPresent(cap -> {
-                ModMessages.sendToPlayer(new SyncKnockbackValueS2CPacket(cap.getKnockbackValue()), serverPlayer);
+                ModMessages.sendToPlayer(new SyncKnockbackValueS2CPacket(cap.getKBPercent()), serverPlayer);
             });
         }
     }

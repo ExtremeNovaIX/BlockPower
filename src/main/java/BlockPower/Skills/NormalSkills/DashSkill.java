@@ -93,4 +93,13 @@ public class DashSkill implements IPacketSerializableSkill {
 
     }
 
+    @Override
+    public double getSkillKBPercent() {
+        return 0;
+    }
+
+    @Override
+    public double getSkillDamage() {
+        return 0;
+    }
 }

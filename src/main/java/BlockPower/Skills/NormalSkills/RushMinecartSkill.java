@@ -27,7 +27,7 @@ public class RushMinecartSkill implements IPacketSerializableSkill {
 
     @Override
     public SkillExecutionResult triggerSkill(ServerPlayer player) {
-        RushMinecartEntity.createRushMinecart(player);
+        RushMinecartEntity.createRushMinecart(player,this);
         return SkillExecutionResult.success();
     }
 
@@ -61,5 +61,13 @@ public class RushMinecartSkill implements IPacketSerializableSkill {
 
     }
 
+    @Override
+    public double getSkillKBPercent() {
+        return 10;
+    }
 
+    @Override
+    public double getSkillDamage() {
+        return 15;
+    }
 }

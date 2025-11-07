@@ -121,4 +121,14 @@ public class PlaceBlockSkill implements IPacketSerializableSkill {
     public void readParams(FriendlyByteBuf buf) {
 
     }
+
+    @Override
+    public double getSkillKBPercent() {
+        return 0;
+    }
+
+    @Override
+    public double getSkillDamage() {
+        return 0;
+    }
 }

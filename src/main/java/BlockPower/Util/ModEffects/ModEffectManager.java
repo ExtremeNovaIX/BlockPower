@@ -74,7 +74,7 @@ public class ModEffectManager {
     }
 
     public static void addToAllAround(ITickBasedEffect effect, Vec3 pos, Level level, double radius) {
-        List<Entity> entityList = Commons.detectEntity(pos, level, radius, null);
+        List<Entity> entityList = Commons.aabbDetectEntity(pos, level, radius, null);
 
         entityList.forEach(entity -> {
             // 根据效果的运行端选择正确的队列

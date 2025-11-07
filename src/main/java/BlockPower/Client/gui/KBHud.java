@@ -1,6 +1,6 @@
 package BlockPower.Client.gui;
 
-import BlockPower.Capability.IKnockbackData;
+import BlockPower.Capability.IKBPercentData;
 import BlockPower.Capability.ModCapabilities;
 import BlockPower.Skills.MinerState.client.ClientMinerState;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -18,7 +18,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import org.joml.Matrix4f;
 
-public class KnockbackHud {
+public class KBHud {
 
     private static final RandomSource random = RandomSource.create();
     private static final float HUD_SHAKE_AMPLITUDE = 2.5f;
@@ -33,13 +33,13 @@ public class KnockbackHud {
         }
 
         player.getCapability(ModCapabilities.KNOCKBACK_VALUE_CAPABILITY).ifPresent(cap -> {
-            double knockbackValue = cap.getKnockbackValue();
+            double knockbackValue = cap.getKBPercent();
             // 获取整个动画状态对象
-            KnockbackAnimationManager.AnimationState animState = KnockbackAnimationManager.getAndUpdatePlayerState((float) knockbackValue);
+            KBAnimationManager.AnimationState animState = KBAnimationManager.getAndUpdatePlayerState((float) knockbackValue);
             float shakeIntensity = animState.getShakeIntensity();
             float colorIntensity = animState.getColorIntensity();
 
-            int baseColor = getKnockbackColor(knockbackValue);
+            int baseColor = getKBColor(knockbackValue);
             // 如果在颜色动画中，则在基础色和红色之间插值
             int finalColor = (colorIntensity > 0) ? lerpColor(colorIntensity, baseColor, 0xFF0000) : baseColor;
 
@@ -74,7 +74,7 @@ public class KnockbackHud {
         });
     }
 
-    public static int getKnockbackColor(double value) {
+    public static int getKBColor(double value) {
         final int colorWhite = 0xFFFFFF;
         final int colorYellow = 0xFFFF55;
         final int colorOrange = 0xFFAA00;
@@ -123,19 +123,19 @@ public class KnockbackHud {
         }
 
         // 通过Mixin接口安全地获取击退值
-        if (entity instanceof IKnockbackData data) {
-            float knockbackValue = entity.getEntityData().get(data.getKnockbackDataAccessor());
+        if (entity instanceof IKBPercentData data) {
+            float knockbackValue = entity.getEntityData().get(data.getKBPercentDataAccessor());
 
             if (knockbackValue > 0) {
                 // 从管理器获取该实体的完整动画状态对象
-                KnockbackAnimationManager.AnimationState animState = KnockbackAnimationManager.getAndUpdateEntityState(entity, knockbackValue);
+                KBAnimationManager.AnimationState animState = KBAnimationManager.getAndUpdateEntityState(entity, knockbackValue);
                 // 从状态对象中分别获取抖动和颜色的强度
                 float shakeIntensity = animState.getShakeIntensity();
                 float colorIntensity = animState.getColorIntensity();
 
-                int baseColor = KnockbackHud.getKnockbackColor(knockbackValue);
+                int baseColor = KBHud.getKBColor(knockbackValue);
                 // 如果在颜色动画中，则在基础色和红色之间插值
-                int finalColor = (colorIntensity > 0) ? KnockbackHud.lerpColor(colorIntensity, baseColor, 0xFF0000) : baseColor;
+                int finalColor = (colorIntensity > 0) ? KBHud.lerpColor(colorIntensity, baseColor, 0xFF0000) : baseColor;
 
                 String text = String.format("%.1f%%", knockbackValue);
                 Font font = minecraft.font;

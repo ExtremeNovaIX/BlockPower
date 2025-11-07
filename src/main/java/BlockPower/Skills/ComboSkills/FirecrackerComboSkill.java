@@ -21,7 +21,7 @@ public class FirecrackerComboSkill implements IComboSkill {
 
     @Override
     public void triggerSkill(Player player) {
-        FirecrackerEntity.spawnFirecrackerEntity(player);
+        FirecrackerEntity.spawnFirecrackerEntity(player, this);
     }
 
     @Override
@@ -42,5 +42,10 @@ public class FirecrackerComboSkill implements IComboSkill {
     @Override
     public String getTextureLocation() {
         return "textures/gui/combo_skills/firecracker_combo_skill.png";
+    }
+
+    @Override
+    public double getSkillKBPercent() {
+        return 10;
     }
 }

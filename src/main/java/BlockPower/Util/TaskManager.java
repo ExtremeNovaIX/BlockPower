@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-
+//TODO 添加注解形式的任务管理
 public class TaskManager {
     private static final TaskManager SERVER_INSTANCE = new TaskManager(false);
     private static final TaskManager CLIENT_INSTANCE = new TaskManager(true);

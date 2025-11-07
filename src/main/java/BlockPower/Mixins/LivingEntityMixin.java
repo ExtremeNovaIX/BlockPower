@@ -1,6 +1,6 @@
 package BlockPower.Mixins;
 
-import BlockPower.Capability.IKnockbackData;
+import BlockPower.Capability.IKBPercentData;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin extends Entity implements IKnockbackData {
+public abstract class LivingEntityMixin extends Entity implements IKBPercentData {
 
     @Unique
     private static final EntityDataAccessor<Float> BLOCKPOWER_KNOCKBACK_VALUE = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.FLOAT);
@@ -30,7 +30,7 @@ public abstract class LivingEntityMixin extends Entity implements IKnockbackData
     }
 
     @Override
-    public EntityDataAccessor<Float> getKnockbackDataAccessor() {
+    public EntityDataAccessor<Float> getKBPercentDataAccessor() {
         return BLOCKPOWER_KNOCKBACK_VALUE;
     }
 }

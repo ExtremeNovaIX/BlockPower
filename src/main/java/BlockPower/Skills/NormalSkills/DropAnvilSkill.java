@@ -27,7 +27,7 @@ public class DropAnvilSkill implements IPacketSerializableSkill {
 
     @Override
     public SkillExecutionResult triggerSkill(ServerPlayer player) {
-        DropAnvilEntity.createDropAnvil(player);
+        DropAnvilEntity.createDropAnvil(player, this);
         return SkillExecutionResult.success();
     }
 
@@ -61,4 +61,13 @@ public class DropAnvilSkill implements IPacketSerializableSkill {
         PlayerComboManager.recordCombo(player, ComboSkillType.FIRECRACKER);
     }
 
+    @Override
+    public double getSkillKBPercent() {
+        return 10;
+    }
+
+    @Override
+    public double getSkillDamage() {
+        return 10;
+    }
 }

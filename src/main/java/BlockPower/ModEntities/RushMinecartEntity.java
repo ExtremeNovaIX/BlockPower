@@ -1,5 +1,7 @@
 package BlockPower.ModEntities;
 
+import BlockPower.Skills.NormalSkills.RushMinecartSkill;
+import BlockPower.Util.KBUtils;
 import BlockPower.Util.ModEffects.ClientEffect.ScreenShakeEffect;
 import BlockPower.Util.ModEffects.ModEffectManager;
 import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
@@ -7,6 +9,7 @@ import BlockPower.ModSounds.ModSounds;
 import BlockPower.Skills.SkillLock.LockPriority;
 import BlockPower.Skills.SkillLock.SkillLockManager;
 import BlockPower.Util.Commons;
+import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -29,8 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static BlockPower.Util.Commons.applyDamage;
-import static BlockPower.Util.Commons.detectEntity;
+import static BlockPower.Util.Commons.aabbDetectEntity;
 
 public class RushMinecartEntity extends AbstractMinecart implements IStateMachine<RushMinecartEntity.RushMinecartState> {
 
@@ -49,9 +51,11 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
         ENDING        //技能结束, 准备销毁
     }
 
-    private static final Float MAX_SPEED = 2f;
+    private static final Float MAX_SPEED = 1.3f;
 
-    private final ServerPlayer player;
+    private ServerPlayer player;
+
+    private RushMinecartSkill skill;
 
     private Vec3 lastRailPlacementPos = Vec3.ZERO;//记录上一个生成点的位置
 
@@ -61,19 +65,22 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
 
     private static final EntityDataAccessor<Integer> DATA_STATE = SynchedEntityData.defineId(RushMinecartEntity.class, EntityDataSerializers.INT);
 
+    private static final TaskManager taskManager = TaskManager.getInstance(false);
+
     public RushMinecartEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
-        this.player = null;
     }
 
-    public RushMinecartEntity(ServerPlayer player) {
+    public RushMinecartEntity(ServerPlayer player, RushMinecartSkill skill) {
         super(ModEntities.RUSH_MINECART.get(), player.level());
         this.player = player;
+        this.skill = skill;
     }
 
-    protected RushMinecartEntity(EntityType<?> entityType, Level level, double x, double y, double z, ServerPlayer player) {
+    protected RushMinecartEntity(EntityType<?> entityType, Level level, double x, double y, double z, ServerPlayer player, RushMinecartSkill skill) {
         super(entityType, level, x, y, z);
         this.player = player;
+        this.skill = skill;
     }
 
     @Override
@@ -126,7 +133,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
                 break;
 
             case SEEKING:
-                List<Entity> entities = detectEntity(this, 4, player);
+                List<Entity> entities = aabbDetectEntity(this, 4, player);
                 if (!entities.isEmpty()) {
                     entities.get(0).startRiding(this);
                     setState(RushMinecartState.CAPTURED);
@@ -146,7 +153,6 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
                 break;
 
             case CRASHED:
-                //TODO 修改为按速度大小决定伤害检测范围
                 SkillLockManager.unlock(player, player.getName().getString() + "_MinecartLock");
                 if (this.getFirstPassenger() == player) {
                     player.stopRiding();
@@ -222,7 +228,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
         player.swing(InteractionHand.MAIN_HAND, true);
     }
 
-    public static void createRushMinecart(ServerPlayer player) {
+    public static void createRushMinecart(ServerPlayer player, RushMinecartSkill skill) {
         Vec3 lookAngle = player.getLookAngle();
         lookAngle = new Vec3(lookAngle.x, 0, lookAngle.z).normalize();
         double distance = 1.5;
@@ -234,6 +240,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
                 player.getY() + 0.1,
                 player.getZ() + lookAngle.z * distance
                 , player
+                , skill
         );
 
         //设置矿车的速度和方向
@@ -245,7 +252,6 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
         minecart.setDeltaMovement(minecart.getMinecartSpeed());
         //将矿车添加到世界中
         player.level().addFreshEntity(minecart);
-        LOGGER.info("生成冲刺矿车");
 
         minecart.spawnInitialRail();
 
@@ -260,18 +266,25 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
     }
 
     private void hurtEntity(@NotNull Player player) {
-        List<Entity> entityList = applyDamage(this, player, 15F, 5, ModSounds.MINECART_CRASH_SOUND.get());
-        Commons.knockBackEntity(this, entityList, 1.5);
-        if (!entityList.isEmpty()) {
-            //玩家在车上时触发屏幕震动
-            if (getState() == RushMinecartState.RUSHING && this.getFirstPassenger() == player) {
-                ModEffectManager.addToAllAround(new ScreenShakeEffect(6, 1.8f), this.position(), this.level(), 7);
-            }
+        taskManager.runOnceWithCooldown(this, "hurt_entity", 3, () -> {
+            List<Entity> entityList = Commons.rayDetectEntity(this.level(), this.position(), this.getDeltaMovement().normalize(), 2.5, List.of(player), false, 2.5, player);
+            entityList.forEach(entity -> {
+                boolean result = Commons.applyDamage(this, player, entity, skill.getSkillDamage());
+                if (!result) return;
+                KBUtils.applyKB(this, entity, skill.getSkillKBPercent(), 1.2);
+                Commons.playSoundWithCooldown(this, ModSounds.MINECART_CRASH_SOUND.get(), 0.5f, 8);
+            });
+            if (!entityList.isEmpty()) {
+                //玩家在车上时触发屏幕震动
+                if (getState() == RushMinecartState.RUSHING && this.getFirstPassenger() == player) {
+                    ModEffectManager.addToAllAround(new ScreenShakeEffect(6, 1.8f), this.position(), this.level(), 6);
+                }
 
-            if (getState() == RushMinecartState.RUSHING) {
-                setState(RushMinecartState.CRASHED);
+                if (getState() == RushMinecartState.RUSHING) {
+                    setState(RushMinecartState.CRASHED);
+                }
             }
-        }
+        });
     }
 
     private void normalMinecraftLogic() {

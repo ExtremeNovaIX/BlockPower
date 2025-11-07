@@ -1,10 +1,13 @@
 package BlockPower.ModEntities;
 
+import BlockPower.Skills.ComboSkills.MagmaBlockComboSkill;
+import BlockPower.Util.KBUtils;
 import BlockPower.Util.ModEffects.ClientEffect.ScreenShakeEffect;
 import BlockPower.Util.ModEffects.ServerEffect.AttractEntityEffect;
-import BlockPower.Util.ModEffects.ServerEffect.CloudTrailEffect;
 import BlockPower.Util.ModEffects.ServerEffect.UnBalanceEffect;
 import BlockPower.ModSounds.ModSounds;
+import BlockPower.Util.TaskManager;
+import BlockPower.Util.Timer.TickListener;
 import net.minecraft.sounds.SoundEvents;
 import BlockPower.Util.Commons;
 import BlockPower.Util.ModEffects.ModEffectManager;
@@ -31,11 +34,15 @@ import java.util.List;
 public class MagmaEntity extends Entity implements IStateMachine<MagmaEntity.MagmaEntityState> {
     private static final EntityDataAccessor<Integer> DATA_STATE = SynchedEntityData.defineId(MagmaEntity.class, EntityDataSerializers.INT);
 
-    private final Player player;
+    private Player player;
     private int MAX_LIFE_TICK = 25;
     private int MAX_ACTIVE_TICK = 25;
     private int activeTick = 0;
     private int currentTick = 0;
+
+    private MagmaBlockComboSkill skill;
+
+    private static final TaskManager taskManager = TaskManager.getInstance(false);
 
     public enum MagmaEntityState {
         INIT,
@@ -62,7 +69,7 @@ public class MagmaEntity extends Entity implements IStateMachine<MagmaEntity.Mag
                 break;
             case SEARCHING, ACTIVE:
                 // 检测实体并添加吸引和失衡效果
-                List<Entity> entities = Commons.detectEntity(this, 5, player);
+                List<Entity> entities = Commons.aabbDetectEntity(this, 5, player);
                 entities.forEach(entity -> {
                     ModEffectManager.addEffect(entity, new AttractEntityEffect(6, this, entity));
                     ModEffectManager.addEffect(entity, new UnBalanceEffect(entity, 6));
@@ -74,6 +81,10 @@ public class MagmaEntity extends Entity implements IStateMachine<MagmaEntity.Mag
                             // 对实体造成火焰伤害并设置着火时间为5秒
                             livingEntity.hurt(livingEntity.level().damageSources().onFire(), 2F);
                             livingEntity.setSecondsOnFire(5);
+                            if (TickListener.getServerTicks() % 2 == 0) {
+                                double fireKBPercent = KBUtils.calculateKBPercentMultiplier(livingEntity) * skill.getFireKBPercent();
+                                KBUtils.applyKB(this, livingEntity, fireKBPercent, 0);
+                            }
                         }
                     });
                     spawnParticles();
@@ -81,15 +92,13 @@ public class MagmaEntity extends Entity implements IStateMachine<MagmaEntity.Mag
                 break;
 
             case END:
-                // 结束时，给实体添加云迹和失衡效果
-                List<Entity> e = Commons.detectEntity(this, 3, player);
-                e.forEach(entity -> {
-                    ModEffectManager.addEffect(entity, new CloudTrailEffect(entity, 20));
-                    ModEffectManager.addEffect(entity, new UnBalanceEffect(entity, 10));
-                });
+                List<Entity> e = Commons.aabbDetectEntity(this, 3, player);
                 // 应用伤害
-                Commons.applyDamage(this, player, 10, 3, null);
-                Commons.knockBackEntity(this, e, 1.8F);
+                e.forEach(entity -> {
+                    boolean result = Commons.applyDamage(this, player, entity, 10);
+                    if (!result) return;
+                    KBUtils.applyKB(this, entity, skill.getSkillKBPercent(), 1.5F);
+                });
 
                 this.discard();
 
@@ -144,7 +153,7 @@ public class MagmaEntity extends Entity implements IStateMachine<MagmaEntity.Mag
                 break;
             case SEARCHING:
                 // 在近距离搜索实体如果检测到实体，切换到ACTIVE状态
-                List<Entity> searchList = Commons.detectEntity(this, 1.5, player);
+                List<Entity> searchList = Commons.aabbDetectEntity(this, 1.5, player);
                 if (!searchList.isEmpty()) setState(MagmaEntityState.ACTIVE);
                 break;
             case ACTIVE:
@@ -179,17 +188,17 @@ public class MagmaEntity extends Entity implements IStateMachine<MagmaEntity.Mag
 
     public MagmaEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
-        player = null;
     }
 
 
-    public MagmaEntity(Player player) {
+    public MagmaEntity(Player player, MagmaBlockComboSkill skill) {
         super(ModEntities.MAGMA_ENTITY.get(), player.level());
         this.player = player;
+        this.skill = skill;
     }
 
-    public static void spawnMagmaEntity(Player player) {
-        MagmaEntity magmaEntity = new MagmaEntity(player);
+    public static void spawnMagmaEntity(Player player, MagmaBlockComboSkill skill) {
+        MagmaEntity magmaEntity = new MagmaEntity(player, skill);
         Vec3 pos = player.position();
         magmaEntity.setPos(pos.x, pos.y + 2.5, pos.z);
         player.level().addFreshEntity(magmaEntity);

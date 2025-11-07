@@ -1,5 +1,7 @@
 package BlockPower.ModEntities;
 
+import BlockPower.Skills.ComboSkills.FirecrackerComboSkill;
+import BlockPower.Util.KBUtils;
 import BlockPower.Util.ModEffects.ClientEffect.ScreenShakeEffect;
 import BlockPower.Util.ModEffects.ModEffectManager;
 import BlockPower.Util.ModEffects.ServerEffect.AttractEntityEffect;
@@ -42,7 +44,9 @@ public class FirecrackerEntity extends Entity implements IStateMachine<Firecrack
     private static final int LIFE_TICK = 20;
     private int currLifeTick = 0;
 
-    private final Player player;
+    private FirecrackerComboSkill skill;
+
+    private Player player;
 
     private static final List<Pair<Vector3f, Vector3f>> FIREWORK_COLOR_PAIRS = List.of(
             // 火红 - 橙
@@ -59,12 +63,12 @@ public class FirecrackerEntity extends Entity implements IStateMachine<Firecrack
 
     public FirecrackerEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
-        this.player = null;
     }
 
-    public FirecrackerEntity(Player player) {
+    public FirecrackerEntity(Player player, FirecrackerComboSkill skill) {
         super(ModEntities.FIRECRACKER_ENTITY.get(), player.level());
         this.player = player;
+        this.skill = skill;
         this.getEntityData().set(DATA_OWNER_UUID, Optional.of(player.getUUID()));
     }
 
@@ -118,7 +122,7 @@ public class FirecrackerEntity extends Entity implements IStateMachine<Firecrack
                 }
 
                 // 当有实体进入近距离检测范围时，进入结束状态
-                List<Entity> detectedEntity = Commons.detectEntity(this, 2, player);
+                List<Entity> detectedEntity = Commons.aabbDetectEntity(this, 2, player);
                 if (!detectedEntity.isEmpty()) {
                     setState(FirecrackerState.ENDING);
                 }
@@ -135,7 +139,7 @@ public class FirecrackerEntity extends Entity implements IStateMachine<Firecrack
 
         switch (state) {
             case TRACKING:
-                List<Entity> targetList = Commons.detectEntity(this, 9, player);
+                List<Entity> targetList = Commons.aabbDetectEntity(this, 9, player);
                 if (!targetList.isEmpty()) {
                     Entity targetEntity = targetList.get(0);
                     ModEffectManager.addEffect(targetEntity, new AttractEntityEffect(2, targetEntity, this));
@@ -235,17 +239,21 @@ public class FirecrackerEntity extends Entity implements IStateMachine<Firecrack
 
 
         // 造成伤害和击退
-        List<Entity> entityList = Commons.applyDamage(this, player, 12f, 6f, null);
-        Commons.knockBackEntity(this, entityList, 1.5);
+        List<Entity> entityList = Commons.aabbDetectEntity(this, 6, player);
+        entityList.forEach(entity -> {
+            boolean result = Commons.applyDamage(this, player, entity, 12f);
+            if (!result) return;
+            KBUtils.applyKB(this, entity, 0.5, 1.5);
+        });
     }
 
-    public static void spawnFirecrackerEntity(Player player) {
-        FirecrackerEntity firecracker = new FirecrackerEntity(player);
+    public static void spawnFirecrackerEntity(Player player, FirecrackerComboSkill skill) {
+        FirecrackerEntity firecracker = new FirecrackerEntity(player, skill);
         // 设置初始位置为玩家前方1格
         Vec3 spawnPos = player.getEyePosition().add(player.getLookAngle().scale(1.0));
         firecracker.setPos(spawnPos);
         // 设置初始速度
-        firecracker.setDeltaMovement(player.getLookAngle().scale(1.5));
+        firecracker.setDeltaMovement(player.getLookAngle().scale(2));
         player.level().addFreshEntity(firecracker);
     }
 

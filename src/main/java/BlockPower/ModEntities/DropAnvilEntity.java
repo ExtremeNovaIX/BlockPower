@@ -1,5 +1,7 @@
 package BlockPower.ModEntities;
 
+import BlockPower.Skills.NormalSkills.DropAnvilSkill;
+import BlockPower.Util.KBUtils;
 import BlockPower.Util.ModEffects.ClientEffect.PlayerSneakEffect;
 import BlockPower.Util.ModEffects.ClientEffect.ScreenShakeEffect;
 import BlockPower.Util.ModEffects.ModEffectManager;
@@ -34,7 +36,9 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
     private static final int LIFE_TICK = 100;
     private int currLifeTick = 0;
 
-    private final ServerPlayer player;
+    private ServerPlayer player;
+
+    private DropAnvilSkill skill;// 技能实例
 
     private String lockID;
 
@@ -62,22 +66,23 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
 
     public DropAnvilEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
-        this.player = null;
     }
 
-    public DropAnvilEntity(ServerPlayer player) {
+    public DropAnvilEntity(ServerPlayer player, DropAnvilSkill skill) {
         super(ModEntities.DROP_ANVIL.get(), player.level());
         this.player = player;
+        this.skill = skill;
         this.getEntityData().set(DATA_OWNER_UUID, Optional.of(player.getUUID()));
         this.lockID = player.getName().getString() + "_AnvilLock:" + this.getUUID();
     }
 
-    public DropAnvilEntity(ServerPlayer player, double x, double y, double z) {
+    public DropAnvilEntity(ServerPlayer player, double x, double y, double z, DropAnvilSkill skill) {
         super(ModEntities.DROP_ANVIL.get(), player.level());
         this.setPos(x, y, z);
         this.player = player;
         this.getEntityData().set(DATA_OWNER_UUID, Optional.of(player.getUUID()));
         this.lockID = player.getName().getString() + "_AnvilLock:" + this.getUUID();
+        this.skill = skill;
     }
 
     @Override
@@ -212,8 +217,13 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
 
     private void hurtEntity() {
         taskManager.runOnceWithCooldown(this, "hurt_entity", 5, () -> {
-            List<Entity> entityList = applyDamage(this, player, 10F, 9, ModSounds.ANVIL_SOUND.get());
-            Commons.knockBackEntity(this, entityList, 1.5);
+            List<Entity> entityList = Commons.aabbDetectEntity(this, 9, player);
+            entityList.forEach(entity -> {
+                boolean result = applyDamage(this, player, entity, skill.getSkillDamage());
+                if (!result) return;
+                KBUtils.applyKB(this, entity, skill.getSkillKBPercent(), 1.6);
+                Commons.playSoundWithCooldown(this, ModSounds.ANVIL_SOUND.get(), 0.5f, 10);
+            });
             if (!entityList.isEmpty()) {
                 ModEffectManager.addToAllAround(new ScreenShakeEffect(10, 1.6f), this.position(), this.level(), 9);
             }
@@ -228,8 +238,8 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
         this.setDeltaMovement(this.getDeltaMovement().scale(0.99));
     }
 
-    public static void createDropAnvil(ServerPlayer player) {
-        DropAnvilEntity dropAnvil = new DropAnvilEntity(player);
+    public static void createDropAnvil(ServerPlayer player, DropAnvilSkill skill) {
+        DropAnvilEntity dropAnvil = new DropAnvilEntity(player, skill);
         Vec3 spawnPos = player.position();
         if (!player.onGround()) {
             player.swing(InteractionHand.MAIN_HAND, true);

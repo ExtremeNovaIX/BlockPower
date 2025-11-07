@@ -52,7 +52,6 @@ public class BarrierWallSkill implements IPacketSerializableSkill {
 
     @Override
     public SkillExecutionResult triggerSkill(ServerPlayer player) {
-        SkillLockManager.lock(player, "barrier_wall", LockPriority.LOWEST);
         Level level = player.level();
         // 获取玩家的视线方向向量
         Vec3 lookVec = player.getLookAngle();
@@ -99,7 +98,7 @@ public class BarrierWallSkill implements IPacketSerializableSkill {
 
                         // 检查位置是否可放置方块
                         if (canPlaceBlock(level, wallPos)) {
-                            level.setBlockAndUpdate(wallPos, ModBlocks.DECAYING_DIRT.get().defaultBlockState());
+                            level.setBlockAndUpdate(wallPos, ModBlocks.DECAYING_STONE.get().defaultBlockState());
                             // 播放放置方块的声音
                             BlockState newState = level.getBlockState(wallPos);
                             SoundType soundType = newState.getSoundType();
@@ -126,7 +125,6 @@ public class BarrierWallSkill implements IPacketSerializableSkill {
                 }
             }
         }
-        SkillLockManager.unlock(player, LOCK_ID);
         return SkillExecutionResult.success();
     }
 
@@ -143,7 +141,7 @@ public class BarrierWallSkill implements IPacketSerializableSkill {
 
             // 检查位置是否可放置方块
             if (canPlaceBlock(level, wallPos)) {
-                level.setBlockAndUpdate(wallPos, ModBlocks.DECAYING_DIRT.get().defaultBlockState());
+                level.setBlockAndUpdate(wallPos, ModBlocks.DECAYING_STONE.get().defaultBlockState());
                 // 播放放置方块的声音
                 BlockState newState = level.getBlockState(wallPos);
                 SoundType soundType = newState.getSoundType();
@@ -155,31 +153,38 @@ public class BarrierWallSkill implements IPacketSerializableSkill {
 
     private boolean canPlaceBlock(Level level, BlockPos pos) {
         Block block = level.getBlockState(pos).getBlock();
-        boolean canPlace = block == Blocks.AIR || block instanceof LiquidBlock ||
-                block instanceof net.minecraft.world.level.block.SaplingBlock ||
-                block instanceof net.minecraft.world.level.block.FlowerBlock ||
-                block instanceof net.minecraft.world.level.block.TallGrassBlock ||
+        return block == Blocks.AIR ||
+                block instanceof LiquidBlock ||
                 block instanceof net.minecraft.world.level.block.BushBlock;
-        return canPlace;
     }
 
     @Override
     public AllResourceType getSkillCostType() {
-        return null;
+        return AllResourceType.STONE;
     }
 
     @Override
     public double getSkillCostAmount() {
-        return 0;
+        return 5;
     }
 
     @Override
     public boolean isSkillConsumeResource() {
-        return false;
+        return true;
     }
 
     @Override
     public void recordCombo(ServerPlayer player) {
 
+    }
+
+    @Override
+    public double getSkillKBPercent() {
+        return 0;
+    }
+
+    @Override
+    public double getSkillDamage() {
+        return 0;
     }
 }

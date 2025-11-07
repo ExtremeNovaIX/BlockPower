@@ -21,7 +21,7 @@ public class MagmaBlockComboSkill implements IComboSkill {
 
     @Override
     public void triggerSkill(Player player) {
-        MagmaEntity.spawnMagmaEntity(player);
+        MagmaEntity.spawnMagmaEntity(player,this);
     }
 
     @Override
@@ -42,5 +42,14 @@ public class MagmaBlockComboSkill implements IComboSkill {
     @Override
     public String getTextureLocation() {
         return "textures/gui/combo_skills/magma_block_combo_skill.png";
+    }
+
+    @Override
+    public double getSkillKBPercent() {
+        return 5;
+    }
+
+    public double getFireKBPercent() {
+        return 0.5;
     }
 }
