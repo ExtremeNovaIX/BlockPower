@@ -21,7 +21,7 @@ import java.util.List;
  * 包括：图标、计时器、登场动画（缩放、扩散环）和触发动画（缩放、扩散环）。
  */
 public class ComboHudRenderer implements IGuiOverlay {
-    private static final ResourceLocation COMBO_TIMER_MASK = new ResourceLocation(Main.MOD_ID, "textures/gui/combo_skills/combo_timer_mask.png");
+    private static final ResourceLocation COMBO_TIMER_MASK = ResourceLocation.fromNamespaceAndPath(Main.MOD_ID, "textures/gui/combo_skills/combo_timer_mask.png");
 
     // 布局配置
     private static final int LOGICAL_ICON_SIZE = 16;
@@ -293,7 +293,7 @@ public class ComboHudRenderer implements IGuiOverlay {
     private void drawIconTexture(GuiGraphics guiGraphics, IComboSkill skill) {
         String iconPath = skill.getTextureLocation();
         if (iconPath != null) {
-            ResourceLocation iconTexture = new ResourceLocation(Main.MOD_ID, iconPath);
+            ResourceLocation iconTexture = ResourceLocation.fromNamespaceAndPath(Main.MOD_ID, iconPath);
 
             int renderX = (int) (-LOGICAL_ICON_SIZE / 2.0f);
             int renderY = (int) (-LOGICAL_ICON_SIZE / 2.0f);

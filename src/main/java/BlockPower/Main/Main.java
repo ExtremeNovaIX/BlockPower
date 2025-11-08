@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static BlockPower.Main.Main.MOD_ID;
+
 //TODO 修复在技能结束一瞬间触发技能可以无视技能锁的问题
 //TODO 修复实体多次受击问题
 @Mod(MOD_ID)
@@ -23,10 +24,10 @@ public class Main {
     public static final String MOD_ID = "blockpower";
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-    public Main() {
+    public Main(FMLJavaModLoadingContext context) {
         printWelcome();
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         //注册事件总线
+        IEventBus modEventBus = context.getModEventBus();
         ModSounds.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
         ModBlocks.BLOCKS.register(modEventBus);
@@ -41,7 +42,7 @@ public class Main {
 
     public static void printWelcome() {
         String welcomeArt =
-                        "░░░░░░▒▒▒▒▒▒▒▒▓▒▒▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒" +
+                "░░░░░░▒▒▒▒▒▒▒▒▓▒▒▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒" +
                         "░░░░░░▒▒▒▒░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░▒▒▓▓▓▒▒▒▒▒▒▒" +
                         "░░░░░░░▒▒▒▒▓▓▓▓▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒" +
                         "░░░░░░░▒▒▓▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒" +

@@ -76,6 +76,6 @@ public class MagmaEntityRenderer extends EntityRenderer<MagmaEntity> {
      */
     @Override
     public @NotNull ResourceLocation getTextureLocation(@NotNull MagmaEntity entity) {
-        return new ResourceLocation("minecraft:textures/block/magma.png");
+        return ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/magma.png");
     }
 }

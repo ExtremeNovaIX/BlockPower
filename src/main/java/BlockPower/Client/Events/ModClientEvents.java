@@ -24,13 +24,13 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 public class ModClientEvents {
 
     public static final ResourceLocation COMBO_HUD_OVERLAY =
-            new ResourceLocation(Main.MOD_ID, "combo_hud");
+            ResourceLocation.fromNamespaceAndPath(Main.MOD_ID, "combo_hud");
 
     @SubscribeEvent
     public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
         // 在快捷栏上方绘制
         event.registerAbove(
-                new ResourceLocation("minecraft", "hotbar"),
+                ResourceLocation.withDefaultNamespace("hotbar"),
                 COMBO_HUD_OVERLAY.getPath(),
                 new ComboHudRenderer()
         );
@@ -65,7 +65,7 @@ public class ModClientEvents {
         // PIXEL_CORE相关
         // 注册skill_state属性
         ItemProperties.register(ModItems.PIXEL_CORE.get(),
-                new ResourceLocation(Main.MOD_ID, "skill_state"),
+                ResourceLocation.fromNamespaceAndPath(Main.MOD_ID, "skill_state"),
                 (stack, level, entity, seed) -> {
                     return stack.getOrCreateTag().getInt("skill_state");
                 }
@@ -73,7 +73,7 @@ public class ModClientEvents {
 
         // 注册tool_type属性
         ItemProperties.register(ModItems.PIXEL_CORE.get(),
-                new ResourceLocation(Main.MOD_ID, "tool_type"),
+                ResourceLocation.fromNamespaceAndPath(Main.MOD_ID, "tool_type"),
                 (stack, level, entity, seed) -> {
                     return stack.getOrCreateTag().getInt("tool_type");
                 }
@@ -81,7 +81,7 @@ public class ModClientEvents {
 
         // 注册 "pixel_core_level" 属性
         ItemProperties.register(ModItems.PIXEL_CORE.get(),
-                new ResourceLocation(Main.MOD_ID, "pixel_core_level"),
+                ResourceLocation.fromNamespaceAndPath(Main.MOD_ID, "pixel_core_level"),
                 (stack, level, entity, seed) -> {
                     return stack.getOrCreateTag().getInt("pixel_core_level");
                 }

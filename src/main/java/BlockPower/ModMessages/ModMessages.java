@@ -38,7 +38,7 @@ public class ModMessages {
     //定义通信频道
     public static void register() {
         SimpleChannel net = NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(MOD_ID, "messages"))
+                .named(ResourceLocation.fromNamespaceAndPath(MOD_ID, "messages"))
                 .networkProtocolVersion(() -> "1.0")
                 .clientAcceptedVersions(s -> true)
                 .serverAcceptedVersions(s -> true)

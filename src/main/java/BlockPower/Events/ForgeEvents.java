@@ -42,14 +42,14 @@ public class ForgeEvents {
                 // 对于非玩家生物，只在服务器端附加带回调的Provider
                 if (!(entity instanceof Player)) {
                     if (!entity.level().isClientSide()) {
-                        event.addCapability(new ResourceLocation(Main.MOD_ID, "knockback_value"), new KBPercentProvider(onValueUpdate));
+                        event.addCapability(ResourceLocation.fromNamespaceAndPath(Main.MOD_ID, "knockback_value"), new KBPercentProvider(onValueUpdate));
                     }
                 } else {
                     // 对于玩家，两端都附加，服务器端带回调
                     if (!entity.level().isClientSide()) {
-                        event.addCapability(new ResourceLocation(Main.MOD_ID, "knockback_value"), new KBPercentProvider(onValueUpdate));
+                        event.addCapability(ResourceLocation.fromNamespaceAndPath(Main.MOD_ID, "knockback_value"), new KBPercentProvider(onValueUpdate));
                     } else {
-                        event.addCapability(new ResourceLocation(Main.MOD_ID, "knockback_value"), new KBPercentProvider());
+                        event.addCapability(ResourceLocation.fromNamespaceAndPath(Main.MOD_ID, "knockback_value"), new KBPercentProvider());
                     }
                 }
             }
