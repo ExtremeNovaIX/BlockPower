@@ -23,7 +23,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 @Mod.EventBusSubscriber(modid = Main.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ModClientEvents {
 
-    public static final ResourceLocation COMBO_HUD_OVERLAY =  new ResourceLocation(Main.MOD_ID, "combo_hud");
+    public static final ResourceLocation COMBO_HUD_OVERLAY =
+            new ResourceLocation(Main.MOD_ID, "combo_hud");
 
     @SubscribeEvent
     public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {

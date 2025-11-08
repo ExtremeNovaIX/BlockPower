@@ -102,4 +102,9 @@ public class DashSkill implements IPacketSerializableSkill {
     public double getSkillDamage() {
         return 0;
     }
+
+     @Override
+    public boolean isMustMainHandItemPixelCore() {
+        return false;
+    }
 }

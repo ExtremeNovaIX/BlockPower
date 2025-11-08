@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 public interface ISkill {
     Logger log = LoggerFactory.getLogger(ISkill.class);
+
     // 技能名称
     @NotNull String getSkillName();
 
@@ -43,4 +44,8 @@ public interface ISkill {
 
     // 获取技能伤害值
     double getSkillDamage();
+
+    default boolean isMustMainHandItemPixelCore() {
+        return true;
+    }
 }

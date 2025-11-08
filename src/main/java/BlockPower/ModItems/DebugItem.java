@@ -1,7 +1,11 @@
 package BlockPower.ModItems;
 
 import BlockPower.Capability.ModCapabilities;
+import BlockPower.ModMessages.ComboSkillPacket.ComboStandbyPacket_S2C;
+import BlockPower.ModMessages.ModMessages;
+import BlockPower.Skills.ComboSkills.ComboSkillType;
 import BlockPower.Util.Commons;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
@@ -31,13 +35,6 @@ public class DebugItem extends Item {
     }
 
     private void testServerMethod(Player player) {
-        AABB area = new AABB(player.blockPosition()).inflate(11);
-        List<LivingEntity> entities = player.level().getEntitiesOfClass(LivingEntity.class, area);
-        for (LivingEntity entity : entities) {
-            entity.getCapability(ModCapabilities.KNOCKBACK_VALUE_CAPABILITY).ifPresent(knockbackValue -> {
-                double value = knockbackValue.getKBPercent();
-                Commons.sendDebugMessage(player, entity.getName().getString() + " Knockback: " + value);
-            });
-        }
+        ModMessages.sendToPlayer(new ComboStandbyPacket_S2C(ComboSkillType.FIRECRACKER), (ServerPlayer) player);
     }
 }

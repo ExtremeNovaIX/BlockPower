@@ -252,7 +252,11 @@ public class Commons {
         if (detectedEntity.isRemoved()) return false;
         double finalDamage = KBUtils.calculateSkillDamage(detectedEntity, baseDamage);
         detectedEntity.hurt(mainEntity.level().damageSources().mobAttack(skillUser), (float) finalDamage);
-        ModEffectManager.addEffect(detectedEntity, new UnBalanceEffect(detectedEntity, 9));
+        if (detectedEntity instanceof ServerPlayer) {
+            ModEffectManager.addEffect(detectedEntity, new UnBalanceEffect(detectedEntity, 9));
+        } else {
+            ModEffectManager.addEffect(detectedEntity, new UnBalanceEffect(detectedEntity, 20));
+        }
         //为每个被击中的实体启动粒子计时器
         ModEffectManager.addEffect(detectedEntity, new CloudTrailEffect(detectedEntity, 40));
         return true;

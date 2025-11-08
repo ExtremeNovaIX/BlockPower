@@ -2,8 +2,10 @@ package BlockPower.Util;
 
 import BlockPower.Capability.ModCapabilities;
 import BlockPower.Skills.NormalSkills.ISkill;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,19 +100,36 @@ public class KBUtils {
         double kbPercent = currentKBPercent.get();
         double multiplier;
 
-        if (kbPercent <= 100) {
-            // 0-100% 区间: 0.01 -> 0.8，x^2曲线
-            double progress = kbPercent / 100.0;
-            multiplier = 0.01 + Math.pow(progress, 2) * 0.79;
-        } else if (kbPercent <= 200) {
-            // 100-200% 区间: 0.8 -> 1.5，线性增长
-            double progress = (kbPercent - 100.0) / 100.0;
-            multiplier = 0.8 + progress * 0.7;
+        if (entity instanceof Player) {
+            if (kbPercent <= 100) {
+                // 0-100% 区间: 0.3 -> 1，x^2曲线
+                double progress = kbPercent / 100.0;
+                multiplier = 0.3 + Math.pow(progress, 2) * 0.7;
+            } else if (kbPercent <= 200) {
+                // 100-200% 区间: 1 -> 1.5，线性增长
+                double progress = (kbPercent - 100.0) / 100.0;
+                multiplier = 1 + progress * 0.5;
+            } else {
+                // 200%+ 区间: 1.5 -> 100，线性增长
+                double progress = (kbPercent - 200.0) / 200.0;
+                multiplier = 1.5 + progress * 98.5;
+            }
         } else {
-            // 200%+ 区间: 1.5 -> 100，线性增长
-            double progress = (kbPercent - 200.0) / 200.0;
-            multiplier = 1.5 + progress * 98.5;
+            if (kbPercent <= 100) {
+                // 0-100% 区间: 0.7 -> 1，x^2曲线
+                double progress = kbPercent / 100.0;
+                multiplier = 0.7 + Math.pow(progress, 2) * 0.3;
+            } else if (kbPercent <= 200) {
+                // 100-200% 区间: 1 -> 1.8，线性增长
+                double progress = (kbPercent - 100.0) / 100.0;
+                multiplier = 1 + progress * 0.8;
+            } else {
+                // 200%+ 区间: 1.8 -> 100，线性增长
+                double progress = (kbPercent - 200.0) / 200.0;
+                multiplier = 1.8 + progress * 98.2;
+            }
         }
+
 
         return Mth.clamp(multiplier, 0.01, 100.0);
     }
@@ -156,24 +175,46 @@ public class KBUtils {
         double kbPercent = currentKBPercent.get();
         double multiplier;
 
-        if (kbPercent <= 100) {
-            // 0-100%: 三次缓动曲线，伤害带有减免
-            double progress = kbPercent / 100.0;
-            double easeOutCubic = MathUtils.easeOutCubic((float) progress);
-            multiplier = 0.1 + easeOutCubic * 0.7;
-        } else if (kbPercent <= 200) {
-            // 100-200%: 对数增长，伤害带有增益，最大增益为1.5倍
-            double progress = (kbPercent - 100.0) / 100.0;
-            double logValue = Math.log1p(progress);
-            multiplier = 0.8 + (logValue / Math.log(2.0)) * 0.7;
-        } else {
-            // 200%+: 指数增长，每提高10%增加一倍
-            double progress = (kbPercent - 200.0) / 10.0;
-            // 上限为1024倍
-            if (progress > 10) {
-                progress = 10;
+        if (entity instanceof Player) {
+            if (kbPercent <= 100) {
+                // 0-100%: 三次缓动曲线，伤害带有减免
+                double progress = kbPercent / 100.0;
+                double easeOutCubic = MathUtils.easeOutCubic((float) progress);
+                multiplier = 0.1 + easeOutCubic * 0.7;
+            } else if (kbPercent <= 200) {
+                // 100-200%: 对数增长，伤害带有增益，最大增益为1.5倍
+                double progress = (kbPercent - 100.0) / 100.0;
+                double logValue = Math.log1p(progress);
+                multiplier = 0.8 + (logValue / Math.log(2.0)) * 0.7;
+            } else {
+                // 200%+: 指数增长，每提高10%增加一倍
+                double progress = (kbPercent - 200.0) / 10.0;
+                // 上限为1024倍
+                if (progress > 10) {
+                    progress = 10;
+                }
+                multiplier = 1.5 * Math.pow(2, progress);
             }
-            multiplier = 1.5 * Math.pow(2, progress);
+        } else {
+            if (kbPercent <= 100) {
+                // 0-100%: 三次缓动曲线，伤害带有减免 0.7 -> 1
+                double progress = kbPercent / 100.0;
+                double easeOutCubic = MathUtils.easeOutCubic((float) progress);
+                multiplier = 0.7 + easeOutCubic * 0.3;
+            } else if (kbPercent <= 200) {
+                // 100-200%: 对数增长，伤害带有增益，最大增益为1.5倍 1.0 -> 2
+                double progress = (kbPercent - 100.0) / 100.0;
+                double logValue = Math.log1p(progress);
+                multiplier = 1 + (logValue / Math.log(2.0));
+            } else {
+                // 200%+: 指数增长，每提高10%增加一倍
+                double progress = (kbPercent - 200.0) / 10.0;
+                // 上限为1024倍
+                if (progress > 10) {
+                    progress = 10;
+                }
+                multiplier = 1.5 * Math.pow(2, progress);
+            }
         }
         return multiplier;
     }

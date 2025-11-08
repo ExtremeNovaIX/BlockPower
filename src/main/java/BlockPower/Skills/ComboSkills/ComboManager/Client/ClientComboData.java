@@ -91,7 +91,7 @@ public class ClientComboData {
      */
     public static void addActiveChainSkill(ComboSkillType comboSkillType, int durationTicks) {
         log.info("ClientComboData add: {} for {} ticks", comboSkillType, durationTicks);
-//        // 检查是否已存在同类型，如果需要则刷新
+        // 检查是否已存在同类型，如果需要则刷新
         activeComboSkills.removeIf(skill -> skill.getType() == comboSkillType);
 
         activeComboSkills.add(new ActiveSkillData(comboSkillType, durationTicks));
@@ -105,8 +105,16 @@ public class ClientComboData {
         return activeComboSkills;
     }
 
+    /**
+     * 返回第一个未被触发的连携技
+     */
     public static ActiveSkillData getFirstActiveComboSkill() {
-        return activeComboSkills.isEmpty() ? null : activeComboSkills.get(0);
+        for (ActiveSkillData skill : activeComboSkills) {
+            if (!skill.isTriggered()) {
+                return skill;
+            }
+        }
+        return null;
     }
 
     public static boolean isComboSkillAvailable() {
@@ -116,7 +124,7 @@ public class ClientComboData {
     /**
      * 移除已释放的连携技
      */
-    public static void triggerSkillAnimation(ComboSkillType comboSkillType) { //
+    public static void triggerSkillAnimation(ComboSkillType comboSkillType) {
         log.info("ClientComboData trigger: {}", comboSkillType);
         // 找到第一个匹配的技能并标记它
         for (ActiveSkillData skill : activeComboSkills) {

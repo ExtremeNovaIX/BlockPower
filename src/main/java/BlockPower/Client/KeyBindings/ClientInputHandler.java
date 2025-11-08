@@ -100,7 +100,6 @@ public class ClientInputHandler {
             ClientComboData.ActiveSkillData activeSkillData = ClientComboData.getFirstActiveComboSkill();
             if (activeSkillData == null) return;
 
-            LOGGER.info("COMBO_SKILL key triggered");
             ComboSkillType comboSkillType = activeSkillData.getType();
             ModMessages.sendToServer(new ComboTriggeredPacket_C2S(comboSkillType));
             // 移除已触发的连携技

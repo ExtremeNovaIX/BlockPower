@@ -26,6 +26,7 @@ public class ForgeServerEvents {
     @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event) {
         PlayerResourceManager.getInstance().clear();
+
         LOGGER.info("PlayerResourceManager cleared");
     }
 }
