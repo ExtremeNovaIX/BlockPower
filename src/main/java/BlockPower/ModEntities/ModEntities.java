@@ -33,7 +33,7 @@ public class ModEntities {
     public static final RegistryObject<EntityType<DropAnvilEntity>> DROP_ANVIL =
             ENTITY_TYPES.register("drop_anvil",
                     () -> EntityType.Builder.<DropAnvilEntity>of(DropAnvilEntity::new, MobCategory.MISC)
-                            .sized(3F, 3F)
+                            .sized(1.5F, 1.5F)
                             .noSave()
                             .noSummon()
                             .build("drop_anvil"));

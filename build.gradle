@@ -54,6 +54,8 @@ minecraft {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'//mixin
+    compileOnly 'org.projectlombok:lombok:1.18.30'// lombok
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'// lombok
 }
 
 // 资源处理

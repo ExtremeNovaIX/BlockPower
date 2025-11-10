@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 //TODO 修改成一段时间内combo上限6次，并且后几次击退明显增大，防止无限连
+//TODO 修复异常吸附问题
 public class LauncherSwingSkill implements IPacketSerializableSkill {
     private static final TaskManager taskManager = TaskManager.getInstance(false);
 
@@ -81,7 +82,6 @@ public class LauncherSwingSkill implements IPacketSerializableSkill {
 
         final Entity targetEntity = entities.get(0);
         ModEffectManager.addEffect(player, new SpringAttractionEffect(player, targetEntity));
-        ModMessages.sendToPlayer(new CameraLockPacket_S2C(targetEntity.getId()), player);
         ModMessages.sendToPlayer(new HitStopPacket_S2C(2), player);
         ModMessages.sendToPlayer(new ShakePacket_S2C(4, 2F), player);
     }

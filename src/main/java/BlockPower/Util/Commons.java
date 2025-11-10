@@ -30,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Commons {
     private static final Random r = new Random();
@@ -39,92 +41,109 @@ public class Commons {
     private static final Logger log = LoggerFactory.getLogger(Commons.class);
 
     /**
-     * 检测半径内的非技能释放者的LivingEntity
-     *
-     * @param mainEntity 释放技能的实体
-     * @param radius     检测半径
-     * @return 半径内的非技能释放者和非自身LivingEntity列表
+     * 以实体为中心，进行AABB包围盒式的实体检测。
+     * @param mainEntity  检测的中心实体。
+     * @param radius      检测半径。
+     * @param blacklist   需要忽略的玩家。
+     * @return 检测到的实体列表。
      */
-    public static List<Entity> aabbDetectEntity(@NotNull Entity mainEntity, double radius, Player blacklist) {
-        //创建一个默认半径为radius的检测区域
-        AABB detectionArea = new AABB(
-                mainEntity.getX() - radius,
-                mainEntity.getY() - radius,
-                mainEntity.getZ() - radius,
-                mainEntity.getX() + radius,
-                mainEntity.getY() + radius,
-                mainEntity.getZ() + radius
+    public static List<Entity> aabbDetectEntity(@NotNull Entity mainEntity, double radius, @Nullable Player blacklist) {
+        return aabbDetectEntity(mainEntity, radius, blacklist, 0);
+    }
+
+    /**
+     * 以实体为中心，进行AABB包围盒式的实体检测，并应用命中冷却。
+     * @param mainEntity   检测的中心实体。
+     * @param radius       检测半径。
+     * @param blacklist    需要忽略的玩家。
+     * @param hitCooldown  对每个目标施加的命中冷却时间(ticks)。如果为0，则不应用冷却。
+     * @return 符合条件且不在冷却中的实体列表。
+     */
+    public static List<Entity> aabbDetectEntity(@NotNull Entity mainEntity, double radius, @Nullable Player blacklist, int hitCooldown) {
+        AABB detectionArea = mainEntity.getBoundingBox().inflate(radius);
+        List<Entity> entities = mainEntity.level().getEntities(mainEntity, detectionArea, entity ->
+                entity instanceof LivingEntity &&
+                entity.isPickable() &&
+                !entity.equals(blacklist)
         );
 
-        //获取半径内的非技能释放者的LivingEntity
-        return mainEntity.level().getEntities(
-                mainEntity,
-                detectionArea,
-                detectedEntity -> detectedEntity != mainEntity
-                        && detectedEntity.distanceToSqr(mainEntity) <= radius * radius
-                        && detectedEntity != blacklist
-                        && detectedEntity instanceof LivingEntity
+        // 如果设置了命中冷却，则过滤掉仍在冷却中的目标
+        if (hitCooldown > 0) {
+            return entities.stream()
+                    .filter(target -> HitCooldownManager.getInstance().canHit(mainEntity, target, hitCooldown))
+                    .collect(Collectors.toList());
+        }
+        return entities;
+    }
+
+    /**
+     * 以指定位置为中心，进行AABB包围盒式的实体检测。
+     * @param pos       检测的中心位置。
+     * @param level     检测发生所在的世界。
+     * @param radius    检测半径。
+     * @param blacklist 需要忽略的玩家。
+     * @return 检测到的实体列表。
+     */
+    public static List<Entity> aabbDetectEntity(@NotNull Vec3 pos, Level level, double radius, @Nullable Player blacklist) {
+        AABB detectionArea = new AABB(pos.x - radius, pos.y - radius, pos.z - radius, pos.x + radius, pos.y + radius, pos.z + radius);
+        return level.getEntities(blacklist, detectionArea, entity ->
+                entity instanceof LivingEntity &&
+                entity.isPickable() &&
+                entity.distanceToSqr(pos) <= radius * radius
         );
     }
 
     /**
-     * 检测半径内的非技能释放者的LivingEntity
-     *
-     * @param pos    检测位置
-     * @param radius 检测半径
-     * @return 半径内的非技能释放者和非自身LivingEntity列表
-     */
-    public static List<Entity> aabbDetectEntity(@NotNull Vec3 pos, Level level, double radius, Player blacklist) {
-        //创建一个默认半径为radius的检测区域
-        AABB detectionArea = new AABB(
-                pos.x - radius,
-                pos.y - radius,
-                pos.z - radius,
-                pos.x + radius,
-                pos.y + radius,
-                pos.z + radius
-        );
-
-        //获取半径内的非技能释放者的LivingEntity
-        return level.getEntities(
-                blacklist,
-                detectionArea,
-                detectedEntity -> detectedEntity != null
-                        && detectedEntity.distanceToSqr(pos) <= radius * radius
-                        && detectedEntity instanceof LivingEntity
-        );
-    }
-
-    /**
-     * 射线式检测实体
-     *
-     * @param mainEntity  发出射线的实体
-     * @param radius      射线半径
-     * @param blacklist   检测中要忽略的实体列表
-     * @param throughWall 射线是否穿透方块
-     * @param length      射线的最大长度
-     * @return 射线路径上检测到的实体列表
+     * 从实体视线发出的射线式实体检测。
+     * @param mainEntity  发出射线的实体。
+     * @param radius      射线半径。
+     * @param blacklist   需要忽略的实体列表。
+     * @param throughWall 射线是否穿透方块。
+     * @param length      射线的最大长度。
+     * @return 检测到的实体列表。
      */
     public static List<Entity> rayDetectEntity(@NotNull Entity mainEntity, double radius, @Nullable List<Entity> blacklist, boolean throughWall, double length) {
-        return rayDetectEntity(mainEntity.level(), mainEntity.getEyePosition(), mainEntity.getLookAngle(), radius, blacklist, throughWall, length, mainEntity);
+        return rayDetectEntity(mainEntity, radius, blacklist, throughWall, length, 0);
     }
 
     /**
-     * 射线式检测实体
-     *
-     * @param level       进行检测的世界
-     * @param startPos    射线起点
-     * @param direction   射线方向 (应为单位向量)
-     * @param radius      射线半径
-     * @param blacklist   检测中要忽略的实体列表
-     * @param throughWall 射线是否穿透方块
-     * @param length      射线的最大长度
-     * @param owner       射线的所有者，用于忽略自身和进行方块碰撞检测
-     * @return 射线路径上检测到的实体列表
+     * 从实体视线发出的射线式实体检测，并应用命中冷却。
+     * @param mainEntity   发出射线的实体。
+     * @param radius       射线半径。
+     * @param blacklist    需要忽略的实体列表。
+     * @param throughWall  射线是否穿透方块。
+     * @param length       射线的最大长度。
+     * @param hitCooldown  对每个目标施加的命中冷却时间(ticks)。如果为0，则不应用冷却。
+     * @return 符合条件且不在冷却中的实体列表。
+     */
+    public static List<Entity> rayDetectEntity(@NotNull Entity mainEntity, double radius, @Nullable List<Entity> blacklist, boolean throughWall, double length, int hitCooldown) {
+        List<Entity> detected = rayDetectEntity(mainEntity.level(), mainEntity.getEyePosition(), mainEntity.getLookAngle(), radius, blacklist, throughWall, length, mainEntity);
+        
+        // 如果设置了命中冷却，则过滤掉仍在冷却中的目标
+        if (hitCooldown > 0) {
+            return detected.stream()
+                    .filter(target -> HitCooldownManager.getInstance().canHit(mainEntity, target, hitCooldown))
+                    .collect(Collectors.toList());
+        }
+        return detected;
+    }
+
+    /**
+     * 射线式实体检测的核心实现。
+     * @param level       进行检测的世界。
+     * @param startPos    射线起点。
+     * @param direction   射线方向 (应为单位向量)。
+     * @param radius      射线半径。
+     * @param blacklist   需要忽略的实体列表。
+     * @param throughWall 射线是否穿透方块。
+     * @param length      射线的最大长度。
+     * @param owner       射线的所有者，用于忽略自身和进行方块碰撞检测。
+     * @return 射线路径上检测到的实体列表。
      */
     public static List<Entity> rayDetectEntity(@NotNull Level level, @NotNull Vec3 startPos, @NotNull Vec3 direction, double radius, @Nullable List<Entity> blacklist, boolean throughWall, double length, @Nullable Entity owner) {
         Vec3 endPos = startPos.add(direction.normalize().scale(length));
 
+        // 如果不穿墙，则修正终点为碰撞点
         if (!throughWall) {
             ClipContext clipContext = new ClipContext(startPos, endPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, owner);
             BlockHitResult blockHitResult = level.clip(clipContext);
@@ -132,6 +151,8 @@ public class Commons {
                 endPos = blockHitResult.getLocation();
             }
         }
+        
+        // 宽相检测：获取可能碰撞的实体
         AABB searchBox = new AABB(startPos, endPos).inflate(radius);
         List<Entity> potentialEntities = level.getEntities(
                 owner,
@@ -145,17 +166,19 @@ public class Commons {
         List<Entity> detectedEntities = new ArrayList<>();
         for (Entity entity : potentialEntities) {
             AABB entityBoundingBox = entity.getBoundingBox().inflate(radius);
-            // 首先检查起点是否就在实体的碰撞箱内，覆盖近距离检测盲区
+            // 窄相检测：修复近距离检测盲区
             if (entityBoundingBox.contains(startPos)) {
                 detectedEntities.add(entity);
                 continue;
             }
+            // 窄相检测：检查射线是否与实体碰撞箱相交
             Optional<Vec3> intersection = entityBoundingBox.clip(startPos, endPos);
             if (intersection.isPresent()) {
                 detectedEntities.add(entity);
             }
         }
 
+        // 按距离排序，最近的在最前
         detectedEntities.sort(Comparator.comparingDouble(e -> e.distanceToSqr(startPos)));
 
         return detectedEntities;
@@ -248,6 +271,14 @@ public class Commons {
         });
     }
 
+    /**
+     * 对目标实体造成伤害并附加效果。
+     * @param mainEntity     造成伤害的源实体。
+     * @param skillUser      技能使用者。
+     * @param detectedEntity 被伤害的目标实体。
+     * @param baseDamage     基础伤害值。
+     * @return 是否成功造成伤害。
+     */
     public static boolean applyDamage(@NotNull Entity mainEntity, Player skillUser, Entity detectedEntity, double baseDamage) {
         if (detectedEntity.isRemoved()) return false;
         double finalDamage = KBUtils.calculateSkillDamage(detectedEntity, baseDamage);
@@ -306,6 +337,13 @@ public class Commons {
         return gameType == GameType.SPECTATOR || gameType == GameType.CREATIVE;
     }
 
+    /**
+     * 修改玩家主手像素核心的NBT数据。
+     * @param player         目标玩家。
+     * @param skillState     要设置的技能状态。
+     * @param toolType       要设置的工具类型。
+     * @param pixelCoreLevel 要设置的像素核心等级。
+     */
     public static void changePixelCoreNBT(Player player, @Nullable PixelCoreSkillState skillState, @Nullable Float toolType, @Nullable Float pixelCoreLevel) {
         if (player.level().isClientSide) return;
         ItemStack mainHandItem = player.getMainHandItem();
@@ -317,6 +355,11 @@ public class Commons {
         mainHandItem.setTag(NBT);
     }
 
+    /**
+     * 为玩家播放带有随机音高的音效。
+     * @param player     目标玩家。
+     * @param soundEvent 要播放的音效。
+     */
     public static void playSoundWithRandomPitch(ServerPlayer player, SoundEvent soundEvent) {
         if (player.level().isClientSide) return;
         player.level().playSound(null,

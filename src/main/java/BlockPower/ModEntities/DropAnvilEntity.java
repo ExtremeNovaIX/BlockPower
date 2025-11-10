@@ -10,6 +10,7 @@ import BlockPower.ModSounds.ModSounds;
 import BlockPower.Skills.SkillLock.LockPriority;
 import BlockPower.Skills.SkillLock.SkillLockManager;
 import BlockPower.Util.Commons;
+import BlockPower.Util.ModEffects.ServerEffect.SpringAttractionEffect;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.nbt.CompoundTag;
@@ -32,6 +33,7 @@ import java.util.*;
 
 import static BlockPower.Util.Commons.applyDamage;
 
+//TODO 修复非主机位置不同步导致乱飞问题
 public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEntity.AnvilState> {
     private static final int LIFE_TICK = 100;
     private int currLifeTick = 0;
@@ -39,8 +41,6 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
     private ServerPlayer player;
 
     private DropAnvilSkill skill;// 技能实例
-
-    private String lockID;
 
     private final Random r = new Random();
 
@@ -53,8 +53,6 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
     private static final EntityDataAccessor<Optional<UUID>> DATA_OWNER_UUID = SynchedEntityData.defineId(DropAnvilEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
     private boolean isPlacedBelow = false;
-
-    private boolean isPlayerStandingOnAnvil = true;
 
     public enum AnvilState {
         INIT,
@@ -73,7 +71,6 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
         this.player = player;
         this.skill = skill;
         this.getEntityData().set(DATA_OWNER_UUID, Optional.of(player.getUUID()));
-        this.lockID = player.getName().getString() + "_AnvilLock:" + this.getUUID();
     }
 
     public DropAnvilEntity(ServerPlayer player, double x, double y, double z, DropAnvilSkill skill) {
@@ -81,7 +78,6 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
         this.setPos(x, y, z);
         this.player = player;
         this.getEntityData().set(DATA_OWNER_UUID, Optional.of(player.getUUID()));
-        this.lockID = player.getName().getString() + "_AnvilLock:" + this.getUUID();
         this.skill = skill;
     }
 
@@ -92,47 +88,15 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
         handleAnvilMovement();
         if (!this.level().isClientSide) {
             handleStateChange();
-            handlePlayerReset();
             handleStateAction();
-        }
-    }
-
-    /**
-     * 如果玩家脱离铁砧，则重置状态
-     */
-    private void handlePlayerReset() {
-        if (!isPlayerStandingOnAnvil) return;
-
-        //如果玩家按下shift，则设置骑乘状态为false
-        if (this.player.isShiftKeyDown()) {
-            this.isPlayerStandingOnAnvil = false;
-            ModEffectManager.removeEffect(player, PlayerSneakEffect.class);
-
-            SkillLockManager.unlock(player, lockID);
-            player.noPhysics = false;
-            player.setNoGravity(false);
         }
     }
 
     @Override
     public void handleStateAction() {
-        if (this.isPlayerStandingOnAnvil) {
-            taskManager.runOnce(this, "reset_speed", () -> {
-                player.setDeltaMovement(Vec3.ZERO);
-                player.noPhysics = true;
-                player.setNoGravity(true);
-            });
-            Vec3 targetPosition = new Vec3(this.getX(), this.getY() + 3, this.getZ());
-            // 计算从玩家当前位置指向目标位置的矢量
-            Vec3 desiredVelocity = targetPosition.subtract(player.position());
-            // 将这个矢量直接设置为玩家的运动矢量
-            player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), desiredVelocity));
-        }
-
         if (getState() == AnvilState.DROPPING) {
             hurtEntity();
         }
-
     }
 
     @Override
@@ -174,10 +138,9 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
                 break;
         }
 
-
         //如果不是初始化状态状态，且有一定速度，进入掉落状态
         if (getState() != AnvilState.INIT) {
-            if (this.getDeltaMovement().length() > 0) {
+            if (this.getDeltaMovement().length() > 0.1) {
                 setState(AnvilState.DROPPING);
             }
         }
@@ -187,12 +150,6 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
     public void onStateChange(AnvilState newState, AnvilState oldState) {
         switch (newState) {
             case ANIMATING:
-                //添加技能锁
-                SkillLockManager.lock(player, lockID, LockPriority.LOWEST);
-                //设置玩家站立在铁砧上
-                isPlayerStandingOnAnvil = true;
-                ModEffectManager.addEffect(player, new PlayerSneakEffect());
-                ModEffectManager.addEffect(player, new PlayerSneakEffect());
                 //切换像素核心材质为铁砧
                 Commons.changePixelCoreNBT(player, PixelCoreSkillState.ANVIL, null, null);
                 break;
@@ -203,13 +160,6 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
                         SoundSource.PLAYERS, 0.5f, r.nextFloat(0.5f) + 0.8f);
                 break;
             case ENDING:
-                if (isPlayerStandingOnAnvil) {
-                    // 重置状态逻辑
-                    ModEffectManager.removeEffect(player, PlayerSneakEffect.class);
-                    SkillLockManager.unlock(player, lockID);
-                    player.noPhysics = false;
-                    player.setNoGravity(false);
-                }
                 this.discard();
                 break;
         }
@@ -217,7 +167,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
 
     private void hurtEntity() {
         taskManager.runOnceWithCooldown(this, "hurt_entity", 5, () -> {
-            List<Entity> entityList = Commons.aabbDetectEntity(this, 9, player);
+            List<Entity> entityList = Commons.aabbDetectEntity(this, 5, player);
             entityList.forEach(entity -> {
                 boolean result = applyDamage(this, player, entity, skill.getSkillDamage());
                 if (!result) return;
@@ -232,7 +182,7 @@ public class DropAnvilEntity extends Entity implements IStateMachine<DropAnvilEn
 
     private void handleAnvilMovement() {
         if (!this.isNoGravity()) {
-            this.setDeltaMovement(this.getDeltaMovement().add(0.0, -0.2, 0.0));
+            this.setDeltaMovement(this.getDeltaMovement().add(0.0, -0.25, 0.0));
         }
         this.move(MoverType.SELF, this.getDeltaMovement());
         this.setDeltaMovement(this.getDeltaMovement().scale(0.99));

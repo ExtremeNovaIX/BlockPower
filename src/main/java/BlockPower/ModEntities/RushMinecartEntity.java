@@ -32,8 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static BlockPower.Util.Commons.aabbDetectEntity;
-
 public class RushMinecartEntity extends AbstractMinecart implements IStateMachine<RushMinecartEntity.RushMinecartState> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RushMinecartEntity.class);
@@ -133,7 +131,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
                 break;
 
             case SEEKING:
-                List<Entity> entities = aabbDetectEntity(this, 4, player);
+                List<Entity> entities = Commons.aabbDetectEntity(this, 4, player);
                 if (!entities.isEmpty()) {
                     entities.get(0).startRiding(this);
                     setState(RushMinecartState.CAPTURED);
@@ -266,25 +264,32 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
     }
 
     private void hurtEntity(@NotNull Player player) {
-        taskManager.runOnceWithCooldown(this, "hurt_entity", 3, () -> {
-            List<Entity> entityList = Commons.rayDetectEntity(this.level(), this.position(), this.getDeltaMovement().normalize(), 2.5, List.of(player), false, 2.5, player);
-            entityList.forEach(entity -> {
-                boolean result = Commons.applyDamage(this, player, entity, skill.getSkillDamage());
-                if (!result) return;
-                KBUtils.applyKB(this, entity, skill.getSkillKBPercent(), 1.2);
-                Commons.playSoundWithCooldown(this, ModSounds.MINECART_CRASH_SOUND.get(), 0.5f, 8);
-            });
-            if (!entityList.isEmpty()) {
-                //玩家在车上时触发屏幕震动
-                if (getState() == RushMinecartState.RUSHING && this.getFirstPassenger() == player) {
-                    ModEffectManager.addToAllAround(new ScreenShakeEffect(6, 1.8f), this.position(), this.level(), 6);
-                }
+        // 调用带有命中冷却的检测方法，冷却时间为10 ticks
+        List<Entity> hitableEntities = Commons.rayDetectEntity(this, 2.5, List.of(player), false, 2.5, 10);
 
-                if (getState() == RushMinecartState.RUSHING) {
-                    setState(RushMinecartState.CRASHED);
-                }
+        // 如果没有可命中的实体，则直接返回
+        if (hitableEntities.isEmpty()) {
+            return;
+        }
+
+        // 对所有可命中的实体应用伤害和效果
+        hitableEntities.forEach(entity -> {
+            boolean result = Commons.applyDamage(this, player, entity, skill.getSkillDamage());
+            if (result) {
+                KBUtils.applyKB(this, entity, skill.getSkillKBPercent(), 1.2);
             }
         });
+
+        // 只要命中了至少一个实体，就执行后续效果
+        Commons.playSoundWithCooldown(this, ModSounds.MINECART_CRASH_SOUND.get(), 0.5f, 8);
+
+        if (getState() == RushMinecartState.RUSHING && this.getFirstPassenger() == player) {
+            ModEffectManager.addToAllAround(new ScreenShakeEffect(6, 1.8f), this.position(), this.level(), 6);
+        }
+
+        if (getState() == RushMinecartState.RUSHING) {
+            setState(RushMinecartState.CRASHED);
+        }
     }
 
     private void normalMinecraftLogic() {

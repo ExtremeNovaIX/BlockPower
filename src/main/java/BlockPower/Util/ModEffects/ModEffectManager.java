@@ -60,6 +60,10 @@ public class ModEffectManager {
      * 将添加效果操作推入队列，在下一次 tickAll 迭代开始前安全添加。
      */
     public static void addEffect(Entity entity, ITickBasedEffect effect) {
+        // 安全检查：如果实体已移除，则不执行任何操作
+        if (entity == null || entity.isRemoved()) {
+            return;
+        }
         // 根据效果的运行端选择正确的队列
         Map<Entity, List<ITickBasedEffect>> pendingMap = getPendingAdditions(effect.isClientSide());
         // 将效果加入对应实体的待添加列表
@@ -77,6 +81,10 @@ public class ModEffectManager {
         List<Entity> entityList = Commons.aabbDetectEntity(pos, level, radius, null);
 
         entityList.forEach(entity -> {
+            // 安全检查：如果实体已移除，则跳过
+            if (entity.isRemoved()) {
+                return;
+            }
             // 根据效果的运行端选择正确的队列
             Map<Entity, List<ITickBasedEffect>> pendingMap = getPendingAdditions(effect.isClientSide());
             // 将效果加入对应实体的待添加列表
@@ -98,6 +106,10 @@ public class ModEffectManager {
      * @param effectClass 效果类
      */
     public static void removeEffect(Entity entity, Class<? extends ITickBasedEffect> effectClass) {
+        // 安全检查：如果实体已移除，则不执行任何操作
+        if (entity == null || entity.isRemoved()) {
+            return;
+        }
         Optional<? extends ITickBasedEffect> effect = ModEffectManager.getEntityEffect(entity, effectClass);
         if (effect.isEmpty()) return;
         boolean isClientSide = effect.get().isClientSide();
@@ -143,59 +155,32 @@ public class ModEffectManager {
      * 在开始遍历前，处理所有添加和移除操作。
      */
     private static void processPendingModifications(boolean isClientSide) {
-        String levelName = isClientSide ? "Client:" : "Server:";
-
         Map<Entity, Map<Class<? extends ITickBasedEffect>, ITickBasedEffect>> mainMap = getEffectMap(isClientSide);
-
         Map<Entity, Set<Class<? extends ITickBasedEffect>>> pendingRemovals = getPendingRemovals(isClientSide);
-        // 遍历所有待移除的效果
-        pendingRemovals.forEach((entity, effectClasses) -> {
+        Map<Entity, List<ITickBasedEffect>> pendingAdds = getPendingAdditions(isClientSide);
 
-            if (!effectClasses.isEmpty()) {
-                String entityName;
-                if (entity instanceof Player player) {
-                    entityName = player.getGameProfile().getName();
-                } else {
-                    entityName = entity.toString();
-                }
-                log.info("{}Removing effects: {} for entity: {}", levelName, effectClasses, entityName);
-            }
+        // 创建副本以进行安全迭代
+        Map<Entity, Set<Class<? extends ITickBasedEffect>>> removalsCopy = new HashMap<>(pendingRemovals);
+        Map<Entity, List<ITickBasedEffect>> addsCopy = new HashMap<>(pendingAdds);
 
+        // 清空原始暂存区，以便在处理期间可以接收新的请求
+        pendingRemovals.clear();
+        pendingAdds.clear();
+
+        // 遍历副本进行处理
+        removalsCopy.forEach((entity, classes) -> {
             Map<Class<? extends ITickBasedEffect>, ITickBasedEffect> entityEffects = mainMap.get(entity);
             if (entityEffects != null) {
-                for (Class<? extends ITickBasedEffect> effectClass : effectClasses) {
-                    entityEffects.remove(effectClass);
-                }
+                classes.forEach(entityEffects::remove);
             }
         });
-        pendingRemovals.clear();
 
-        // 遍历所有待添加的实体和效果
-        Map<Entity, List<ITickBasedEffect>> pendingAdds = getPendingAdditions(isClientSide);
-        pendingAdds.forEach((entity, effects) -> {
-            // 获取该实体的效果Map，如果不存在则创建
-            Map<Class<? extends ITickBasedEffect>, ITickBasedEffect> entityEffects =
-                    mainMap.computeIfAbsent(entity, k -> new HashMap<>());
-
-            if (!effects.isEmpty()) {
-                String entityName;
-                if (entity instanceof Player player) {
-                    entityName = player.getGameProfile().getName();
-                } else {
-                    entityName = entity.toString();
-                }
-                log.info("{}Adding effects: {} for entity: {}", levelName, effects, entityName);
-            }
-
-            // 将所有待添加的效果放入实体Map
+        addsCopy.forEach((entity, effects) -> {
+            Map<Class<? extends ITickBasedEffect>, ITickBasedEffect> entityEffects = mainMap.computeIfAbsent(entity, k -> new HashMap<>());
             for (ITickBasedEffect effect : effects) {
-                // 这里执行原来的 addEffect 核心逻辑：添加或覆盖
                 entityEffects.put(effect.getClass(), effect);
             }
         });
-
-        // 清空列表，等待下一 Tick
-        pendingAdds.clear();
     }
 
     /**
@@ -204,50 +189,36 @@ public class ModEffectManager {
      * @param isClientSide 是否更新客户端效果
      */
     public static void tickAll(boolean isClientSide) {
-        // 处理所有的修改操作
+        // 处理所有待定修改
         processPendingModifications(isClientSide);
 
-        // 获取当前端正确的Map
         Map<Entity, Map<Class<? extends ITickBasedEffect>, ITickBasedEffect>> mainMap = getEffectMap(isClientSide);
 
-        //用于缓存所有需要执行的修改操作（如删除）
-        List<Runnable> modifications = new ArrayList<>();
+        // 创建主效果Map的条目副本进行安全迭代
+        Set<Map.Entry<Entity, Map<Class<? extends ITickBasedEffect>, ITickBasedEffect>>> entries = new HashSet<>(mainMap.entrySet());
 
-        //这个循环只调用 tick() 和 isFinished()，不进行任何删除或添加操作。将需要执行的删除操作存入modifications列表
-        for (Map.Entry<Entity, Map<Class<? extends ITickBasedEffect>, ITickBasedEffect>> entityEntry : mainMap.entrySet()) {
+        for (Map.Entry<Entity, Map<Class<? extends ITickBasedEffect>, ITickBasedEffect>> entityEntry : entries) {
             Entity entity = entityEntry.getKey();
             Map<Class<? extends ITickBasedEffect>, ITickBasedEffect> effectMap = entityEntry.getValue();
 
-            //如果实体本身已失效，安排清空其所有效果
-            if (entity.isRemoved()) {
-                modifications.add(effectMap::clear);
-                continue; //继续检查下一个实体
+            if (entity == null || entity.isRemoved()) {
+                // 如果实体已失效，直接在主Map中移除该条目
+                mainMap.remove(entity);
+                continue;
             }
 
-            //遍历实体身上的每一种效果
-            Iterator<ITickBasedEffect> effectIterator = effectMap.values().iterator();
-            while (effectIterator.hasNext()) {
-                ITickBasedEffect effect = effectIterator.next();
-
+            effectMap.values().removeIf(effect -> {
                 if (effect.isFinished()) {
-                    // 安全移除内部 Map 中的元素
-                    effectIterator.remove();
                     effect.onEnd();
+                    return true;
                 } else {
-                    // 执行 tick 逻辑
                     effect.tick();
+                    return false;
                 }
-            }
+            });
         }
 
-        //执行所有已安排的修改
-        if (!modifications.isEmpty()) {
-            for (Runnable modification : modifications) {
-                modification.run();
-            }
-        }
-
-        //清理空条目
+        // 清理所有内部效果Map为空的实体条目
         mainMap.entrySet().removeIf(entry -> entry.getValue().isEmpty());
     }
 }

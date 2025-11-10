@@ -25,7 +25,7 @@ public class DropAnvilRenderer extends EntityRenderer<DropAnvilEntity> {
         BlockState anvilState = Blocks.ANVIL.defaultBlockState();
 
         poseStack.pushPose();
-        poseStack.scale(3F, 3F, 3F);
+        poseStack.scale(1.5F, 1.5F, 1.5F);
         poseStack.translate(-0.5D, 0.0D, -0.5D);
 
         blockRenderer.renderSingleBlock(
