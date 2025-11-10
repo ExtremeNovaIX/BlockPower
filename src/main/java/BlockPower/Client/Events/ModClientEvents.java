@@ -8,7 +8,7 @@ import BlockPower.Util.ModParticles.AdvancedParticle;
 import BlockPower.Util.ModParticles.GlowingSparkParticle;
 import BlockPower.Util.ModParticles.ModParticles;
 import BlockPower.Util.ModParticles.ParticleRibbon;
-import BlockPower.Skills.ComboSkills.ComboManager.Client.ComboHudRenderer;
+import BlockPower.Client.ComboSkills.ComboManager.Client.ComboHudRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;

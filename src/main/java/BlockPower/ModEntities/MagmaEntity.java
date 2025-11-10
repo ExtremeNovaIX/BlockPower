@@ -6,6 +6,7 @@ import BlockPower.Util.ModEffects.ClientEffect.ScreenShakeEffect;
 import BlockPower.Util.ModEffects.ServerEffect.AttractEntityEffect;
 import BlockPower.Util.ModEffects.ServerEffect.UnBalanceEffect;
 import BlockPower.ModSounds.ModSounds;
+import BlockPower.Util.StateMachine.IStateMachine;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TickListener;
 import net.minecraft.sounds.SoundEvents;

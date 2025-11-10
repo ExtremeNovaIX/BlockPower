@@ -1,10 +1,9 @@
 package BlockPower.Skills.NormalSkills;
 
 import BlockPower.ModBlocks.ModBlocks;
+import BlockPower.Skills.IPacketSerializable;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.SkillExecutionResult;
-import BlockPower.Skills.SkillLock.LockPriority;
-import BlockPower.Skills.SkillLock.SkillLockManager;
 import BlockPower.Util.TaskManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -20,20 +19,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-public class BarrierWallSkill implements IPacketSerializableSkill {
+public class BarrierWallSkill implements ISkill{
     private static final TaskManager taskManager = TaskManager.getInstance(false);
 
     private static final String LOCK_ID = "barrier_wall";
-
-    @Override
-    public void writeParams(FriendlyByteBuf buf) {
-
-    }
-
-    @Override
-    public void readParams(FriendlyByteBuf buf) {
-
-    }
 
     @Override
     public @NotNull String getSkillName() {

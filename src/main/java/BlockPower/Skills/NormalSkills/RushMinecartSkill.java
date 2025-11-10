@@ -1,15 +1,16 @@
 package BlockPower.Skills.NormalSkills;
 
 import BlockPower.ModEntities.RushMinecartEntity;
-import BlockPower.Skills.ComboSkills.ComboManager.Server.PlayerComboManager;
+import BlockPower.Skills.ComboSkills.ComboManager.PlayerComboManager;
 import BlockPower.Skills.ComboSkills.ComboSkillType;
+import BlockPower.Skills.IPacketSerializable;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
-public class RushMinecartSkill implements IPacketSerializableSkill {
+public class RushMinecartSkill implements ISkill {
     @Override
     public @NotNull String getSkillName() {
         return "RushMinecart";
@@ -49,16 +50,6 @@ public class RushMinecartSkill implements IPacketSerializableSkill {
     @Override
     public void recordCombo(ServerPlayer player) {
         PlayerComboManager.recordCombo(player, ComboSkillType.FIRECRACKER);
-    }
-
-    @Override
-    public void writeParams(FriendlyByteBuf buf) {
-
-    }
-
-    @Override
-    public void readParams(FriendlyByteBuf buf) {
-
     }
 
     @Override

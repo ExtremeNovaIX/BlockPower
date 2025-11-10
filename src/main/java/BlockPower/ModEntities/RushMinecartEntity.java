@@ -9,6 +9,7 @@ import BlockPower.ModSounds.ModSounds;
 import BlockPower.Skills.SkillLock.LockPriority;
 import BlockPower.Skills.SkillLock.SkillLockManager;
 import BlockPower.Util.Commons;
+import BlockPower.Util.StateMachine.IStateMachine;
 import BlockPower.Util.TaskManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;

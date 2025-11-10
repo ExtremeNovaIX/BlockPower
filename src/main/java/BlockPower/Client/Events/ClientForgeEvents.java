@@ -2,7 +2,7 @@ package BlockPower.Client.Events;
 
 import BlockPower.Client.gui.KBHud;
 import BlockPower.Main.Main;
-import BlockPower.Skills.ComboSkills.ComboManager.Client.ClientComboData;
+import BlockPower.Client.ComboSkills.ComboManager.Client.ClientComboData;
 import BlockPower.Util.ClientCameraTrackingManager;
 import BlockPower.Util.ModEffects.ModEffectManager;
 import net.minecraft.client.Minecraft;

@@ -1,10 +1,8 @@
 package BlockPower.Skills.NormalSkills;
 
 import BlockPower.ModBlocks.ModBlocks;
-import BlockPower.ModException.SkillException;
 import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
-import BlockPower.Skills.ComboSkills.ComboManager.Server.PlayerComboManager;
-import BlockPower.Skills.ComboSkills.ComboSkillType;
+import BlockPower.Skills.IPacketSerializable;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import BlockPower.Util.Commons;
@@ -17,9 +15,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -27,7 +23,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.ForgeMod;
 import org.jetbrains.annotations.NotNull;
 
-public class PlaceBlockSkill implements IPacketSerializableSkill {
+public class PlaceBlockSkill implements ISkill {
     @Override
     public @NotNull String getSkillName() {
         return "PlaceBlock";
@@ -110,16 +106,6 @@ public class PlaceBlockSkill implements IPacketSerializableSkill {
 
     @Override
     public void recordCombo(ServerPlayer player) {
-    }
-
-    @Override
-    public void writeParams(FriendlyByteBuf buf) {
-
-    }
-
-    @Override
-    public void readParams(FriendlyByteBuf buf) {
-
     }
 
     @Override

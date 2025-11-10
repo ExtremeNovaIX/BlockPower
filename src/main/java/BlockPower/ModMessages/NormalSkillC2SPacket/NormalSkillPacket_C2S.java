@@ -1,9 +1,7 @@
 package BlockPower.ModMessages.NormalSkillC2SPacket;
 
 import BlockPower.ModException.SilentSkillException;
-import BlockPower.ModException.SkillException;
-import BlockPower.ModItems.ModItems;
-import BlockPower.Skills.NormalSkills.IPacketSerializableSkill;
+import BlockPower.Skills.IPacketSerializable;
 import BlockPower.Skills.NormalSkills.ISkill;
 import BlockPower.Skills.SkillExecutionResult;
 import net.minecraft.network.FriendlyByteBuf;
@@ -14,7 +12,7 @@ public class NormalSkillPacket_C2S extends AbstractSkillPacket_C2S {
     private final NormalSkillType skillType;
 
     // 客户端构造：将 Skill 实例和类型 ID 传入
-    public NormalSkillPacket_C2S(NormalSkillType skillType, IPacketSerializableSkill skill) {
+    public NormalSkillPacket_C2S(NormalSkillType skillType, ISkill skill) {
         super(skill);
         this.skillType = skillType;
     }
@@ -26,10 +24,10 @@ public class NormalSkillPacket_C2S extends AbstractSkillPacket_C2S {
 
         // 根据枚举值实例化正确的技能类
         try {
-            // 注意：这里需要一个默认的无参构造函数
+            // 注意：技能类需要一个无参构造函数
             ISkill newSkill = skillType.skillClass.getDeclaredConstructor().newInstance();
             // 检查是否是可序列化的，并读取参数
-            if (newSkill instanceof IPacketSerializableSkill paramSkill) {
+            if (newSkill instanceof IPacketSerializable paramSkill) {
                 // 调用技能的readParams方法读取参数
                 paramSkill.readParams(buf);
             }
@@ -46,7 +44,7 @@ public class NormalSkillPacket_C2S extends AbstractSkillPacket_C2S {
         buf.writeEnum(this.skillType);
 
         // 写入参数
-        if (skill instanceof IPacketSerializableSkill paramSkill) {
+        if (skill instanceof IPacketSerializable paramSkill) {
             // 调用技能的writeParams方法写入参数
             paramSkill.writeParams(buf);
         }

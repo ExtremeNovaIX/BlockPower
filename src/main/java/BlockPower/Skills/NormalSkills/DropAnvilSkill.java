@@ -1,15 +1,16 @@
 package BlockPower.Skills.NormalSkills;
 
 import BlockPower.ModEntities.DropAnvilEntity;
-import BlockPower.Skills.ComboSkills.ComboManager.Server.PlayerComboManager;
+import BlockPower.Skills.ComboSkills.ComboManager.PlayerComboManager;
 import BlockPower.Skills.ComboSkills.ComboSkillType;
+import BlockPower.Skills.IPacketSerializable;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
-public class DropAnvilSkill implements IPacketSerializableSkill {
+public class DropAnvilSkill implements ISkill {
     @Override
     public @NotNull String getSkillName() {
         return "DropAnvil";
@@ -39,16 +40,6 @@ public class DropAnvilSkill implements IPacketSerializableSkill {
     @Override
     public double getSkillCostAmount() {
         return 10;
-    }
-
-    @Override
-    public void writeParams(FriendlyByteBuf buf) {
-
-    }
-
-    @Override
-    public void readParams(FriendlyByteBuf buf) {
-
     }
 
     @Override

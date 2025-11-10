@@ -1,8 +1,8 @@
-package BlockPower.Skills.NormalSkills;
+package BlockPower.Skills;
 
 import net.minecraft.network.FriendlyByteBuf;
 
-public interface IPacketSerializableSkill extends ISkill {
+public interface IPacketSerializable {
     // 客户端调用：将技能的参数写入网络缓冲区
     void writeParams(FriendlyByteBuf buf);
 

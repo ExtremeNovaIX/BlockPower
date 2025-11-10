@@ -1,5 +1,6 @@
 package BlockPower.Skills.NormalSkills;
 
+import BlockPower.Skills.IPacketSerializable;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import BlockPower.Util.TaskManager;
@@ -16,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-public class AirJumpSkill implements IPacketSerializableSkill {
+public class AirJumpSkill implements ISkill, IPacketSerializable {
 
     public static final Map<Player, Integer> playerAirTicks = new WeakHashMap<>();//记录玩家滞空时间
 

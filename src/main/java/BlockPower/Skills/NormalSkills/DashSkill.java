@@ -1,6 +1,6 @@
 package BlockPower.Skills.NormalSkills;
 
-import BlockPower.Skills.ComboSkills.ComboManager.Server.PlayerComboManager;
+import BlockPower.Skills.IPacketSerializable;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import BlockPower.Util.Commons;
@@ -11,7 +11,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-public class DashSkill implements IPacketSerializableSkill {
+public class DashSkill implements ISkill, IPacketSerializable {
     private static final TaskManager taskManager = TaskManager.getInstance(false);
 
     private String keyResult;
@@ -50,7 +50,7 @@ public class DashSkill implements IPacketSerializableSkill {
                 case "d" -> new Vec3(-lookAngle.z, 0, lookAngle.x);
                 default -> new Vec3(lookAngle.x, 0, lookAngle.z);//默认向前
             };
-            Vec3 finalVec = new Vec3(newVec.x, 0, newVec.z).multiply(1.3, 0, 1.3);
+            Vec3 finalVec = new Vec3(newVec.x, 0, newVec.z).multiply(1.2, 0, 1.2);
             player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), finalVec));
             player.setSprinting(true);
         });

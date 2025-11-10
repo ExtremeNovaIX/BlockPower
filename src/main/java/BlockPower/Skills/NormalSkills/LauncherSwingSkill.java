@@ -1,18 +1,18 @@
 package BlockPower.Skills.NormalSkills;
 
+import BlockPower.Skills.IPacketSerializable;
 import BlockPower.Util.KBUtils;
 import BlockPower.Util.ModEffects.ServerEffect.SpringAttractionEffect;
 import BlockPower.ModItems.ModItems;
 import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
 import BlockPower.ModMessages.ModMessages;
-import BlockPower.ModMessages.S2CPacket.CameraLockPacket_S2C;
 import BlockPower.ModMessages.S2CPacket.HitStopPacket_S2C;
 import BlockPower.ModMessages.S2CPacket.ShakePacket_S2C;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Skills.ComboSkills.ComboSkillType;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.SkillExecutionResult;
-import BlockPower.Skills.ComboSkills.ComboManager.Server.PlayerComboManager;
+import BlockPower.Skills.ComboSkills.ComboManager.PlayerComboManager;
 import BlockPower.Util.Commons;
 import BlockPower.Util.ModEffects.ModEffectManager;
 import BlockPower.Util.TaskManager;
@@ -26,7 +26,7 @@ import java.util.List;
 
 //TODO 修改成一段时间内combo上限6次，并且后几次击退明显增大，防止无限连
 //TODO 修复异常吸附问题
-public class LauncherSwingSkill implements IPacketSerializableSkill {
+public class LauncherSwingSkill implements ISkill {
     private static final TaskManager taskManager = TaskManager.getInstance(false);
 
     @Override
@@ -115,15 +115,5 @@ public class LauncherSwingSkill implements IPacketSerializableSkill {
     @Override
     public double getSkillDamage() {
         return 3;
-    }
-
-    @Override
-    public void writeParams(FriendlyByteBuf buf) {
-
-    }
-
-    @Override
-    public void readParams(FriendlyByteBuf buf) {
-
     }
 }

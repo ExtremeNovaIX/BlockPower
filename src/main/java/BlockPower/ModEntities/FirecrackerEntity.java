@@ -10,6 +10,7 @@ import BlockPower.ModMessages.ModMessages;
 import BlockPower.ModMessages.S2CPacket.FireworkPacket_S2C;
 import BlockPower.Util.ModParticles.GlowingSparkParticleOptions;
 import BlockPower.Util.Commons;
+import BlockPower.Util.StateMachine.IStateMachine;
 import BlockPower.Util.TaskManager;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.particles.ParticleTypes;
