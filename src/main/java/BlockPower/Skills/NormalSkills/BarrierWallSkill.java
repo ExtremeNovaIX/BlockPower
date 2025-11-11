@@ -47,7 +47,7 @@ public class BarrierWallSkill implements ISkill{
         BlockPos playerPos = player.blockPosition();
 
         // 圆半径设为4格
-        int radius = 4;
+        int radius = 3;
         // 墙的高度设为3格
         int wallHeight = 3;
 

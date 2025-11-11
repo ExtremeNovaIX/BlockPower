@@ -15,8 +15,12 @@ public class ModCapabilities {
     public static final Capability<IKBPercent> KNOCKBACK_VALUE_CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {
     });
 
+    public static final Capability<IPlayerAirJumpData> PLAYER_AIR_JUMP_DATA = CapabilityManager.get(new CapabilityToken<>() {
+    });
+
     @SubscribeEvent
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.register(IKBPercent.class);
+        event.register(IPlayerAirJumpData.class);
     }
 }

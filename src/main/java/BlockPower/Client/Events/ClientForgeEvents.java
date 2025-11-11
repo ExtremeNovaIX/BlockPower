@@ -6,6 +6,7 @@ import BlockPower.Client.ComboSkills.ComboManager.Client.ClientComboData;
 import BlockPower.Util.ClientCameraTrackingManager;
 import BlockPower.Util.ModEffects.ModEffectManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -22,7 +23,6 @@ import static BlockPower.Client.gui.KBHud.renderEntityKBHud;
 public class ClientForgeEvents {
 
     private static final RandomSource random = RandomSource.create();
-
 
     @SubscribeEvent
     public static void onRenderGui(RenderGuiEvent.Post event) {

@@ -6,6 +6,7 @@ import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.MinerState.server.PlayerResourceData;
 import BlockPower.Skills.MinerState.server.PlayerResourceManager;
 import BlockPower.Skills.NormalSkills.ISkill;
+import BlockPower.Skills.SkillLock.LockPriority;
 import BlockPower.Skills.SkillLock.SkillLockManager;
 import BlockPower.Util.Commons;
 import net.minecraft.server.level.ServerPlayer;
@@ -28,7 +29,7 @@ abstract class AbstractSkillPacket_C2S extends AbstractC2SPacket {
     @Override
     protected boolean checkLegit(ServerPlayer player) {
         if (Commons.isSpectatorOrCreativeMode(player)) return true;
-        if (SkillLockManager.isLocked(player)) return false;//如果玩家被技能锁锁定，直接返回false
+        if (SkillLockManager.isLocked(player, LockPriority.MEDIUM)) return false;//如果玩家被中等以上的技能锁锁定，直接返回false
         if (skill.isMustMainHandItemPixelCore()) {
             if (player.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) return false;//如果玩家主手物品不是像素核心，直接返回false
         }

@@ -41,12 +41,10 @@ public class ClientInputHandler {
         }
 
         if (KeyBindings.CUSTOM_SPACE.consumeClick()) {
-            if (!localPlayer.onGround()) {
-                if (localPlayer.input.up) {
-                    ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.AIR_JUMP, new AirJumpSkill("w")));
-                } else {
-                    ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.AIR_JUMP, new AirJumpSkill("")));
-                }
+            if (localPlayer.input.up) {
+                ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.AIR_JUMP, new AirJumpSkill("w")));
+            } else {
+                ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.AIR_JUMP, new AirJumpSkill("")));
             }
         }
 
@@ -106,10 +104,16 @@ public class ClientInputHandler {
             ClientComboData.triggerSkillAnimation(comboSkillType);
         }
 
-        if(KeyBindings.BARRIER_WALL.consumeClick()) {
+//        if (KeyBindings.BARRIER_WALL.consumeClick()) {
+//            if (!ClientMinerState.isMinerMode()) return;
+//            if (localPlayer.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) return;
+//            ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.BARRIER_WALL, new BarrierWallSkill()));
+//        }
+
+        if (KeyBindings.FLY.consumeClick()) {
             if (!ClientMinerState.isMinerMode()) return;
             if (localPlayer.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) return;
-            ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.BARRIER_WALL, new BarrierWallSkill()));
+            ModMessages.sendToServer(new NormalSkillPacket_C2S(NormalSkillType.FLY, new FlySkill()));
         }
 
     }

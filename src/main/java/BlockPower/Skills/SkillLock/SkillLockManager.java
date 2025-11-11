@@ -135,6 +135,19 @@ public class SkillLockManager {
     }
 
     /**
+     * 为玩家添加一个技能锁
+     * 默认优先级为NORMAL
+     *
+     * @param player   玩家实体
+     * @param lockId   技能锁ID
+     * @param duration 技能锁持续时间
+     */
+    public static synchronized void lock(@NotNull Player player, @NotNull String lockId, int duration) {
+        PlayerLockContainer container = playerLocks.computeIfAbsent(player, k -> new PlayerLockContainer());
+        container.addOrUpdateLock(lockId, LockPriority.NORMAL.getPriority(), duration);
+    }
+
+    /**
      * 为玩家添加一个无持续时间的技能锁。此技能锁不会自动解除，需要手动解除
      *
      * @param player   玩家实体
@@ -144,6 +157,18 @@ public class SkillLockManager {
     public static synchronized void lock(@NotNull Player player, @NotNull String lockId, LockPriority priority) {
         PlayerLockContainer container = playerLocks.computeIfAbsent(player, k -> new PlayerLockContainer());
         container.addOrUpdateLock(lockId, priority.getPriority(), -1);
+    }
+
+    /**
+     * 为玩家添加一个无持续时间的技能锁。此技能锁不会自动解除，需要手动解除
+     * 默认优先级为NORMAL
+     *
+     * @param player 玩家实体
+     * @param lockId 技能锁ID
+     */
+    public static synchronized void lock(@NotNull Player player, @NotNull String lockId) {
+        PlayerLockContainer container = playerLocks.computeIfAbsent(player, k -> new PlayerLockContainer());
+        container.addOrUpdateLock(lockId, LockPriority.NORMAL.getPriority(), -1);
     }
 
     /**
@@ -180,13 +205,40 @@ public class SkillLockManager {
     }
 
     /**
-     * 检查玩家是否被锁定
+     * 检查玩家是否被任意锁锁定
      *
      * @param player 玩家实体
      * @return 如果玩家被锁定则返回true，否则返回false
      */
     public static synchronized boolean isLocked(@NotNull Player player) {
         return getHighestLockPriority(player) > 0;
+    }
+
+    /**
+     * 检查玩家是否被最低优先级或以上的锁锁定（包括等于最低优先级的锁）
+     *
+     * @param player   玩家实体
+     * @param priority 最低优先级
+     * @return 如果玩家被锁定则返回true，否则返回false
+     */
+    public static synchronized boolean isLocked(@NotNull Player player, LockPriority priority) {
+        return getHighestLockPriority(player) >= priority.getPriority();
+    }
+
+    /**
+     * 检查玩家是否被锁定（检测特定锁ID）
+     *
+     * @param player 玩家实体
+     * @param lockId 技能锁ID
+     * @return 如果玩家被锁定则返回true，否则返回false
+     */
+    public static synchronized boolean isLocked(@NotNull Player player, @NotNull String lockId) {
+        PlayerLockContainer container = playerLocks.get(player);
+        if (container == null) {
+            return false;
+        }
+        LockData lockData = container.getData(lockId);
+        return lockData != null && lockData.priority > 0;
     }
 
     /**

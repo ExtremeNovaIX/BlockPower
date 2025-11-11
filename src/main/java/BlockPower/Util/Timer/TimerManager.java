@@ -92,6 +92,30 @@ public final class TimerManager {
     }
 
     /**
+     * 移除一个由字符串键标识的全局计时器。
+     * 如果计时器不存在，此方法将静默失败，不抛出异常。
+     *
+     * @param timerName 要移除的计时器的唯一字符串标识符。
+     */
+    public void removeTimer(@NotNull String timerName) {
+        globalTimers.remove(timerName);
+    }
+
+    /**
+     * 移除一个特定实体的具名计时器。
+     * 如果计时器不存在，此方法将静默失败，不抛出异常。
+     *
+     * @param entity    与计时器关联的实体。
+     * @param timerName 要移除的计时器的唯一名称。
+     */
+    public void removeTimer(@NotNull Entity entity, @NotNull String timerName) {
+        Map<String, TickTimer> innerMap = entityToStringTimers.get(entity);
+        if (innerMap != null) {
+            innerMap.remove(timerName);
+        }
+    }
+
+    /**
      * 确保一个由字符串键标识的全局计时器存在。
      * 仅当同名计时器不存在时，才会创建新的计时器。如果已存在，则此方法不执行任何操作。
      * 此方法适合在循环中安全调用。

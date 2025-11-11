@@ -57,6 +57,7 @@ public class UnBalanceEffect implements ITickBasedEffect {
      */
     private interface IEffectHandler {
         void tick(int remainingTicks);
+
         void onEnd();
     }
 
@@ -114,6 +115,7 @@ public class UnBalanceEffect implements ITickBasedEffect {
     private static class PlayerUnbalanceHandler implements IEffectHandler {
         private final ServerPlayer affectedPlayer;
         private boolean a = false;
+
         public PlayerUnbalanceHandler(ServerPlayer player) {
             this.affectedPlayer = player;
 
@@ -124,7 +126,7 @@ public class UnBalanceEffect implements ITickBasedEffect {
             if (a) return;
             // 仅一次为玩家添加技能锁
             String skillLockID = affectedPlayer.getName().getString() + "_UnBalanceEffect";
-            SkillLockManager.lock(affectedPlayer, skillLockID, LockPriority.HIGHEST,remainingTicks);
+            SkillLockManager.lock(affectedPlayer, skillLockID, LockPriority.HIGHEST, remainingTicks);
             a = true;
         }
 

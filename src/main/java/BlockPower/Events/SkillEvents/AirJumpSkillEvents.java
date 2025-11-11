@@ -1,44 +1,55 @@
 package BlockPower.Events.SkillEvents;
 
 
+import BlockPower.Capability.IPlayerAccessor;
+import BlockPower.Capability.ModCapabilities;
 import BlockPower.Main.Main;
+import BlockPower.ModBlocks.DestroyingBlocks.DestroyingBlock;
 import BlockPower.Skills.NormalSkills.AirJumpSkill;
+import BlockPower.Skills.SkillLock.SkillLockManager;
 import BlockPower.Util.Commons;
 import BlockPower.Util.Timer.TimerManager;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 @Mod.EventBusSubscriber(modid = Main.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class AirJumpSkillEvents {
-    private static final TimerManager timerManager = TimerManager.getInstance(false);
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.MOD_ID);
-
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        Player p = event.player;
-        if (p.level().isClientSide()) return;
-        if (event.phase != TickEvent.Phase.END) return;
-        ServerPlayer player = (ServerPlayer) p;
-        if (Commons.isSpectatorOrCreativeMode(player)) return;
+        if (event.player.level().isClientSide() || event.phase != TickEvent.Phase.END) {
+            return;
+        }
+        ServerPlayer player = (ServerPlayer) event.player;
+        if (Commons.isSpectatorOrCreativeMode(player)) {
+            return;
+        }
 
-        AirJumpSkill.handleAirJump(player);
-    }
+        if (player.onGround()) {
+//            // 检查玩家脚下方块是否属于DestroyingBlock
+//            BlockPos footPos = player.blockPosition().below();
+//            BlockState blockState = player.level().getBlockState(footPos);
+//
+//            // 如果脚下方块是DestroyingBlock，则不执行逻辑
+//            if (blockState.getBlock() instanceof DestroyingBlock) {
+//                return;
+//            }
 
-    @SubscribeEvent
-    public static void onLivingFall(LivingFallEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            // 检查玩家是否有免疫摔落伤害的任务
-            if (timerManager.isTimerActive(player,"noFallDamage") && !timerManager.isFinished(player, "noFallDamage",true)) {
-                event.setCanceled(true);
-            }
+            player.getCapability(ModCapabilities.PLAYER_AIR_JUMP_DATA).ifPresent(airJumpData -> {
+                if (airJumpData.getJumpCount() > 0) {
+                    airJumpData.resetJumpCount();
+                    SkillLockManager.unlock(player, AirJumpSkill.SKILL_ID);
+                }
+            });
         }
     }
+
 }

@@ -111,7 +111,7 @@ public class RushMinecartEntity extends AbstractMinecart implements IStateMachin
         switch (currentState) {
             case INITIALIZING:
                 player.startRiding(this);
-                SkillLockManager.lock(player, player.getName().getString() + "_MinecartLock", LockPriority.LOWEST);
+                SkillLockManager.lock(player, player.getName().getString() + "_MinecartLock", LockPriority.MEDIUM);
                 setState(RushMinecartState.RUSHING);
                 break;
 

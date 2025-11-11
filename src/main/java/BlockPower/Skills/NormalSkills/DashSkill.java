@@ -40,7 +40,7 @@ public class DashSkill implements ISkill, IPacketSerializable {
 
     @Override
     public SkillExecutionResult triggerSkill(ServerPlayer player) {
-        if (Commons.isSpectatorOrCreativeMode(player)) return SkillExecutionResult.fail("Player is Spectator or Creative Mode");
+        if (Commons.isSpectatorOrCreativeMode(player)) return SkillExecutionResult.fail("Spectator or Creative mode cannot use DashSkill");
         taskManager.runOnceWithCooldown(player, "dashingCoolDown", 10, () -> {
             Vec3 lookAngle = player.getLookAngle().normalize();
             //根据玩家的最后方向输入决定冲刺方向

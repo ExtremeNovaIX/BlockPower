@@ -71,8 +71,16 @@ public class KeyBindings {
             BLOCKPOWER_KEY
     );
 
-    public static final KeyMapping BARRIER_WALL = new KeyMapping(
-            "key.blockpower.barrier_wall",
+//    public static final KeyMapping BARRIER_WALL = new KeyMapping(
+//            "key.blockpower.barrier_wall",
+//            KeyConflictContext.IN_GAME,
+//            InputConstants.Type.KEYSYM,
+//            InputConstants.KEY_C,
+//            BLOCKPOWER_KEY
+//    );
+
+    public static final KeyMapping FLY = new KeyMapping(
+            "key.blockpower.fly",
             KeyConflictContext.IN_GAME,
             InputConstants.Type.KEYSYM,
             InputConstants.KEY_C,

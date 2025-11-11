@@ -1,30 +1,19 @@
 package BlockPower.Skills.NormalSkills;
 
+import BlockPower.Capability.ModCapabilities;
 import BlockPower.Skills.IPacketSerializable;
 import BlockPower.Skills.MinerState.server.AllResourceType;
 import BlockPower.Skills.SkillExecutionResult;
-import BlockPower.Util.TaskManager;
+import BlockPower.Skills.SkillLock.SkillLockManager;
 import BlockPower.Util.Timer.TimerManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.WeakHashMap;
-
-public class AirJumpSkill implements ISkill, IPacketSerializable {
-
-    public static final Map<Player, Integer> playerAirTicks = new WeakHashMap<>();//记录玩家滞空时间
-
-    private static final TaskManager taskManager = TaskManager.getInstance(false);
-
-    private static final Logger log = LoggerFactory.getLogger(AirJumpSkill.class);
-
+public class AirJumpSkill implements IPacketSerializable, ISkill {
+    public static final String SKILL_ID = "AirJump";
     private static final TimerManager timerManager = TimerManager.getInstance(false);
 
     private String keyResult;
@@ -53,52 +42,37 @@ public class AirJumpSkill implements ISkill, IPacketSerializable {
 
     @Override
     public SkillExecutionResult triggerSkill(ServerPlayer player) {
-        if (!player.onGround() && AirJumpSkill.getPlayerAirTicks(player) >= 3) {
-            taskManager.runOnce(player, "airJump", () -> {
-                Vec3 motion;
-                if (keyResult.equals("w")) {
-                    motion = new Vec3(player.getDeltaMovement().x * 6, 0.8, player.getDeltaMovement().z * 6);
-                } else {
-                    motion = new Vec3(0, 0.9, 0);
+        if (!player.onGround()) {
+            player.getCapability(ModCapabilities.PLAYER_AIR_JUMP_DATA).ifPresent(airJumpData -> {
+                int serverJumpCount = airJumpData.getJumpCount();
+
+                if (serverJumpCount == 1) {
+                    DoubleJump(player);
+                } else if (serverJumpCount == 2) {
+                    if (SkillLockManager.isLocked(player, SKILL_ID)) {
+                        return;
+                    }
+                    TripleJump(player);
                 }
-                player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), motion));
-                timerManager.setTimer(player, "noFallDamage", 100);
+                airJumpData.incrementJumpCount();
             });
         }
         return SkillExecutionResult.success();
     }
 
-    /**
-     * 处理玩家空中跳跃计时器逻辑，在专门的event类调用
-     *
-     * @param player 目标玩家
-     */
-    public static void handleAirJump(ServerPlayer player) {
-        if (player.onGround() && taskManager.queryRemainExecutions(player, "airJump") == 0) {
-            taskManager.flushTasks(player, "airJump");
-        }
+    private void TripleJump(ServerPlayer player) {
 
-        if (player.onGround()) {
-            // 如果玩家在地上，移除计时器
-            playerAirTicks.remove(player);
+    }
+
+    private void DoubleJump(ServerPlayer player) {
+        Vec3 motion;
+        if (keyResult.equals("w")) {
+            motion = new Vec3(player.getDeltaMovement().x * 6, 0.8, player.getDeltaMovement().z * 6);
         } else {
-            // 如果玩家在空中，将计时器+1
-            playerAirTicks.merge(player, 1, Integer::sum);
+            motion = new Vec3(0, 1, 0);
         }
-    }
-
-    public String getKeyResult() {
-        return keyResult;
-    }
-
-    /**
-     * 获取玩家的滞空时长
-     *
-     * @param player 目标玩家
-     * @return 玩家在空中的tick数，如果在地上则为0
-     */
-    public static int getPlayerAirTicks(Player player) {
-        return playerAirTicks.getOrDefault(player, 0);
+        player.connection.send(new ClientboundSetEntityMotionPacket(player.getId(), motion));
+        timerManager.setTimer(player, "noFallDamage", 100);
     }
 
     @Override
@@ -128,7 +102,6 @@ public class AirJumpSkill implements ISkill, IPacketSerializable {
 
     @Override
     public void recordCombo(ServerPlayer player) {
-
     }
 
     @Override
@@ -141,7 +114,7 @@ public class AirJumpSkill implements ISkill, IPacketSerializable {
         return 0;
     }
 
-     @Override
+    @Override
     public boolean isMustMainHandItemPixelCore() {
         return false;
     }
