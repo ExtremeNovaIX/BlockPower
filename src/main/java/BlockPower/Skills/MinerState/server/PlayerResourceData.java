@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class PlayerResourceData {
     // 用于存储每种资源的真实数量。
-    public final Map<AllResourceType, Double> trueResourceCounts = new EnumMap<>(AllResourceType.class);
+    public final Map<ResourceType, Double> trueResourceCounts = new EnumMap<>(ResourceType.class);
 
     // 每次获取资源时增加的量。
     private static final double RESOURCE_GAIN_AMOUNT = 1.0;
@@ -22,7 +22,7 @@ public class PlayerResourceData {
      * 构造函数，初始化所有资源的真实数量为0。
      */
     public PlayerResourceData() {
-        for (AllResourceType type : AllResourceType.values()) {
+        for (ResourceType type : ResourceType.values()) {
             trueResourceCounts.put(type, 0.0);
         }
     }
@@ -32,7 +32,7 @@ public class PlayerResourceData {
      *
      * @param type 要增加的资源类型。
      */
-    public void addResource(AllResourceType type) {
+    public void addResource(ResourceType type) {
         // 获取当前数量和该资源类型的独立上限
         double currentAmount = trueResourceCounts.getOrDefault(type, 0.0);
         double maxAmount = type.getMaxAmount(); // 从枚举中获取上限
@@ -55,7 +55,7 @@ public class PlayerResourceData {
      *
      * @return 一个包含所有资源类型及其真实数量的Map。
      */
-    public Map<AllResourceType, Double> getResourceCounts() {
+    public Map<ResourceType, Double> getResourceCounts() {
         return new EnumMap<>(trueResourceCounts);
     }
 
@@ -64,7 +64,7 @@ public class PlayerResourceData {
      */
     public static double getTotalMaxAmount() {
         double totalMax = 0;
-        for (AllResourceType type : AllResourceType.getNormalResourceType()) {
+        for (ResourceType type : ResourceType.getNormalResourceType()) {
             totalMax += type.getMaxAmount();
         }
         return totalMax;
@@ -86,7 +86,7 @@ public class PlayerResourceData {
      * @param amount 需要检查的数量
      * @return 是否足够
      */
-    public boolean hasEnoughResource(AllResourceType type, double amount) {
+    public boolean hasEnoughResource(ResourceType type, double amount) {
         Double currentAmount = trueResourceCounts.get(type);
         return currentAmount != null && currentAmount >= amount;
     }
@@ -98,12 +98,12 @@ public class PlayerResourceData {
      * @param amount 要消耗的数量
      * @return 是否成功消耗（如果资源不足则返回false）
      */
-    public boolean consumeResource(AllResourceType type, double amount, ServerPlayer player) {
+    public boolean consumeResource(ResourceType type, double amount, ServerPlayer player) {
         if (!hasEnoughResource(type, amount)) {
             return false;
         }
         trueResourceCounts.compute(type, (k, v) -> v - amount);
-        ModMessages.sendToPlayer(new ResourceSyncPacket_S2C(trueResourceCounts), player);
+        ModMessages.sendToPlayer(new ResourceSyncPacket_S2C(true, trueResourceCounts), player);
         return true;
     }
 }

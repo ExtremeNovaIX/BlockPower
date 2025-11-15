@@ -9,9 +9,9 @@ import java.util.List;
  * 定义了玩家可以收集的资源类型。
  * 枚举在此处声明的顺序决定了资源在UI资源条上的渲染顺序。
  */
-public enum AllResourceType {
+public enum ResourceType {
     DIRT(Items.DIRT, 100),
-    WOOD(Items.OAK_PLANKS, 50),
+    WOOD(Items.OAK_PLANKS, 20),
     STONE(Items.COBBLESTONE, 70),
     IRON(Items.RAW_IRON, 100),
     GOLD(Items.RAW_GOLD, 16),
@@ -22,7 +22,7 @@ public enum AllResourceType {
 
     private final Item correspondingItem;// 每种资源类型在游戏中对应的物品实例
 
-    AllResourceType(Item item, int maxAmount) {
+    ResourceType(Item item, int maxAmount) {
         this.correspondingItem = item;
         this.maxAmount = maxAmount;
     }
@@ -40,15 +40,15 @@ public enum AllResourceType {
         return this.correspondingItem;
     }
 
-    public static List<AllResourceType> getNormalResourceType() {
+    public static List<ResourceType> getNormalResourceType() {
         return List.of(DIRT, WOOD, STONE, IRON);
     }
 
-    public static List<AllResourceType> getPreciousResourceType() {
+    public static List<ResourceType> getPreciousResourceType() {
         return List.of(GOLD, DIAMOND, NETHERITE);
     }
 
-    public static List<AllResourceType> getNoCompressionResourceType() {
+    public static List<ResourceType> getNoCompressionResourceType() {
         return List.of(IRON, GOLD, DIAMOND, NETHERITE);
     }
 

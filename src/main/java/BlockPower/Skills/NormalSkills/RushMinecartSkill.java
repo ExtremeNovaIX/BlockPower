@@ -3,10 +3,8 @@ package BlockPower.Skills.NormalSkills;
 import BlockPower.ModEntities.RushMinecartEntity;
 import BlockPower.Skills.ComboSkills.ComboManager.PlayerComboManager;
 import BlockPower.Skills.ComboSkills.ComboSkillType;
-import BlockPower.Skills.IPacketSerializable;
-import BlockPower.Skills.MinerState.server.AllResourceType;
+import BlockPower.Skills.MinerState.server.ResourceType;
 import BlockPower.Skills.SkillExecutionResult;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,8 +31,8 @@ public class RushMinecartSkill implements ISkill {
     }
 
     @Override
-    public AllResourceType getSkillCostType() {
-        return AllResourceType.IRON;
+    public ResourceType getSkillCostType() {
+        return ResourceType.IRON;
     }
 
     @Override

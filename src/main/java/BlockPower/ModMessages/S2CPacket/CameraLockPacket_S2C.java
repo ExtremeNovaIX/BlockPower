@@ -1,6 +1,6 @@
 package BlockPower.ModMessages.S2CPacket;
 
-import BlockPower.Util.ClientCameraTrackingManager;
+import BlockPower.Client.ClientCameraTrackingManager;
 import net.minecraft.network.FriendlyByteBuf;
 
 public class CameraLockPacket_S2C extends AbstractS2CPacket {

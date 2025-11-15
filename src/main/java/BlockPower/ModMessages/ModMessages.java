@@ -117,12 +117,6 @@ public class ModMessages {
                 .consumerMainThread(ShakePacket_S2C::handle)
                 .add();
 
-        net.messageBuilder(MinerStateSyncPacket_S2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(MinerStateSyncPacket_S2C::new)
-                .encoder(MinerStateSyncPacket_S2C::toBytes)
-                .consumerMainThread(MinerStateSyncPacket_S2C::handle)
-                .add();
-
         net.messageBuilder(SyncKnockbackValueS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(SyncKnockbackValueS2CPacket::new)
                 .encoder(SyncKnockbackValueS2CPacket::toBytes)

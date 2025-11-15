@@ -1,14 +1,10 @@
 package BlockPower.ModMessages.C2SPacket;
 
-import BlockPower.ModMessages.ModMessages;
-import BlockPower.ModMessages.S2CPacket.MinerStateSyncPacket_S2C;
+import BlockPower.Capability.ModCapabilities;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static BlockPower.Skills.MinerState.server.MinerStateEvent.minerStateMap;
-
 
 public class ChangeMinerStatePacket_C2S extends AbstractC2SPacket {
 
@@ -26,10 +22,12 @@ public class ChangeMinerStatePacket_C2S extends AbstractC2SPacket {
 
     @Override
     protected void handleServerSide(ServerPlayer player) {
-        boolean b = !minerStateMap.getOrDefault(player, false);
-        minerStateMap.put(player, b);
-        // 同步客户端状态
-        ModMessages.sendToPlayer(new MinerStateSyncPacket_S2C(b), player);
-        LOGGER.info("{} changed miner state to {}", player.getGameProfile().getName(), b);
+        // 从Capability系统中获取当前的MinerState
+        player.getCapability(ModCapabilities.PLAYER_MINER_STATE).ifPresent(minerState -> {
+            // 计算新的状态并设置
+            boolean newState = !minerState.isMinerMode();
+            minerState.setMinerMode(newState, player);
+            LOGGER.info("{} changed miner state to {}", player.getGameProfile().getName(), newState);
+        });
     }
 }

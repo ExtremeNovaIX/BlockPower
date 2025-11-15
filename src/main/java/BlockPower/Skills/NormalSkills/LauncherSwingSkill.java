@@ -1,6 +1,5 @@
 package BlockPower.Skills.NormalSkills;
 
-import BlockPower.Skills.IPacketSerializable;
 import BlockPower.Util.KBUtils;
 import BlockPower.Util.ModEffects.ServerEffect.SpringAttractionEffect;
 import BlockPower.ModItems.ModItems;
@@ -10,13 +9,12 @@ import BlockPower.ModMessages.S2CPacket.HitStopPacket_S2C;
 import BlockPower.ModMessages.S2CPacket.ShakePacket_S2C;
 import BlockPower.ModSounds.ModSounds;
 import BlockPower.Skills.ComboSkills.ComboSkillType;
-import BlockPower.Skills.MinerState.server.AllResourceType;
+import BlockPower.Skills.MinerState.server.ResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import BlockPower.Skills.ComboSkills.ComboManager.PlayerComboManager;
 import BlockPower.Util.Commons;
 import BlockPower.Util.ModEffects.ModEffectManager;
 import BlockPower.Util.TaskManager;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
@@ -88,7 +86,7 @@ public class LauncherSwingSkill implements ISkill {
 
 
     @Override
-    public AllResourceType getSkillCostType() {
+    public ResourceType getSkillCostType() {
         return null;
     }
 

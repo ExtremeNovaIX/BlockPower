@@ -1,4 +1,4 @@
-package BlockPower.Util;
+package BlockPower.Client;
 
 import BlockPower.Util.Timer.TickListener;
 import net.minecraft.client.Minecraft;

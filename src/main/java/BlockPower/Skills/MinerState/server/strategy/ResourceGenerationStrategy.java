@@ -1,9 +1,9 @@
 package BlockPower.Skills.MinerState.server.strategy;
 
-import BlockPower.Skills.MinerState.server.AllResourceType;
+import BlockPower.Skills.MinerState.server.ResourceType;
 
 public interface ResourceGenerationStrategy {
-    AllResourceType generateResource();
+    ResourceType generateResource();
 
     Integer getDigCoolDown();
 }

@@ -1,7 +1,7 @@
 package BlockPower.Skills.NormalSkills;
 
 import BlockPower.Capability.IPlayerAccessor;
-import BlockPower.Skills.MinerState.server.AllResourceType;
+import BlockPower.Skills.MinerState.server.ResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import BlockPower.Skills.SkillLock.LockPriority;
 import BlockPower.Skills.SkillLock.SkillLockManager;
@@ -55,8 +55,8 @@ public class FlySkill implements ISkill {
     }
 
     @Override
-    public AllResourceType getSkillCostType() {
-        return AllResourceType.DIAMOND;
+    public ResourceType getSkillCostType() {
+        return ResourceType.DIAMOND;
     }
 
     @Override

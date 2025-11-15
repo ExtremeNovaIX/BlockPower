@@ -40,7 +40,6 @@ public class PlayerResourceManager {
     }
 
 
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

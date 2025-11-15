@@ -1,7 +1,7 @@
 package BlockPower.Skills.NormalSkills;
 
 import BlockPower.Skills.IPacketSerializable;
-import BlockPower.Skills.MinerState.server.AllResourceType;
+import BlockPower.Skills.MinerState.server.ResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import BlockPower.Util.Commons;
 import BlockPower.Util.TaskManager;
@@ -74,7 +74,7 @@ public class DashSkill implements ISkill, IPacketSerializable {
     }
 
     @Override
-    public AllResourceType getSkillCostType() {
+    public ResourceType getSkillCostType() {
         return null;
     }
 

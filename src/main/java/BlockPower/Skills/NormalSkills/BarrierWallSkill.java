@@ -1,12 +1,10 @@
 package BlockPower.Skills.NormalSkills;
 
 import BlockPower.ModBlocks.ModBlocks;
-import BlockPower.Skills.IPacketSerializable;
-import BlockPower.Skills.MinerState.server.AllResourceType;
+import BlockPower.Skills.MinerState.server.ResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import BlockPower.Util.TaskManager;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -148,8 +146,8 @@ public class BarrierWallSkill implements ISkill{
     }
 
     @Override
-    public AllResourceType getSkillCostType() {
-        return AllResourceType.STONE;
+    public ResourceType getSkillCostType() {
+        return ResourceType.STONE;
     }
 
     @Override

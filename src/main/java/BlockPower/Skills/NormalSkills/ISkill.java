@@ -1,6 +1,6 @@
 package BlockPower.Skills.NormalSkills;
 
-import BlockPower.Skills.MinerState.server.AllResourceType;
+import BlockPower.Skills.MinerState.server.ResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +28,7 @@ public interface ISkill {
     SkillExecutionResult triggerSkill(ServerPlayer player);
 
     // 获取技能消耗 - 返回资源类型
-    AllResourceType getSkillCostType();
+    ResourceType getSkillCostType();
 
     // 获取技能消耗数量
     double getSkillCostAmount();

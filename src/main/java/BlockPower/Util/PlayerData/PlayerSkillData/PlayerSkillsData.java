@@ -1,6 +1,6 @@
 package BlockPower.Util.PlayerData.PlayerSkillData;
 
-import BlockPower.Skills.MinerState.server.AllResourceType;
+import BlockPower.Skills.MinerState.server.ResourceType;
 
 public class PlayerSkillsData{
     //TODO 完善forge能力系统的存取
@@ -12,7 +12,7 @@ public class PlayerSkillsData{
 
     }
 
-    public static AllResourceType getSkillCostType() {
+    public static ResourceType getSkillCostType() {
         return null;
     }
 

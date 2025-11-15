@@ -2,7 +2,7 @@ package BlockPower.Skills.NormalSkills;
 
 import BlockPower.Capability.ModCapabilities;
 import BlockPower.Skills.IPacketSerializable;
-import BlockPower.Skills.MinerState.server.AllResourceType;
+import BlockPower.Skills.MinerState.server.ResourceType;
 import BlockPower.Skills.SkillExecutionResult;
 import BlockPower.Skills.SkillLock.SkillLockManager;
 import BlockPower.Util.Timer.TimerManager;
@@ -86,7 +86,7 @@ public class AirJumpSkill implements IPacketSerializable, ISkill {
     }
 
     @Override
-    public AllResourceType getSkillCostType() {
+    public ResourceType getSkillCostType() {
         return null;
     }
 

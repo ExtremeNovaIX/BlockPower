@@ -18,9 +18,13 @@ public class ModCapabilities {
     public static final Capability<IPlayerAirJumpData> PLAYER_AIR_JUMP_DATA = CapabilityManager.get(new CapabilityToken<>() {
     });
 
+    public static final Capability<IPlayerMinerState> PLAYER_MINER_STATE = CapabilityManager.get(new CapabilityToken<>() {
+    });
+
     @SubscribeEvent
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.register(IKBPercent.class);
         event.register(IPlayerAirJumpData.class);
+        event.register(IPlayerMinerState.class);
     }
 }

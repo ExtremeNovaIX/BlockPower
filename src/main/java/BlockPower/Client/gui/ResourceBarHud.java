@@ -3,7 +3,7 @@ package BlockPower.Client.gui;
 import BlockPower.Main.Main;
 import BlockPower.Skills.MinerState.client.ClientMinerState;
 import BlockPower.Skills.MinerState.client.ClientResourceData;
-import BlockPower.Skills.MinerState.server.AllResourceType;
+import BlockPower.Skills.MinerState.server.ResourceType;
 import BlockPower.Skills.MinerState.server.PlayerResourceData;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -40,7 +40,7 @@ public class ResourceBarHud {
                 return;
             }
 
-            Map<AllResourceType, Double> resourceCounts = ClientResourceData.getResources();
+            Map<ResourceType, Double> resourceCounts = ClientResourceData.getResources();
             if (resourceCounts.isEmpty() || resourceCounts.values().stream().allMatch(v -> v <= 0)) {
                 return;
             }
@@ -70,11 +70,11 @@ public class ResourceBarHud {
     /**
      * 使用累积计算的方式填充资源条，以消除舍入误差。
      */
-    private static void fillHudResourceBar(Map<AllResourceType, Double> resourceCounts, int barX, int barY, int barTotalWidth, int barHeight) {
+    private static void fillHudResourceBar(Map<ResourceType, Double> resourceCounts, int barX, int barY, int barTotalWidth, int barHeight) {
         double barCapacity = PlayerResourceData.getTotalMaxAmount();
         double accumulatedAmount = 0.0; // 用于累积已计算的资源量
 
-        for (AllResourceType type : AllResourceType.getNormalResourceType()) {
+        for (ResourceType type : ResourceType.getNormalResourceType()) {
             double visualAmount = resourceCounts.getOrDefault(type, 0.0);
             if (visualAmount <= 0) continue;
 
@@ -102,7 +102,7 @@ public class ResourceBarHud {
     /**
      * 在指定位置绘制特殊资源（金、钻石、下界合金）的图标和数量角标。
      */
-    private static void drawPreciousResourceIcons(GuiGraphics guiGraphics, Map<AllResourceType, Double> resourceData, int startX, int startY) {
+    private static void drawPreciousResourceIcons(GuiGraphics guiGraphics, Map<ResourceType, Double> resourceData, int startX, int startY) {
         Minecraft mc = Minecraft.getInstance();
         int iconSize = 12;
         int spacing = 2;
@@ -112,7 +112,7 @@ public class ResourceBarHud {
         int scaledX = (int) (startX / scale);
         int scaledY = (int) (startY / scale);
         int currentX = scaledX;
-        for (AllResourceType type : AllResourceType.getPreciousResourceType()) {
+        for (ResourceType type : ResourceType.getPreciousResourceType()) {
             double amount = resourceData.getOrDefault(type, 0.0);
             if (amount <= 0) continue;
             int count = (int) Math.floor(amount);
@@ -130,7 +130,7 @@ public class ResourceBarHud {
     /**
      * 根据资源类型获取对应的渲染材质。
      */
-    private static TextureAtlasSprite getSpriteForResource(AllResourceType type) {
+    private static TextureAtlasSprite getSpriteForResource(ResourceType type) {
         Minecraft mc = Minecraft.getInstance();
         return switch (type) {
             case DIRT ->
