@@ -1,13 +1,19 @@
 package BlockPower.Events.SkillEvents;
 
-import BlockPower.Capability.IPlayerMinerState;
+import BlockPower.Capability.IPixelCoreLevel;
+import BlockPower.Capability.MinerState.IPlayerMinerState;
 import BlockPower.Capability.ModCapabilities;
 import BlockPower.ModEntities.FakeItem;
+import BlockPower.ModItems.ModItems;
+import BlockPower.ModItems.PixelCore.PixelCoreSkillState;
 import BlockPower.Skills.MinerState.client.ClientMinerState;
 import BlockPower.Skills.MinerState.server.ResourceType;
 import BlockPower.Skills.MinerState.server.strategy.ResourceGenerationStrategy;
 import BlockPower.Skills.MinerState.server.strategy.ResourceStrategyFactory;
+import BlockPower.Util.Commons;
 import BlockPower.Util.TaskManager;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -34,26 +40,41 @@ public class MinerStateEvent {
                 event.setNewSpeed(0F);
             }
         } else {
+            if (player.getMainHandItem().getItem() != ModItems.PIXEL_CORE.get()) {
+                return;
+            }
+
             player.getCapability(ModCapabilities.PLAYER_MINER_STATE).ifPresent(minerState -> {
                 if (minerState.isMinerMode()) {
                     event.setNewSpeed(0F);
-                    ResourceGenerationStrategy strategy = ResourceStrategyFactory.getStrategy(player.getMainHandItem());
-                    taskManager.runOnceWithCooldown(player, "minerState", strategy.getDigCoolDown(), () -> {
-                        ResourceType result = strategy.generateResource();
-                        spawnSource(event, (ServerPlayer) player, result, minerState);
+
+                    player.getMainHandItem().getCapability(ModCapabilities.PIXEL_CORE_LEVEL).ifPresent(coreLevel -> {
+                        int level = coreLevel.getLevel();
+                        ResourceGenerationStrategy strategy = ResourceStrategyFactory.getStrategy(level);
+                        Commons.changePixelCoreNBT(player, PixelCoreSkillState.TOOL, 2.0f, (float) level);
+
+                        taskManager.runOnceWithCooldown(player, "minerState", strategy.getDigCoolDown(), () -> {
+                            ResourceType result = strategy.generateResource();
+                            spawnSource(event, (ServerPlayer) player, result, minerState, coreLevel);
+                        });
                     });
                 }
             });
         }
     }
 
-    private static void spawnSource(PlayerEvent.BreakSpeed event, ServerPlayer player, ResourceType result, IPlayerMinerState minerState) {
+    private static void spawnSource(PlayerEvent.BreakSpeed event, ServerPlayer player, ResourceType result, IPlayerMinerState minerState, IPixelCoreLevel coreLevel) {
         Level level = player.level();
-        
-        // 数据更新：调用Capability的方法，并传入player以触发同步
+
         minerState.addResource(result, player);
 
-        // 视觉与音效表现
+        // 自动升级逻辑（暂定）
+        int resourceLevel = result.getLevel();
+        int currentCoreLevel = coreLevel.getLevel();
+        if (resourceLevel > currentCoreLevel) {
+            coreLevel.setLevel(resourceLevel);
+        }
+
         Vec3 position = event.getPosition().get().getCenter().add(0, 0.4, 0);
         Vec3 velocity = new Vec3(0, 0.35, 0);
         ItemStack displayStack = new ItemStack(result.getCorrespondingItem());

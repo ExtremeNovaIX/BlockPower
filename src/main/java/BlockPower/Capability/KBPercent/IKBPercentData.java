@@ -1,4 +1,4 @@
-package BlockPower.Capability;
+package BlockPower.Capability.KBPercent;
 
 import net.minecraft.network.syncher.EntityDataAccessor;
 

@@ -1,4 +1,4 @@
-package BlockPower.Capability;
+package BlockPower.Capability.MinerState;
 
 import BlockPower.Skills.MinerState.server.ResourceType;
 import net.minecraft.server.level.ServerPlayer;

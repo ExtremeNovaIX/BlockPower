@@ -1,5 +1,6 @@
-package BlockPower.Capability;
+package BlockPower.Capability.MinerState;
 
+import BlockPower.Capability.ModCapabilities;
 import BlockPower.Skills.MinerState.server.ResourceType;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;

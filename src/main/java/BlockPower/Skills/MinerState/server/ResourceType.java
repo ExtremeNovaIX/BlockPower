@@ -10,34 +10,34 @@ import java.util.List;
  * 枚举在此处声明的顺序决定了资源在UI资源条上的渲染顺序。
  */
 public enum ResourceType {
-    DIRT(Items.DIRT, 100),
-    WOOD(Items.OAK_PLANKS, 20),
-    STONE(Items.COBBLESTONE, 70),
-    IRON(Items.RAW_IRON, 100),
-    GOLD(Items.RAW_GOLD, 16),
-    DIAMOND(Items.DIAMOND, 8),
-    NETHERITE(Items.NETHERITE_SCRAP, 4);
+    DIRT(Items.DIRT, 100, 0),
+    WOOD(Items.OAK_PLANKS, 20, 1),
+    STONE(Items.COBBLESTONE, 70, 2),
+    GOLD(Items.RAW_GOLD, 16, 3),
+    IRON(Items.RAW_IRON, 100, 4),
+    DIAMOND(Items.DIAMOND, 8, 5),
+    NETHERITE(Items.NETHERITE_SCRAP, 4, 6);
 
-    private final int maxAmount;//每种资源的最大数量
+    private final int maxAmount;
+    private final Item correspondingItem;
+    private final int level;
 
-    private final Item correspondingItem;// 每种资源类型在游戏中对应的物品实例
-
-    ResourceType(Item item, int maxAmount) {
+    ResourceType(Item item, int maxAmount, int level) {
         this.correspondingItem = item;
         this.maxAmount = maxAmount;
+        this.level = level;
     }
 
     public int getMaxAmount() {
         return this.maxAmount;
     }
 
-    /**
-     * 获取此资源类型对应的虚拟物品实例。
-     *
-     * @return 对应的Item对象，用于生成ItemStack。
-     */
     public Item getCorrespondingItem() {
         return this.correspondingItem;
+    }
+
+    public int getLevel() {
+        return this.level;
     }
 
     public static List<ResourceType> getNormalResourceType() {
@@ -47,9 +47,4 @@ public enum ResourceType {
     public static List<ResourceType> getPreciousResourceType() {
         return List.of(GOLD, DIAMOND, NETHERITE);
     }
-
-    public static List<ResourceType> getNoCompressionResourceType() {
-        return List.of(IRON, GOLD, DIAMOND, NETHERITE);
-    }
-
 }

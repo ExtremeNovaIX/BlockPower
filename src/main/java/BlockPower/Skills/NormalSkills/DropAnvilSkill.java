@@ -37,7 +37,7 @@ public class DropAnvilSkill implements ISkill {
 
     @Override
     public double getSkillCostAmount() {
-        return 10;
+        return 8;
     }
 
     @Override

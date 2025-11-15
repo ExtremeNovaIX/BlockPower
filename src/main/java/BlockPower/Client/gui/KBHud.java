@@ -1,6 +1,6 @@
 package BlockPower.Client.gui;
 
-import BlockPower.Capability.IKBPercentData;
+import BlockPower.Capability.KBPercent.IKBPercentData;
 import BlockPower.Capability.ModCapabilities;
 import BlockPower.Skills.MinerState.client.ClientMinerState;
 import com.mojang.blaze3d.vertex.PoseStack;

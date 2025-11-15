@@ -1,4 +1,4 @@
-package BlockPower.Capability;
+package BlockPower.Capability.MinerState;
 
 import BlockPower.ModMessages.ModMessages;
 import BlockPower.ModMessages.S2CPacket.ResourceSyncPacket_S2C;

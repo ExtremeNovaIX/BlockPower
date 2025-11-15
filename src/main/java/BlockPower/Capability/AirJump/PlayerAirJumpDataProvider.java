@@ -1,5 +1,6 @@
-package BlockPower.Capability;
+package BlockPower.Capability.AirJump;
 
+import BlockPower.Capability.ModCapabilities;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.capabilities.Capability;

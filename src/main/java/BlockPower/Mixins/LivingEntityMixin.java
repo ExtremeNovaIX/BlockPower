@@ -1,6 +1,6 @@
 package BlockPower.Mixins;
 
-import BlockPower.Capability.IKBPercentData;
+import BlockPower.Capability.KBPercent.IKBPercentData;
 import BlockPower.Capability.IPlayerAccessor;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;

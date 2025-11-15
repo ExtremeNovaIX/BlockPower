@@ -1,4 +1,4 @@
-package BlockPower.Capability;
+package BlockPower.Capability.AirJump;
 
 /**
  * IPlayerAirJumpData 接口的默认实现。

@@ -1,6 +1,6 @@
-package BlockPower.ModEvents;
+package BlockPower.Events;
 
-import BlockPower.Capability.IKBPercentData;
+import BlockPower.Capability.KBPercent.IKBPercentData;
 import BlockPower.Capability.KBPercent.KBPercentProvider;
 import BlockPower.Capability.ModCapabilities;
 import BlockPower.Main.Main;

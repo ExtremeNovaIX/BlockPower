@@ -1,4 +1,4 @@
-package BlockPower.Capability;
+package BlockPower.Capability.AirJump;
 
 /**
  * 该接口定义了玩家空中跳跃数据的能力。

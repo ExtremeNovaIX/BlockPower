@@ -53,14 +53,15 @@ public class NormalSkillPacket_C2S extends AbstractSkillPacket_C2S {
     @Override
     protected void handleServerSide(ServerPlayer player) {
         SkillExecutionResult skillExecutionResult = skill.triggerSkill(player);
-        if (!skillExecutionResult.isSuccess()) {
+        if (skillExecutionResult.isSuccess()) {
+            // 检查是否需要消耗资源
+            if (this.isSkillConsumeResource()) {
+                consumeResource(player, skill);
+            }
+            // 记录连击次数
+            skill.recordCombo(player);
+        } else {
             throw new SilentSkillException(skill, skillExecutionResult.getMessage());
         }
-        // 检查是否需要消耗资源
-        if (this.isSkillConsumeResource()) {
-            consumeResource(player, skill);
-        }
-        // 记录连击次数
-        skill.recordCombo(player);
     }
 }
